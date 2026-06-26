@@ -173,14 +173,61 @@ def _location_fingerprint(loc: IssueLocation) -> str:
     return f"{material}||{tail}||{value}"
 
 
+# 通用的"缺失/未填写"占位符。模型在这些情况下没有给出可区分的 value，
+# 必须把 issue_summary 纳入聚类 key，否则不同字段的缺失会被错误合并成一条。
+GENERIC_MISSING_VALUES = {
+    "",
+    "缺失",
+    "字段缺失",
+    "未填写",
+    "未填",
+    "空",
+    "无",
+    "null",
+    "None",
+    "N/A",
+    "n/a",
+    "NA",
+}
+
+
+def _is_coarse_location(loc: IssueLocation) -> bool:
+    """location 是否粗粒度（≤1 段路径），或 value 是通用缺失占位符。
+
+    这两种情况下，仅凭 (material, location, value) 无法区分不同字段的问题，
+    需要把 issue_summary 拉进聚类 key 才能避免错误合并。
+    """
+    import re
+
+    path = (loc.location or "").strip()
+    if path.startswith("[") and path.endswith("]"):
+        path = path[1:-1].strip()
+    path = re.sub(r"\[\d+\]", "", path)
+    parts = [p for p in path.split(".") if p]
+    coarse = len(parts) <= 1
+
+    value = (loc.value or "").strip()
+    generic_value = value in GENERIC_MISSING_VALUES
+
+    return coarse or generic_value
+
+
 def _issue_cluster_key(issue: Issue) -> str:
-    """整个 Issue 的聚类 key：把所有 location 指纹排序拼接。"""
+    """整个 Issue 的聚类 key：把所有 location 指纹排序拼接。
+
+    降级规则：若所有 location 都是粗粒度（表级路径）或 value 为通用缺失占位符，
+    则把 issue_summary[:48] 纳入 key，避免不同字段的"缺失"问题被错误合并成一条。
+    """
     if not issue.issue_location:
         return f"NOLOC||{issue.issue_summary[:24]}"
     fps = sorted(_location_fingerprint(l) for l in issue.issue_location)
+    base = " | ".join(fps)
     # 仅按 location 指纹合并，不考虑 risk_level
     # 不同规则发现同一事实时 risk_level 应一致（由后端按规则回填，几乎不冲突）
-    return " | ".join(fps)
+    coarse_all = all(_is_coarse_location(l) for l in issue.issue_location)
+    if coarse_all:
+        return f"{base} || SUMMARY:{(issue.issue_summary or '')[:48]}"
+    return base
 
 
 def _merge_issues(issues: list[Issue]) -> list[Issue]:

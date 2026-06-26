@@ -11,6 +11,7 @@ from ..services.user_rules import (
     add_user_rule,
     delete_user_rule,
     list_user_rules,
+    update_user_rule,
 )
 
 router = APIRouter(prefix="/api/user-rules", tags=["user-rules"])
@@ -21,6 +22,12 @@ class UserRuleCreate(BaseModel):
     applicable_materials: list = []
     rule_text: str
     risk_level: RiskLevel = "中风险"
+
+
+class UserRuleUpdate(BaseModel):
+    applicable_materials: Optional[list] = None
+    rule_text: Optional[str] = None
+    risk_level: Optional[RiskLevel] = None
 
 
 @router.get("")
@@ -38,6 +45,21 @@ def create_user_rule(payload: UserRuleCreate):
         rule_text=payload.rule_text,
         risk_level=payload.risk_level,
     )
+    return rule.model_dump()
+
+
+@router.put("/{rule_id}")
+def edit_user_rule(rule_id: str, payload: UserRuleUpdate):
+    if payload.rule_text is not None and not payload.rule_text.strip():
+        raise HTTPException(status_code=400, detail="规则内容不能为空")
+    rule = update_user_rule(
+        rule_id,
+        applicable_materials=payload.applicable_materials,
+        rule_text=payload.rule_text,
+        risk_level=payload.risk_level,
+    )
+    if rule is None:
+        raise HTTPException(status_code=404, detail=f"规则 {rule_id} 不存在")
     return rule.model_dump()
 
 

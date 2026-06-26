@@ -81,6 +81,30 @@ def delete_user_rule(rule_id: str) -> bool:
     return True
 
 
+def update_user_rule(
+    rule_id: str,
+    *,
+    applicable_materials: Optional[list[str]] = None,
+    rule_text: Optional[str] = None,
+    risk_level: Optional[RiskLevel] = None,
+) -> Optional[UserRule]:
+    """按 rule_id 局部更新用户规则。返回更新后的规则；找不到则返回 None。"""
+    rules = _load_all()
+    for i, r in enumerate(rules):
+        if r.rule_id != rule_id:
+            continue
+        if applicable_materials is not None:
+            r.applicable_materials = applicable_materials
+        if rule_text is not None:
+            r.rule_text = rule_text.strip()
+        if risk_level is not None:
+            r.risk_level = risk_level
+        rules[i] = r
+        _save_all(rules)
+        return r
+    return None
+
+
 def to_review_rule(ur: UserRule):
     """把 UserRule 转成 review_service 使用的 Rule。"""
     from .schemas import Rule
