@@ -67,7 +67,7 @@ def _build_issue_from_model(raw: dict, rules_by_id: dict, ) -> Optional[Issue]:
         issue_summary=str(raw.get("issue_summary", "") or "").strip(),
         risk_level=rule.risk_level,  # 后端回填
         rule_basis=RuleBasis(
-            basis_type="内置规则",
+            basis_type="用户新增规则" if rule_id.startswith("USER-") else "内置规则",
             basis_file=rule.basis_file or "",
             rule_text=rule.rule_text or "",
         ),

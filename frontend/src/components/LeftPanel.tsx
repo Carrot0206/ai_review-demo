@@ -76,6 +76,10 @@ export default function LeftPanel() {
       return [
         { value: '申报模板', label: '申报模板' },
         { value: '申请书', label: '申请书' },
+        {
+          value: '法律、行政法规、国家金融监督管理总局要求的其他文件',
+          label: '法律、行政法规、国家金融监督管理总局要求的其他文件',
+        },
       ]
     }
     return [
@@ -93,7 +97,7 @@ export default function LeftPanel() {
   const currentUploads = uploads
 
   async function refreshUploads() {
-    const list = await listUploads()
+    const list = await listUploads(process)
     setUploads(list)
   }
   async function refreshRules() {
@@ -104,11 +108,17 @@ export default function LeftPanel() {
 
   async function handleUpload(file: File) {
     try {
-      await uploadFile(file)
+      await uploadFile(file, { process })
       message.success(`${file.name} 上传成功`)
       await refreshUploads()
     } catch (e: any) {
-      message.error('上传失败：' + (e?.response?.data?.detail || e?.message))
+      const status = e?.response?.status
+      const detail = e?.response?.data?.detail || e?.message
+      if (status === 409) {
+        message.warning(detail || '同名文件已存在，未重复添加')
+      } else {
+        message.error('上传失败：' + detail)
+      }
     }
     return false // 阻止 antd 自带上传
   }
@@ -116,7 +126,19 @@ export default function LeftPanel() {
   async function handleLoadSamples() {
     try {
       const res = await loadSamples(process)
-      message.success(`已载入 ${res.files.length} 份样例材料`)
+      if (res.files.length > 0) {
+        message.success(`已载入 ${res.files.length} 份样例材料`)
+      }
+      if (res.skipped && res.skipped.length > 0) {
+        message.warning(
+          `${res.skipped.length} 份样例已存在被跳过：${res.skipped
+            .map((s) => s.name)
+            .join('、')}`,
+        )
+      }
+      if (res.files.length === 0 && (!res.skipped || res.skipped.length === 0)) {
+        message.info('未找到可载入的样例文件')
+      }
       await refreshUploads()
     } catch (e: any) {
       message.error('载入样例失败：' + (e?.response?.data?.detail || e?.message))
@@ -336,21 +358,25 @@ export default function LeftPanel() {
           </div>
         </div>
         <div className="panel-body">
-          <Dragger
-            multiple
-            beforeUpload={handleUpload}
-            showUploadList={false}
-            accept=".json,.pdf,.docx,.txt"
-            style={{ background: '#FAFBFF', borderColor: '#CBD5E1' }}
-          >
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined style={{ color: '#5B5BD6' }} />
-            </p>
-            <p style={{ fontSize: 13, color: 'var(--c-text)' }}>点击或拖拽上传材料</p>
-            <p style={{ fontSize: 12, color: 'var(--c-text-3)' }}>
-              支持 JSON / PDF / DOCX / TXT
-            </p>
-          </Dragger>
+          <div className={currentUploads.length > 0 ? 'dragger-compact' : ''}>
+            <Dragger
+              multiple
+              beforeUpload={handleUpload}
+              showUploadList={false}
+              accept=".json,.pdf,.docx,.txt"
+              style={{ background: '#FAFBFF', borderColor: '#CBD5E1' }}
+            >
+              <p className="ant-upload-drag-icon" style={{ marginBottom: 4 }}>
+                <InboxOutlined style={{ color: '#5B5BD6' }} />
+              </p>
+              <p style={{ fontSize: 13, color: 'var(--c-text)', margin: 0 }}>
+                点击或拖拽上传材料
+              </p>
+              <p style={{ fontSize: 12, color: 'var(--c-text-3)', margin: 0 }}>
+                支持 JSON / PDF / DOCX / TXT
+              </p>
+            </Dragger>
+          </div>
 
           {currentUploads.length > 0 && (
             <>
@@ -360,14 +386,20 @@ export default function LeftPanel() {
               <div className="upload-list">
                 {currentUploads.map((u) => (
                   <div key={u.file_id} className="upload-item">
-                    <span style={{ fontSize: 14 }}>📄</span>
-                    <span className="name">{u.original_name}</span>
-                    {u.material_type && (
-                      <Tag color="purple" style={{ marginRight: 0 }}>
-                        {u.material_type}
-                      </Tag>
-                    )}
-                    <span className="size">{fmtSize(u.size_bytes)}</span>
+                    <span className="icn">📄</span>
+                    <div className="meta">
+                      <div className="name" title={u.original_name}>
+                        {u.original_name}
+                      </div>
+                      <div className="sub">
+                        {u.material_type && (
+                          <Tag color="purple" style={{ marginRight: 6 }}>
+                            {u.material_type}
+                          </Tag>
+                        )}
+                        <span className="size">{fmtSize(u.size_bytes)}</span>
+                      </div>
+                    </div>
                     <Popconfirm
                       title="删除该文件？"
                       onConfirm={() => handleDelete(u.file_id)}

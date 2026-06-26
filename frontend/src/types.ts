@@ -46,16 +46,21 @@ export interface UserRule {
 export interface UploadMeta {
   file_id: string
   original_name: string
-  stored_name: string
-  ext: string
+  stored_name?: string
+  ext?: string
   size_bytes: number
   material_type?: string | null
+  process?: ProcessType | null
   uploaded_at: number
   segment_count?: number
+  segments_count?: number
+  size_human?: string
+  parse_status?: string
+  parse_error?: string | null
 }
 
 export interface RuleBasis {
-  basis_type: '内置规则' | '用户新增'
+  basis_type: '内置规则' | '用户新增规则'
   basis_file: string
   rule_text: string
 }

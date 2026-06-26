@@ -44,15 +44,21 @@ export async function deleteUserRule(rule_id: string) {
   return data
 }
 
-export async function listUploads(): Promise<UploadMeta[]> {
-  const { data } = await http.get('/upload')
+export async function listUploads(process?: ProcessType): Promise<UploadMeta[]> {
+  const { data } = await http.get('/upload', {
+    params: process ? { process } : undefined,
+  })
   return data
 }
 
-export async function uploadFile(file: File, material_type?: string): Promise<UploadMeta> {
+export async function uploadFile(
+  file: File,
+  opts?: { material_type?: string; process?: ProcessType },
+): Promise<UploadMeta> {
   const form = new FormData()
   form.append('file', file)
-  if (material_type) form.append('material_type', material_type)
+  if (opts?.material_type) form.append('material_type', opts.material_type)
+  if (opts?.process) form.append('process', opts.process)
   const { data } = await http.post('/upload', form, {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
@@ -69,7 +75,7 @@ export async function listSamples(): Promise<SampleListResponse> {
   return data
 }
 
-export async function loadSamples(process: ProcessType): Promise<{ process: ProcessType; files: UploadMeta[] }> {
+export async function loadSamples(process: ProcessType): Promise<{ process: ProcessType; files: UploadMeta[]; skipped?: { name: string; reason: string }[] }> {
   const { data } = await http.post('/samples/load', { process })
   return data
 }

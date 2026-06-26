@@ -1,11 +1,28 @@
 import { useState } from 'react'
 import { DownOutlined } from '@ant-design/icons'
-import type { Issue } from '../types'
+import type { Issue, RuleBasis } from '../types'
 
 function riskClass(level: string) {
   if (level === '高风险') return 'high'
   if (level === '中风险') return 'mid'
   return 'low'
+}
+
+/** 根据 basis 渲染：《文件》：规则内容；用户新增/无文件时只显示 rule_text。 */
+function renderBasisLine(b: RuleBasis) {
+  const file = (b.basis_file || '').trim()
+  const text = (b.rule_text || '').trim()
+  const isUser = b.basis_type === '用户新增规则' || file === '用户新增规则' || !file
+  if (isUser || !file) {
+    return <span>{text}</span>
+  }
+  return (
+    <span>
+      <span style={{ fontWeight: 600 }}>《{file}》</span>
+      <span style={{ margin: '0 4px', color: 'var(--c-text-3)' }}>：</span>
+      <span>{text}</span>
+    </span>
+  )
 }
 
 interface Props {
@@ -36,84 +53,77 @@ export default function IssueCard({ index, issue, defaultOpen = false }: Props) 
       </div>
       {open && (
         <div className="issue-body">
-          {/* 1. 问题原因 */}
+          {/* 1. 问题点位（合并 原问题原因 + 原问题点位） */}
           <div className="issue-section">
-            <div className="label">① 问题原因</div>
-            <div className="content">
-              {allSummaries.map((s, i) => (
-                <div key={i} style={{ marginBottom: i < allSummaries.length - 1 ? 6 : 0 }}>
-                  {allSummaries.length > 1 && (
-                    <span style={{ color: 'var(--c-text-3)', marginRight: 4 }}>
-                      [{i + 1}]
-                    </span>
-                  )}
-                  {s}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 2. 风险等级 */}
-          <div className="issue-section">
-            <div className="label">② 风险等级</div>
-            <div className="content">
-              <span className={`risk-tag ${cls}`}>{issue.risk_level}</span>
-              <span style={{ marginLeft: 10, color: 'var(--c-text-2)' }}>
-                {issue.risk_level === '高风险'
-                  ? '可能导致登记被退回，需立即整改'
-                  : issue.risk_level === '中风险'
-                  ? '存在合规瑕疵，建议补正后再申报'
-                  : '提示性问题，可关注'}
-              </span>
-            </div>
-          </div>
-
-          {/* 3. 规则依据 */}
-          <div className="issue-section">
-            <div className="label">③ 规则依据</div>
-            {allBases.map((b, i) => (
-              <div className="content basis" key={i} style={{ marginBottom: 6 }}>
-                <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                  <code>{(issue.rule_ids || [issue.rule_id])[i] || issue.rule_id}</code>
-                  <span style={{ marginLeft: 8, color: 'var(--c-text-3)', fontWeight: 400 }}>
-                    {b?.basis_type === '用户新增' ? '· 用户新增' : '· 内置规则'}
-                  </span>
-                </div>
-                <div style={{ marginBottom: 4 }}>{b?.rule_text}</div>
-                {b?.basis_file && (
-                  <div style={{ color: 'var(--c-text-3)', fontSize: 11.5 }}>
-                    📎 {b.basis_file}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* 4. 问题点位 */}
-          <div className="issue-section">
-            <div className="label">④ 问题点位</div>
+            <div className="label">① 问题点位</div>
             {locations.length === 0 ? (
-              <div className="content">未定位到具体字段</div>
+              <div className="content">
+                {allSummaries.map((s, i) => (
+                  <div key={i} style={{ marginBottom: i < allSummaries.length - 1 ? 6 : 0 }}>
+                    {allSummaries.length > 1 && (
+                      <span style={{ color: 'var(--c-text-3)', marginRight: 4 }}>
+                        [{i + 1}]
+                      </span>
+                    )}
+                    {s}
+                  </div>
+                ))}
+                <div className="muted" style={{ marginTop: 6 }}>未定位到具体字段</div>
+              </div>
             ) : (
-              locations.map((loc, i) => (
-                <div className="content" key={i} style={{ marginBottom: 6 }}>
-                  <div style={{ fontSize: 12, color: 'var(--c-text-3)' }}>
-                    📄 {loc.material_name}
+              locations.map((loc, i) => {
+                const reason = allSummaries[i] || allSummaries[0]
+                return (
+                  <div className="content" key={i} style={{ marginBottom: 6 }}>
+                    <div style={{ fontSize: 12, color: 'var(--c-text-3)' }}>
+                      📄 {loc.material_name}
+                    </div>
+                    <div style={{ marginTop: 4 }}>
+                      路径：<code>{loc.location}</code>
+                    </div>
+                    <div style={{ marginTop: 4 }}>
+                      取值：<code style={{ background: '#FEE2E2', color: '#DC2626' }}>{loc.value}</code>
+                    </div>
+                    <div
+                      style={{
+                        marginTop: 6,
+                        paddingTop: 6,
+                        borderTop: '1px dashed var(--c-border)',
+                        color: 'var(--c-text)',
+                      }}
+                    >
+                      <span style={{ color: 'var(--c-text-3)', marginRight: 4 }}>
+                        原因：
+                      </span>
+                      {reason}
+                    </div>
                   </div>
-                  <div style={{ marginTop: 4 }}>
-                    路径：<code>{loc.location}</code>
-                  </div>
-                  <div style={{ marginTop: 4 }}>
-                    取值：<code style={{ background: '#FEE2E2', color: '#DC2626' }}>{loc.value}</code>
-                  </div>
-                </div>
-              ))
+                )
+              })
             )}
           </div>
 
-          {/* 5. AI 整改建议 */}
+          {/* 2. 规则依据 */}
           <div className="issue-section">
-            <div className="label">⑤ AI 整改建议</div>
+            <div className="label">② 规则依据</div>
+            {allBases.map((b, i) => {
+              const isUser =
+                b?.basis_type === '用户新增规则' ||
+                (b?.basis_file || '').trim() === '用户新增规则'
+              return (
+                <div className="content basis" key={i} style={{ marginBottom: 6 }}>
+                  <div style={{ marginBottom: 4, color: 'var(--c-text-3)' }}>
+                    {isUser ? '· 用户新增规则' : '· 内置规则'}
+                  </div>
+                  <div>{renderBasisLine(b)}</div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* 3. AI 整改建议 */}
+          <div className="issue-section">
+            <div className="label">③ AI 整改建议</div>
             <div className="content suggestion">
               {allSuggestions.length === 0 ? (
                 <span className="muted">（无）</span>

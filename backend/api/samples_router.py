@@ -11,7 +11,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from ..services.material_parser import guess_material_type
-from ..services.upload_store import save_upload
+from ..services.upload_store import find_duplicate, save_upload
 
 router = APIRouter(prefix="/api/samples", tags=["samples"])
 
@@ -67,10 +67,12 @@ def load_samples(payload: SampleLoad):
     """把样例文件"假装上传"——读取本地文件并按上传流程保存+解析。
 
     返回新生成的 file_id 列表，前端可直接用于发起审核。
+    同流程下已存在同名+同类型的样例会被跳过并在 skipped 中返回。
     """
     if not SAMPLES_DIR.exists():
         raise HTTPException(status_code=404, detail="samples 目录不存在")
     loaded: list[dict] = []
+    skipped: list[dict] = []
     for p in sorted(SAMPLES_DIR.iterdir()):
         if not p.is_file() or p.name.startswith("."):
             continue
@@ -78,15 +80,25 @@ def load_samples(payload: SampleLoad):
             continue
         if _classify_file(p.name) != payload.process:
             continue
+        mtype = guess_material_type(p.name)
+        dup = find_duplicate(
+            original_name=p.name,
+            material_type=mtype,
+            process=payload.process,
+        )
+        if dup is not None:
+            skipped.append({"name": p.name, "reason": "已存在，跳过"})
+            continue
         meta = save_upload(
             original_name=p.name,
             content=p.read_bytes(),
-            material_type=guess_material_type(p.name),
+            material_type=mtype,
+            process=payload.process,
         )
         loaded.append(meta)
-    if not loaded:
+    if not loaded and not skipped:
         raise HTTPException(
             status_code=404,
             detail=f"未在 samples/ 下找到流程={payload.process} 的样例文件",
         )
-    return {"process": payload.process, "files": loaded}
+    return {"process": payload.process, "files": loaded, "skipped": skipped}

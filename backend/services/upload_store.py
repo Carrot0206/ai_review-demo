@@ -38,6 +38,7 @@ def save_upload(
     original_name: str,
     content: bytes,
     material_type: Optional[str] = None,
+    process: Optional[str] = None,
 ) -> dict:
     """保存上传文件并立即解析。返回文件元信息字典。"""
     file_id = uuid.uuid4().hex[:12]
@@ -54,6 +55,7 @@ def save_upload(
         "size_bytes": len(content),
         "size_human": _human_size(len(content)),
         "material_type": material_type or guess_material_type(original_name),
+        "process": process,  # pre_report | initial | None（兼容旧上传）
         "uploaded_at": int(time.time()),
         "parse_status": "解析中",
         "parse_error": None,
@@ -109,3 +111,21 @@ def list_uploads() -> list[dict]:
         if d.is_dir() and (d / "meta.json").exists():
             out.append(json.loads((d / "meta.json").read_text(encoding="utf-8")))
     return out
+
+
+def find_duplicate(
+    *,
+    original_name: str,
+    material_type: Optional[str],
+    process: Optional[str],
+) -> Optional[dict]:
+    """按 (process, original_name, material_type) 判重，返回已存在的 meta，否则 None。"""
+    for m in list_uploads():
+        if m.get("process") != process:
+            continue
+        if m.get("original_name") != original_name:
+            continue
+        if (m.get("material_type") or None) != (material_type or None):
+            continue
+        return m
+    return None

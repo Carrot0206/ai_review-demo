@@ -13,7 +13,7 @@ function App() {
   const setUserRules = useStore((s) => s.setUserRules)
   const setUploads = useStore((s) => s.setUploads)
 
-  // 切流程刷新规则；初始化加载上传列表
+  // 切流程刷新规则；切流程也刷新对应流程的上传列表
   useEffect(() => {
     getRules(process)
       .then((r) => {
@@ -21,11 +21,8 @@ function App() {
         setUserRules(r.user_rules || [])
       })
       .catch(() => {})
-  }, [process, setRules, setUserRules])
-
-  useEffect(() => {
-    listUploads().then(setUploads).catch(() => {})
-  }, [setUploads])
+    listUploads(process).then(setUploads).catch(() => {})
+  }, [process, setRules, setUserRules, setUploads])
 
   return (
     <>
