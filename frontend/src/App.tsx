@@ -12,9 +12,21 @@ function App() {
   const setRules = useStore((s) => s.setRules)
   const setUserRules = useStore((s) => s.setUserRules)
   const setUploads = useStore((s) => s.setUploads)
+  const setResult = useStore((s) => s.setResult)
+  const setJobId = useStore((s) => s.setJobId)
+  const setJobStatus = useStore((s) => s.setJobStatus)
+  const setStage = useStore((s) => s.setStage)
+  const resetProgress = useStore((s) => s.resetProgress)
 
-  // 切流程刷新规则；切流程也刷新对应流程的上传列表
+  // 切流程刷新规则；切流程也刷新对应流程的上传列表；
+  // 同时清空右侧审核结果/进度/任务状态，避免上个流程的结果残留
   useEffect(() => {
+    setResult(null)
+    setJobId(null)
+    setJobStatus('idle')
+    setStage('idle')
+    resetProgress()
+
     getRules(process)
       .then((r) => {
         setRules(r)
@@ -22,7 +34,17 @@ function App() {
       })
       .catch(() => {})
     listUploads(process).then(setUploads).catch(() => {})
-  }, [process, setRules, setUserRules, setUploads])
+  }, [
+    process,
+    setRules,
+    setUserRules,
+    setUploads,
+    setResult,
+    setJobId,
+    setJobStatus,
+    setStage,
+    resetProgress,
+  ])
 
   return (
     <>

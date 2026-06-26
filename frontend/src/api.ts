@@ -44,6 +44,18 @@ export async function deleteUserRule(rule_id: string) {
   return data
 }
 
+export async function updateUserRule(
+  rule_id: string,
+  payload: {
+    applicable_materials?: string[]
+    rule_text?: string
+    risk_level?: RiskLevel
+  },
+): Promise<UserRule> {
+  const { data } = await http.put(`/user-rules/${rule_id}`, payload)
+  return data
+}
+
 export async function listUploads(process?: ProcessType): Promise<UploadMeta[]> {
   const { data } = await http.get('/upload', {
     params: process ? { process } : undefined,

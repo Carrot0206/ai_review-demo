@@ -4,6 +4,7 @@ import {
   DownloadOutlined,
   FilterOutlined,
   FolderOpenOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
@@ -78,7 +79,7 @@ export default function RightPanel() {
     return (
       <div className="panel" style={{ flex: 1 }}>
         <div className="panel-header">
-          <h3>🧠 AI 审核结果</h3>
+          <h3><ThunderboltOutlined style={{ color: 'var(--c-primary)' }} /> AI 审核结果</h3>
         </div>
         <div className="empty-state">
           <div className="ico">📋</div>
@@ -96,7 +97,7 @@ export default function RightPanel() {
     return (
       <div className="panel" style={{ flex: 1 }}>
         <div className="panel-header">
-          <h3>🧠 AI 审核中…</h3>
+          <h3><ThunderboltOutlined style={{ color: 'var(--c-primary)' }} /> AI 审核中…</h3>
         </div>
         <ThreeStageLoading />
         <div style={{ padding: '0 18px 18px' }}>
@@ -137,7 +138,7 @@ export default function RightPanel() {
     return (
       <div className="panel">
         <div className="panel-header">
-          <h3>🧠 AI 审核结果</h3>
+          <h3><ThunderboltOutlined style={{ color: 'var(--c-primary)' }} /> AI 审核结果</h3>
         </div>
         <Empty description="暂无审核结果" style={{ padding: 48 }} />
       </div>
@@ -149,7 +150,7 @@ export default function RightPanel() {
   return (
     <div className="panel" style={{ flex: 1, minHeight: 0 }} ref={exportRef}>
       <div className="panel-header">
-        <h3>🧠 AI 审核结果 · {summary.registration_type}</h3>
+        <h3><ThunderboltOutlined style={{ color: 'var(--c-primary)' }} /> AI 审核结果 · {summary.registration_type}</h3>
         <div className="right">
           <Space>
             <Tag color="success">已完成</Tag>

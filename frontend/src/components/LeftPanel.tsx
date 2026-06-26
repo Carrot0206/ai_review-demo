@@ -14,6 +14,7 @@ import {
 } from 'antd'
 import {
   DeleteOutlined,
+  EditOutlined,
   InboxOutlined,
   PlusOutlined,
   RocketOutlined,
@@ -28,6 +29,7 @@ import {
   loadSamples,
   startReview,
   subscribeReviewStream,
+  updateUserRule,
   uploadFile,
 } from '../api'
 import { useStore } from '../store'
@@ -59,11 +61,14 @@ export default function LeftPanel() {
   const jobStatus = useStore((s) => s.jobStatus)
 
   const [creating, setCreating] = useState(false)
+  // 正在编辑的规则 id；为 null 表示新增模式
+  const [editingRuleId, setEditingRuleId] = useState<string | null>(null)
   const [form] = Form.useForm()
 
   // 切换流程时：关闭 Modal、重置表单内容
   useEffect(() => {
     setCreating(false)
+    setEditingRuleId(null)
     form.resetFields()
   }, [process, form])
 
@@ -153,19 +158,47 @@ export default function LeftPanel() {
   async function handleCreateRule() {
     try {
       const vals = await form.validateFields()
-      await createUserRule({
-        process,
-        applicable_materials: vals.applicable_materials || [],
-        rule_text: vals.rule_text,
-        risk_level: vals.risk_level as RiskLevel,
-      })
-      message.success('已新增规则')
+      if (editingRuleId) {
+        await updateUserRule(editingRuleId, {
+          applicable_materials: vals.applicable_materials || [],
+          rule_text: vals.rule_text,
+          risk_level: vals.risk_level as RiskLevel,
+        })
+        message.success('已保存修改')
+      } else {
+        await createUserRule({
+          process,
+          applicable_materials: vals.applicable_materials || [],
+          rule_text: vals.rule_text,
+          risk_level: vals.risk_level as RiskLevel,
+        })
+        message.success('已新增规则')
+      }
       setCreating(false)
+      setEditingRuleId(null)
       form.resetFields()
       await refreshRules()
     } catch {
       /* validation */
     }
+  }
+
+  function handleOpenEdit(rule: {
+    rule_id: string
+    rule_text: string
+    risk_level: RiskLevel
+    applicable_materials?: string[]
+  }) {
+    setEditingRuleId(rule.rule_id)
+    setCreating(true)
+    // setFieldsValue 在 Modal forceRender 之后会立刻生效
+    setTimeout(() => {
+      form.setFieldsValue({
+        rule_text: rule.rule_text,
+        risk_level: rule.risk_level,
+        applicable_materials: rule.applicable_materials || [],
+      })
+    }, 0)
   }
 
   async function handleDeleteUserRule(rid: string) {
@@ -292,7 +325,11 @@ export default function LeftPanel() {
                         type="dashed"
                         size="small"
                         icon={<PlusOutlined />}
-                        onClick={() => setCreating(true)}
+                        onClick={() => {
+                          setEditingRuleId(null)
+                          form.resetFields()
+                          setCreating(true)
+                        }}
                         block
                       >
                         新增一条规则
@@ -321,6 +358,14 @@ export default function LeftPanel() {
                             </Tag>
                             {r.rule_text}
                           </span>
+                          <Tooltip title="编辑">
+                            <Button
+                              type="text"
+                              size="small"
+                              icon={<EditOutlined />}
+                              onClick={() => handleOpenEdit(r)}
+                            />
+                          </Tooltip>
                           <Popconfirm
                             title="删除该规则？"
                             onConfirm={() => handleDeleteUserRule(r.rule_id)}
@@ -434,10 +479,11 @@ export default function LeftPanel() {
       {/* 新增规则 Modal */}
       <Modal
         key={process /* 切流程时强制重建并清空 */}
-        title={`新增用户规则 · ${processLabel}`}
+        title={`${editingRuleId ? '编辑' : '新增'}用户规则 · ${processLabel}`}
         open={creating}
         onCancel={() => {
           setCreating(false)
+          setEditingRuleId(null)
           form.resetFields()
         }}
         afterClose={() => form.resetFields()}
