@@ -10,10 +10,10 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from ..services.review_service import review
-from ..services.schemas import ProcessType
+from ..services.schemas import BatchLog, Issue, ProcessType
 from ..services.upload_store import load_extracted, load_meta
 from ..services.user_rules import list_user_rules, to_review_rule
-from .jobs import ReviewJob, create_job, get_job, push_progress
+from .jobs import ReviewJob, create_job, get_job, push_event, push_progress
 
 router = APIRouter(prefix="/api/review", tags=["review"])
 
@@ -49,6 +49,17 @@ async def _run_review_job(job: ReviewJob, payload: ReviewStart):
         async def cb(msg: str):
             await push_progress(job, msg)
 
+        # 3.1 每批完成回调（O6：流式推送）
+        async def batch_cb(issues: list[Issue], log: BatchLog):
+            await push_event(
+                job,
+                "batch_done",
+                {
+                    "batch": log.model_dump(),
+                    "issues": [i.model_dump() for i in issues],
+                },
+            )
+
         # 4. 跑！
         result = await review(
             process=payload.process,
@@ -56,6 +67,7 @@ async def _run_review_job(job: ReviewJob, payload: ReviewStart):
             extra_rules=extra_rules,
             max_concurrency=payload.max_concurrency,
             progress_cb=cb,
+            on_batch_done=batch_cb,
         )
         job.result = result
         job.status = "done"
@@ -104,7 +116,7 @@ async def stream_review(job_id: str):
         raise HTTPException(status_code=404, detail=f"任务 {job_id} 不存在")
 
     async def event_gen():
-        # 把历史消息先发一遍
+        # 把历史消息先发一遍（仅字符串日志；结构化事件不补发，避免重复触发渲染）
         for entry in list(job.progress_log):
             yield f"data: {json.dumps(entry, ensure_ascii=False)}\n\n"
         # 持续监听
@@ -115,6 +127,13 @@ async def stream_review(job_id: str):
                 # 心跳，避免代理断开
                 yield ": keep-alive\n\n"
                 continue
+            # 结构化事件（dict）
+            if isinstance(msg, dict):
+                event_name = msg.get("event") or "message"
+                data = msg.get("data") or {}
+                yield f"event: {event_name}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+                continue
+            # 字符串日志（兼容历史）
             if msg == "__DONE__":
                 yield f"event: done\ndata: {json.dumps({'job_id': job.job_id}, ensure_ascii=False)}\n\n"
                 break

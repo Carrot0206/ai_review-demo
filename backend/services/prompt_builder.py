@@ -8,7 +8,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import Any, Optional
 
 from .schemas import ExtractedMaterial, Rule, PROCESS_LABEL
 
@@ -28,6 +28,10 @@ SYSTEM_PROMPT = """你是中信登（中国信托登记有限责任公司）信�
    - location 必须精确到字段级，写成"表名.字段名"，例如 "产品特征.是否城市更新"、"产品基本信息.信托产品全称"；禁止只写表名（如 "产品特征"、"产品特征表"）这种粗粒度路径。
    - 每个缺失字段必须独立成为一条 issue，不允许把多个不同字段的缺失合并到同一条。
    - value 写成 "缺失:<字段名>" 的形式（例如 "缺失:是否城市更新"），不允许只写泛指的 "缺失"、"未填写"、"字段缺失"。
+10. 【允许性 vs 禁止性 严格区分】：
+   - 仅当规则原文为"应当 / 必须 / 不得 / 禁止 / 必填 / 严禁"等强约束、或明确的"==/!=/必须等于"等条件式校验时，才能据此输出 issue。
+   - 规则原文为"可 / 可以 / 可通过此栏位 / 也可 / 非必填 / 选填 / 填报说明 / 示例"等允许性、说明性、举例性表述时，仅作为对该栏位用途的说明使用，禁止据此判定违规；即便实际填报内容与"示例用途"不同，也不要输出 issue。
+   - 不确定一条规则属于强约束还是允许性时，按允许性处理，不输出 issue。
 """
 
 OUTPUT_SCHEMA_HINT = """输出 JSON 结构：
@@ -85,11 +89,25 @@ def build_messages(
     process: str,
     rules: list[Rule],
     materials: list[ExtractedMaterial],
+    material_filter: Optional[set[str]] = None,
 ) -> list[dict[str, str]]:
-    """构造 chat.completions 的 messages。"""
+    """构造 chat.completions 的 messages。
+
+    material_filter：限定本次只送入哪些 material_type 的材料；为 None 表示全发。
+    若过滤后为空，仍保留 1 行占位提示，使模型可以走"未发现问题"分支。
+    """
     process_label = PROCESS_LABEL.get(process, process)
     rule_list = [_rule_to_prompt_obj(r) for r in rules]
-    materials_text = "\n\n".join(_material_to_text(m) for m in materials)
+
+    if material_filter is None:
+        filtered = list(materials)
+    else:
+        filtered = [m for m in materials if m.material_type in material_filter]
+
+    if filtered:
+        materials_text = "\n\n".join(_material_to_text(m) for m in filtered)
+    else:
+        materials_text = "### 无可审材料（本批次依赖的材料类型在本次上传中未提供）"
 
     user_content = f"""## 登记流程
 {process_label}

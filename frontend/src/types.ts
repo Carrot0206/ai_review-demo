@@ -95,6 +95,7 @@ export interface BatchLog {
   input_tokens: number
   output_tokens: number
   error?: string | null
+  materials_used?: string[]
 }
 
 export interface ReviewSummary {

@@ -1,5 +1,7 @@
 import axios from 'axios'
 import type {
+  BatchLog,
+  Issue,
   JobInfo,
   ProcessType,
   RiskLevel,
@@ -113,6 +115,7 @@ export function subscribeReviewStream(
   onMsg: (msg: string) => void,
   onDone: () => void,
   onFailed: (err: string) => void,
+  onBatchDone?: (payload: { batch: BatchLog; issues: Issue[] }) => void,
 ): () => void {
   const url = `/api/review/${job_id}/stream`
   const es = new EventSource(url)
@@ -124,6 +127,15 @@ export function subscribeReviewStream(
       /* keep-alive */
     }
   }
+  es.addEventListener('batch_done', (e) => {
+    if (!onBatchDone) return
+    try {
+      const data = JSON.parse((e as MessageEvent).data)
+      onBatchDone(data as { batch: BatchLog; issues: Issue[] })
+    } catch {
+      /* ignore */
+    }
+  })
   es.addEventListener('done', () => {
     onDone()
     es.close()

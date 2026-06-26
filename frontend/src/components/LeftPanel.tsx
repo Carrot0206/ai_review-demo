@@ -58,7 +58,10 @@ export default function LeftPanel() {
   const appendProgress = useStore((s) => s.appendProgress)
   const resetProgress = useStore((s) => s.resetProgress)
   const setResult = useStore((s) => s.setResult)
-  const jobStatus = useStore((s) => s.jobStatus)
+  const appendBatchIssues = useStore((s) => s.appendBatchIssues)
+  const setBatchTotal = useStore((s) => s.setBatchTotal)
+  const resetBatchProgress = useStore((s) => s.resetBatchProgress)
+  const jobStatus = useStore((s) => s.jobStatusByProcess[s.process])
 
   const [creating, setCreating] = useState(false)
   // 正在编辑的规则 id；为 null 表示新增模式
@@ -211,46 +214,56 @@ export default function LeftPanel() {
       message.warning('请先上传材料或一键载入样例')
       return
     }
-    resetProgress()
-    setResult(null)
-    setStage('parse')
-    setJobStatus('pending')
+    // 锁定本次审核所属流程,避免审核过程中用户切流程时回调写到错误流程
+    const reviewProcess = process
+    resetProgress(reviewProcess)
+    resetBatchProgress(reviewProcess)
+    setResult(null, reviewProcess)
+    setStage('parse', reviewProcess)
+    setJobStatus('pending', reviewProcess)
     try {
       const { job_id } = await startReview({
-        process,
+        process: reviewProcess,
         file_ids: currentUploads.map((u) => u.file_id),
         max_concurrency: 4,
       })
-      setJobId(job_id)
-      setJobStatus('running')
-      setStage('batch')
+      setJobId(job_id, reviewProcess)
+      setJobStatus('running', reviewProcess)
+      setStage('batch', reviewProcess)
 
       subscribeReviewStream(
         job_id,
         (msg) => {
-          appendProgress(msg)
-          if (msg.includes('分组完成')) setStage('batch')
+          appendProgress(msg, reviewProcess)
+          // 从 "分组完成：共 N 批" 抓总批次数
+          const m = msg.match(/分组完成[：:]\s*共\s*(\d+)\s*批/)
+          if (m) setBatchTotal(parseInt(m[1], 10), reviewProcess)
+          if (msg.includes('分组完成')) setStage('batch', reviewProcess)
           if (msg.includes('全部批次完成') || msg.includes('合并') || msg.includes('去重')) {
-            setStage('merge')
+            setStage('merge', reviewProcess)
           }
         },
         async () => {
-          setStage('done')
-          setJobStatus('done')
-          // 拉取最终结果
+          setStage('done', reviewProcess)
+          setJobStatus('done', reviewProcess)
+          // 拉取最终结果（覆盖累积区为合并后的最终版）
           const { getReview } = await import('../api')
           const job = await getReview(job_id)
-          setResult(job.result || null)
+          setResult(job.result || null, reviewProcess)
         },
         (err) => {
-          setStage('failed')
-          setJobStatus('failed')
+          setStage('failed', reviewProcess)
+          setJobStatus('failed', reviewProcess)
           message.error('审核失败：' + err)
+        },
+        (payload) => {
+          // O6：批次完成事件 → 累积到 store，触发 RightPanel 重渲染
+          appendBatchIssues(payload, reviewProcess)
         },
       )
     } catch (e: any) {
-      setStage('failed')
-      setJobStatus('failed')
+      setStage('failed', reviewProcess)
+      setJobStatus('failed', reviewProcess)
       message.error('启动审核失败：' + (e?.response?.data?.detail || e?.message))
     }
   }

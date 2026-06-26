@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
-import { Button, Collapse, Empty, Space, Tag, message } from 'antd'
+import { Button, Collapse, Empty, Popconfirm, Space, Tag, message } from 'antd'
 import {
+  DeleteOutlined,
   DownloadOutlined,
   FilterOutlined,
   FolderOpenOutlined,
@@ -16,9 +17,12 @@ type R = '高风险' | '中风险' | '低风险'
 const RISK_ORDER: Record<R, number> = { 高风险: 0, 中风险: 1, 低风险: 2 }
 
 export default function RightPanel() {
-  const result = useStore((s) => s.result)
-  const jobStatus = useStore((s) => s.jobStatus)
-  const progress = useStore((s) => s.progress)
+  const process = useStore((s) => s.process)
+  const result = useStore((s) => s.resultByProcess[s.process])
+  const jobStatus = useStore((s) => s.jobStatusByProcess[s.process])
+  const progress = useStore((s) => s.progressByProcess[s.process])
+  const batchProgress = useStore((s) => s.batchProgressByProcess[s.process])
+  const clearReviewState = useStore((s) => s.clearReviewState)
   const filterRisks = useStore((s) => s.filterRisks)
   const toggleRisk = useStore((s) => s.toggleRisk)
   const exportRef = useRef<HTMLDivElement>(null)
@@ -94,12 +98,50 @@ export default function RightPanel() {
 
   // ===== Loading =====
   if (running) {
+    const partialIssues = result?.issues || []
+    const sortedPartial = [...partialIssues].sort(
+      (a, b) => RISK_ORDER[a.risk_level as R] - RISK_ORDER[b.risk_level as R],
+    )
+    const { done, total } = batchProgress
     return (
       <div className="panel" style={{ flex: 1 }}>
         <div className="panel-header">
-          <h3><ThunderboltOutlined style={{ color: 'var(--c-primary)' }} /> AI 审核中…</h3>
+          <h3>
+            <ThunderboltOutlined style={{ color: 'var(--c-primary)' }} /> AI 审核中…
+          </h3>
+          {total > 0 && (
+            <div className="right">
+              <Tag color="processing">
+                {done}/{total} 批已完成
+              </Tag>
+              {partialIssues.length > 0 && (
+                <Tag color="warning">已发现 {partialIssues.length} 个问题</Tag>
+              )}
+            </div>
+          )}
         </div>
         <ThreeStageLoading />
+        {sortedPartial.length > 0 && (
+          <div
+            style={{
+              padding: '4px 18px 0',
+              fontSize: 12,
+              color: 'var(--c-text-2)',
+            }}
+          >
+            👇 已收到的问题（最终合并版会在全部完成后替换显示）
+          </div>
+        )}
+        <div className="panel-body" style={{ flex: 1, minHeight: 0 }}>
+          {sortedPartial.map((iss, idx) => (
+            <IssueCard
+              key={iss.issue_id}
+              index={idx}
+              issue={iss}
+              defaultOpen={idx < 2}
+            />
+          ))}
+        </div>
         <div style={{ padding: '0 18px 18px' }}>
           <Collapse
             size="small"
@@ -163,6 +205,21 @@ export default function RightPanel() {
             >
               导出 PDF
             </Button>
+            <Popconfirm
+              title="清除当前流程的审核结果?"
+              description="该操作只影响当前流程,另一个流程的结果不会受影响"
+              okText="清除"
+              cancelText="取消"
+              okButtonProps={{ danger: true }}
+              onConfirm={() => {
+                clearReviewState(process)
+                message.success('已清除当前流程的审核结果')
+              }}
+            >
+              <Button size="small" danger icon={<DeleteOutlined />}>
+                清除
+              </Button>
+            </Popconfirm>
           </Space>
         </div>
       </div>

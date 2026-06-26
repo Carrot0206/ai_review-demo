@@ -5,7 +5,7 @@ import asyncio
 import time
 import uuid
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Any, Optional, Union
 
 from ..services.schemas import ReviewResult
 
@@ -22,8 +22,8 @@ class ReviewJob:
     error: Optional[str] = None
     # 进度消息日志
     progress_log: list = field(default_factory=list)
-    # 给 SSE 用的异步队列
-    queue: "asyncio.Queue[str]" = field(default_factory=asyncio.Queue)
+    # 给 SSE 用的异步队列；元素可以是 str（兼容历史）或 dict（结构化事件）
+    queue: "asyncio.Queue[Union[str, dict]]" = field(default_factory=asyncio.Queue)
 
 
 _JOBS: dict[str, ReviewJob] = {}
@@ -53,3 +53,8 @@ def list_jobs() -> list[ReviewJob]:
 async def push_progress(job: ReviewJob, msg: str) -> None:
     job.progress_log.append({"ts": time.time(), "msg": msg})
     await job.queue.put(msg)
+
+
+async def push_event(job: ReviewJob, event: str, data: Any) -> None:
+    """推送结构化 SSE 事件（example: batch_done / batch_failed）。"""
+    await job.queue.put({"event": event, "data": data})

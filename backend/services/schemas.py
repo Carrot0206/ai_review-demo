@@ -111,6 +111,7 @@ class BatchLog(BaseModel):
     input_tokens: int = 0
     output_tokens: int = 0
     error: Optional[str] = None
+    materials_used: list[str] = Field(default_factory=list)
 
 
 class ReviewResult(BaseModel):
