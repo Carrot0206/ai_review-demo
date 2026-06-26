@@ -1,0 +1,1326 @@
+{
+  "summary": {
+    "registration_type": "初始登记",
+    "total_issues": 29,
+    "high_risk_count": 15,
+    "medium_risk_count": 12,
+    "low_risk_count": 2
+  },
+  "issues": [
+    {
+      "issue_id": "ISSUE-001",
+      "rule_id": "INIT-ELEMENT-AI-002",
+      "issue_summary": "产品基本信息表中缺失开放频度字段",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明",
+        "rule_text": "填报说明：填写开放式信托产品的开放周期，不属于枚举值中的其他规律开放周期或无规律开放时，填报“其他”。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "产品基本信息",
+          "value": "字段缺失"
+        }
+      ],
+      "suggestion": "请补充开放频度字段，根据实际情况选择枚举值或填报“其他”",
+      "rule_ids": [
+        "INIT-ELEMENT-AI-002"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "填报说明：填写开放式信托产品的开放周期，不属于枚举值中的其他规律开放周期或无规律开放时，填报“其他”。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-002",
+      "rule_id": "INIT-ELEMENT-AI-015",
+      "issue_summary": "产品特征表中缺失是否受托境外理财信托（QDII）字段",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明",
+        "rule_text": "填报说明：受托境外理财（QDII）：是指拥有受托境外理财资格的信托公司开展的相关业务。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "产品特征",
+          "value": "字段缺失"
+        }
+      ],
+      "suggestion": "请补充是否受托境外理财信托（QDII）字段，根据实际情况填报",
+      "rule_ids": [
+        "INIT-ELEMENT-AI-015",
+        "INIT-ELEMENT-AI-017",
+        "INIT-ELEMENT-AI-018",
+        "INIT-ELEMENT-AI-019",
+        "INIT-ELEMENT-AI-020",
+        "INIT-ELEMENT-AI-023"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "填报说明：受托境外理财（QDII）：是指拥有受托境外理财资格的信托公司开展的相关业务。"
+        },
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明；中华人民共和国国民经济和社会发展第十四个五年规划和2035年远景目标纲要；关于开展第一批城市更新试点工作的通知；关于在实施城市更新行动中防止大拆大建问题的通知",
+          "rule_text": "填报说明：城市更新：是指符合《中华人民共和国国民经济和社会发展第十四个五年规划和2035年远景目标纲要》《关于开展第一批城市更新试点工作的通知》《关于在实施城市更新行动中防止大拆大建问题的通知》以及各地地方性法规、政府规章、规范性文件等要求，开展对于城市空间形态和功能的改善、优化和提升等一系列建设活动。城市更新坚持“留改拆”并举，以保留利用提升为主，加强修缮改造，补齐城市短板，注重提升功能，增强城市活力。"
+        },
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明；国务院关于推进普惠金融高质量发展的实施意见",
+          "rule_text": "填报说明：普惠金融：是指立足机会平等要求和商业可持续原则，以可负担的成本为有金融服务需求的社会各阶层和群体提供适当、有效的金融服务。小微企业、农民、城镇低收入人群、贫困人群和残疾人、老年人等特殊群体是当前我国普惠金融重点服务对象。"
+        },
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明；乡村振兴促进法",
+          "rule_text": "填报说明：乡村振兴：是指根据《乡村振兴促进法》要求，信托资金运用于全面实施乡村振兴战略，开展促进乡村产业振兴、人才振兴、文化振兴、生态振兴、组织振兴，推进城乡融合发展等活动。"
+        },
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "填报说明：是指“信托计划+专项计划”（企业资产证券化服务信托）或“信托计划+信托计划”（非金融企业资产支持票据服务信托）模式中的资产层信托计划。"
+        },
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "填报说明：是指信托公司服务知识产权业务发展所开展的信托业务。"
+        }
+      ],
+      "alt_summaries": [
+        "产品特征中缺少'是否城市更新'字段",
+        "产品特征中缺少'是否普惠金融'字段",
+        "产品特征中缺少'是否用于促进乡村振兴'字段",
+        "产品特征中缺少'是否资产证券双SPV结构下的资产层信托'字段",
+        "产品特征中缺少'是否知识产权信托'字段"
+      ],
+      "alt_suggestions": [
+        "请补充填报'是否城市更新'字段，根据实际情况选择是或否",
+        "请补充填报'是否普惠金融'字段，根据实际情况选择是或否",
+        "请补充填报'是否用于促进乡村振兴'字段，根据实际情况选择是或否",
+        "请补充填报'是否资产证券双SPV结构下的资产层信托'字段，根据实际情况选择是或否",
+        "请补充填报'是否知识产权信托'字段，根据实际情况选择是或否"
+      ]
+    },
+    {
+      "issue_id": "ISSUE-003",
+      "rule_id": "INIT-ELEMENT-AI-047",
+      "issue_summary": "共同受托人信息填写了全称，但材料中未体现存在共同受托人",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明",
+        "rule_text": "填报说明：同一信托的受托人有两个以上的，为共同受托人。共同受托人应当共同处理信托事务，但信托文件规定对某些具体事务由受托人分别处理的，从其规定。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "共同受托人信息[0].共同受托人全称",
+          "value": "杭州某某资产管理有限公司"
+        }
+      ],
+      "suggestion": "如产品无共同受托人，应删除共同受托人信息；如存在，请提供信托文件证明",
+      "rule_ids": [
+        "INIT-ELEMENT-AI-047"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "填报说明：同一信托的受托人有两个以上的，为共同受托人。共同受托人应当共同处理信托事务，但信托文件规定对某些具体事务由受托人分别处理的，从其规定。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-004",
+      "rule_id": "INIT-ELEMENT-AI-049",
+      "issue_summary": "初始委托人及其财产信息缺少管理人名称字段",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明",
+        "rule_text": "填报说明：填写金融产品管理人名称，如有多个名称用英文分号（;）隔开。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "初始委托人及其财产信息",
+          "value": "缺失"
+        }
+      ],
+      "suggestion": "请在初始委托人及其财产信息中补充管理人名称字段，按规则填写",
+      "rule_ids": [
+        "INIT-ELEMENT-AI-049",
+        "INIT-ELEMENT-AI-050"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "填报说明：填写金融产品管理人名称，如有多个名称用英文分号（;）隔开。"
+        },
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "填报说明：填写金融产品管理人证件号码，如有多个证件用英文分号（;）隔开。"
+        }
+      ],
+      "alt_summaries": [
+        "初始委托人及其财产信息缺少管理人证件号码字段"
+      ],
+      "alt_suggestions": [
+        "请在初始委托人及其财产信息中补充管理人证件号码字段，按规则填写"
+      ]
+    },
+    {
+      "issue_id": "ISSUE-005",
+      "rule_id": "INIT-ELEMENT-AI-055",
+      "issue_summary": "初始受益权信息中受益凭据编号重复，不唯一",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明",
+        "rule_text": "填报说明：受益权凭据编号，信托公司自定义。受益权凭据编号是信托公司内部对于受益人所持有的信托受益权的唯一凭据编号。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "初始受益权信息[0]和[1].受益凭据编号",
+          "value": "SYPJ-2026-001"
+        }
+      ],
+      "suggestion": "请为每个受益权分配唯一的受益凭据编号",
+      "rule_ids": [
+        "INIT-ELEMENT-AI-055"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "填报说明：受益权凭据编号，信托公司自定义。受益权凭据编号是信托公司内部对于受益人所持有的信托受益权的唯一凭据编号。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-006",
+      "rule_id": "INIT-ELEMENT-AI-056",
+      "issue_summary": "初始受益权信息缺少管理人名称字段",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明",
+        "rule_text": "填报说明：填写金融产品管理人名称，如有多个名称用英文分号（;）隔开。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "初始受益权信息",
+          "value": "缺失"
+        }
+      ],
+      "suggestion": "请在初始受益权信息中补充管理人名称字段，按规则填写",
+      "rule_ids": [
+        "INIT-ELEMENT-AI-056",
+        "INIT-ELEMENT-AI-057"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "填报说明：填写金融产品管理人名称，如有多个名称用英文分号（;）隔开。"
+        },
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "填报说明：填写金融产品管理人证件号码，如有多个证件用英文分号（;）隔开。"
+        }
+      ],
+      "alt_summaries": [
+        "初始受益权信息缺少管理人证件号码字段"
+      ],
+      "alt_suggestions": [
+        "请在初始受益权信息中补充管理人证件号码字段，按规则填写"
+      ]
+    },
+    {
+      "issue_id": "ISSUE-007",
+      "rule_id": "INIT-ELEMENT-AI-059",
+      "issue_summary": "受益人顺位填写不规范，应使用“第一顺位”等规范文本",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明",
+        "rule_text": "填报说明：受益人顺位：是指根据信托合同约定（如有），确定的每一位信托受益人所享有信托利益的顺位。前一顺位的受益人全部丧失信托受益权后，后续顺位的受益人方可递升其顺位。根据受益人顺位，以第一顺位，第二顺位，第三顺位…的文本规范依次填写。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "初始受益权信息[0].受益人顺位",
+          "value": "优先"
+        },
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "初始受益权信息[1].受益人顺位",
+          "value": "劣后"
+        }
+      ],
+      "suggestion": "将受益人顺位改为“第一顺位”、“第二顺位”等规范表述",
+      "rule_ids": [
+        "INIT-ELEMENT-AI-059"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "填报说明：受益人顺位：是指根据信托合同约定（如有），确定的每一位信托受益人所享有信托利益的顺位。前一顺位的受益人全部丧失信托受益权后，后续顺位的受益人方可递升其顺位。根据受益人顺位，以第一顺位，第二顺位，第三顺位…的文本规范依次填写。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-008",
+      "rule_id": "INIT-ELEMENT-AI-065",
+      "issue_summary": "李娜的业绩比较基准下限高于上限，不符合区间填写要求",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明",
+        "rule_text": "填报说明：1.业绩比较基准为单一数值的，下限和上限均报送该数值；业绩比较基准涵盖一组数值区间的，下限和上限分别按最低值和最高值报送。 2.百分比为单位，即1/100，保留两位小数。如4.5%则填报为4.50。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "初始受益权信息[1].业绩比较基准（下限）%",
+          "value": "4.50"
+        }
+      ],
+      "suggestion": "检查合同约定的业绩比较基准区间，确保下限不大于上限",
+      "rule_ids": [
+        "INIT-ELEMENT-AI-065"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "填报说明：1.业绩比较基准为单一数值的，下限和上限均报送该数值；业绩比较基准涵盖一组数值区间的，下限和上限分别按最低值和最高值报送。 2.百分比为单位，即1/100，保留两位小数。如4.5%则填报为4.50。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-009",
+      "rule_id": "INIT-ELEMENT-AI-066",
+      "issue_summary": "李娜的业绩比较基准上限低于下限，不符合区间填写要求",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明",
+        "rule_text": "填报说明：1.业绩比较基准为单一数值的，下限和上限均报送该数值；业绩比较基准涵盖一组数值区间的，下限和上限分别按最低值和最高值报送。 2.百分比为单位，即1/100，保留两位小数。如4.5%则填报为4.50。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "初始受益权信息[1].业绩比较基准（上限）%",
+          "value": "3.80"
+        }
+      ],
+      "suggestion": "检查合同约定的业绩比较基准区间，确保上限不小于下限",
+      "rule_ids": [
+        "INIT-ELEMENT-AI-066"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "填报说明：1.业绩比较基准为单一数值的，下限和上限均报送该数值；业绩比较基准涵盖一组数值区间的，下限和上限分别按最低值和最高值报送。 2.百分比为单位，即1/100，保留两位小数。如4.5%则填报为4.50。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-010",
+      "rule_id": "INIT-ELEMENT-AI-070",
+      "issue_summary": "受益权信息中收益分配方式'按期分配'不符合规则要求",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明",
+        "rule_text": "填报说明：约定的计算并支付利息的方式。按月分配收益的填报“按月结息”，到期分配收益的填报“利随本清”。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "初始受益权信息[0].收益分配方式",
+          "value": "按期分配"
+        }
+      ],
+      "suggestion": "将收益分配方式改为'按月结息'或'利随本清'",
+      "rule_ids": [
+        "INIT-ELEMENT-AI-070"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "填报说明：约定的计算并支付利息的方式。按月分配收益的填报“按月结息”，到期分配收益的填报“利随本清”。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-011",
+      "rule_id": "INIT-ELEMENT-HYBRID-001",
+      "issue_summary": "信托产品全称在申报模板与申请书中不一致",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明",
+        "rule_text": "填报说明：报送信托合同约定的信托产品全称，与信托当事人之间实际签署的信托文件保持一致；信托产品全称不得含有违反法律、行政法规或者国家金融监督管理总局有关规定的字样，不得含有违背公序良俗的字样。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "产品基本信息.信托产品全称",
+          "value": "杭州工商信托·锦绣稳健1号集合资金信托计划"
+        },
+        {
+          "material_name": "初始登记申请书_锦绣稳健1号.docx",
+          "location": "第8段",
+          "value": "杭州工商信托·锦绣稳健壹号集合资金信托计划"
+        }
+      ],
+      "suggestion": "请统一信托产品全称，确保申报模板与申请书一致，建议使用数字或汉字统一表述",
+      "rule_ids": [
+        "INIT-ELEMENT-HYBRID-001"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "填报说明：报送信托合同约定的信托产品全称，与信托当事人之间实际签署的信托文件保持一致；信托产品全称不得含有违反法律、行政法规或者国家金融监督管理总局有关规定的字样，不得含有违背公序良俗的字样。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-012",
+      "rule_id": "INIT-ELEMENT-HYBRID-037",
+      "issue_summary": "募集起始日期晚于募集结束日期，违反日期逻辑",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "系统校验规则：1.募集起始日期≤募集结束日期",
+        "rule_text": "1.募集起始日期≤募集结束日期"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "信托产品初始登记申报模板.初始信托规模.募集起始日期",
+          "value": "2026-04-10"
+        },
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "信托产品初始登记申报模板.初始信托规模.募集结束日期",
+          "value": "2026-04-01"
+        }
+      ],
+      "suggestion": "修正募集起始日期或募集结束日期，确保起始日期不晚于结束日期",
+      "rule_ids": [
+        "INIT-ELEMENT-HYBRID-037",
+        "INIT-ELEMENT-HYBRID-039"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "系统校验规则：1.募集起始日期≤募集结束日期",
+          "rule_text": "1.募集起始日期≤募集结束日期"
+        },
+        {
+          "basis_type": "内置规则",
+          "basis_file": "系统校验规则：1.募集起始日期≤募集结束日期",
+          "rule_text": "1.募集起始日期≤募集结束日期"
+        }
+      ],
+      "alt_summaries": [
+        "募集结束日期早于募集起始日期，违反日期逻辑"
+      ],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-013",
+      "rule_id": "INIT-ELEMENT-HYBRID-067",
+      "issue_summary": "受益权代码SYQ-2026-002的业绩比较基准下限4.50%大于上限3.80%，违反下限≤上限规则",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "系统校验规则：1.业绩比较基准（上限）≥业绩比较基准（下限）",
+        "rule_text": "1.业绩比较基准（上限）≥业绩比较基准（下限）"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "初始受益权信息[1].业绩比较基准（下限）%",
+          "value": "4.50"
+        },
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "初始受益权信息[1].业绩比较基准（上限）%",
+          "value": "3.80"
+        }
+      ],
+      "suggestion": "请将受益权代码SYQ-2026-002的业绩比较基准上限调整为不低于下限4.50%，或相应调整下限。",
+      "rule_ids": [
+        "INIT-ELEMENT-HYBRID-067",
+        "INIT-ELEMENT-HYBRID-069"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "系统校验规则：1.业绩比较基准（上限）≥业绩比较基准（下限）",
+          "rule_text": "1.业绩比较基准（上限）≥业绩比较基准（下限）"
+        },
+        {
+          "basis_type": "内置规则",
+          "basis_file": "系统校验规则：1.业绩比较基准（上限）≥业绩比较基准（下限）",
+          "rule_text": "1.业绩比较基准（上限）≥业绩比较基准（下限）"
+        }
+      ],
+      "alt_summaries": [
+        "受益权代码SYQ-2026-002的业绩比较基准上限3.80%小于下限4.50%，违反上限≥下限规则"
+      ],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-014",
+      "rule_id": "INIT-FILE-AI-005",
+      "issue_summary": "申报模板为JSON格式，不符合Excel模板下载与填写要求",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "附件6：信托登记系统用户手册（信托公司卷）",
+        "rule_text": "通过“项目管理->信托产品列表”点击“EXCEL模板下载”，在模板下载窗口点击“信托产品登记申请模板”下载Excel；打开后启用编辑和宏，在sheet页中填报信息。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "文件整体",
+          "value": "JSON格式，未使用Excel模板"
+        }
+      ],
+      "suggestion": "请按照指引下载并填写Excel模板，确保启用编辑和宏",
+      "rule_ids": [
+        "INIT-FILE-AI-005"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "附件6：信托登记系统用户手册（信托公司卷）",
+          "rule_text": "通过“项目管理->信托产品列表”点击“EXCEL模板下载”，在模板下载窗口点击“信托产品登记申请模板”下载Excel；打开后启用编辑和宏，在sheet页中填报信息。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-015",
+      "rule_id": "INIT-FILE-AI-008",
+      "issue_summary": "未上传信托文件样本，缺少完整性",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "中国信托登记有限责任公司信托登记业务指南（V3.0）",
+        "rule_text": "上传的信托文件样本应完整、清晰、可阅读。"
+      },
+      "issue_location": [
+        {
+          "material_name": "申请材料整体",
+          "location": "缺失文件",
+          "value": "缺少信托文件样本"
+        }
+      ],
+      "suggestion": "请补充上传信托文件样本，确保完整清晰可阅读",
+      "rule_ids": [
+        "INIT-FILE-AI-008"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "中国信托登记有限责任公司信托登记业务指南（V3.0）",
+          "rule_text": "上传的信托文件样本应完整、清晰、可阅读。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-016",
+      "rule_id": "INIT-ELEMENT-AI-003",
+      "issue_summary": "填报是否为结构化信托为否，但受益权存在优先劣后分层",
+      "risk_level": "中风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明",
+        "rule_text": "填报说明：结构化信托：是指信托公司根据投资者不同的风险偏好对信托受益权进行分层配置，按照分层配置中的优先与劣后安排进行收益分配，使具有不同风险承担能力和意愿的投资者通过投资不同层级的受益权来获取不同的收益并承担相应风险的信托业务。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "产品基本信息.是否为结构化信托",
+          "value": "否"
+        },
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "初始受益权信息",
+          "value": "受益人顺位：优先、劣后；受益权类型：优先、劣后"
+        }
+      ],
+      "suggestion": "根据受益权分层情况，应将是否为结构化信托修改为是，并重新填报相关要素",
+      "rule_ids": [
+        "INIT-ELEMENT-AI-003"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "填报说明：结构化信托：是指信托公司根据投资者不同的风险偏好对信托受益权进行分层配置，按照分层配置中的优先与劣后安排进行收益分配，使具有不同风险承担能力和意愿的投资者通过投资不同层级的受益权来获取不同的收益并承担相应风险的信托业务。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-017",
+      "rule_id": "INIT-ELEMENT-AI-004",
+      "issue_summary": "约定优先劣后比例填报3.00，与实收份额计算比例2.00不符",
+      "risk_level": "中风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明",
+        "rule_text": "填报说明：填写信托合同中约定的最高杠杆比例，即本信托产品所有优先受益权份额与劣后受益权份额之比。杠杆比例=优先级实收份额/劣后级实收份额，中间级份额计入优先级份额。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "产品基本信息.约定优先劣后受益权比例（%）",
+          "value": "3.00"
+        },
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "初始受益权信息[0].实际持有信托金额和[1].实际持有信托金额",
+          "value": "优先级20000万元，劣后级10000万元"
+        }
+      ],
+      "suggestion": "根据优先级份额20000和劣后级份额10000，比例应为2.00，请修正为2.00",
+      "rule_ids": [
+        "INIT-ELEMENT-AI-004"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "填报说明：填写信托合同中约定的最高杠杆比例，即本信托产品所有优先受益权份额与劣后受益权份额之比。杠杆比例=优先级实收份额/劣后级实收份额，中间级份额计入优先级份额。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-018",
+      "rule_id": "INIT-ELEMENT-AI-008",
+      "issue_summary": "业务分类信息中缺失是否在民政部门备案字段",
+      "risk_level": "中风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明；慈善信托管理办法",
+        "rule_text": "填报说明：根据《慈善信托管理办法》，受托人应当在慈善信托文件签订之日起7日内，将相关文件向受托人所在地县级以上人民政府民政部门备案。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "业务分类信息",
+          "value": "缺少字段：是否在民政部门备案"
+        }
+      ],
+      "suggestion": "请在业务分类信息表中补充是否在民政部门备案字段并填写正确值",
+      "rule_ids": [
+        "INIT-ELEMENT-AI-008",
+        "INIT-ELEMENT-AI-009"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明；慈善信托管理办法",
+          "rule_text": "填报说明：根据《慈善信托管理办法》，受托人应当在慈善信托文件签订之日起7日内，将相关文件向受托人所在地县级以上人民政府民政部门备案。"
+        },
+        {
+          "basis_type": "内置规则",
+          "basis_file": "系统校验规则：1.是否在民政部门备案选择【否】，公益慈善信托分类不得分类为【慈善信托】；",
+          "rule_text": "1.是否在民政部门备案选择【否】，公益慈善信托分类不得分类为【慈善信托】"
+        }
+      ],
+      "alt_summaries": [
+        "业务分类信息中缺失是否在民政部门备案字段，无法校验与慈善信托分类的关联"
+      ],
+      "alt_suggestions": [
+        "请补充是否在民政部门备案字段，若选择否则不得分类为慈善信托"
+      ]
+    },
+    {
+      "issue_id": "ISSUE-019",
+      "rule_id": "INIT-ELEMENT-AI-011",
+      "issue_summary": "是否参与资金募集填“是”，但未说明募集方式，存在说明不足",
+      "risk_level": "中风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明；关于规范信托公司信托业务分类的通知",
+        "rule_text": "填报说明：是指受托人自主销售或委托符合金融监督管理部门规定的资质条件的其他机构代理销售，参与资金募集的资产管理活动。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记申报模板JSON",
+          "location": "业务分类信息.是否参与资金募集",
+          "value": "是"
+        }
+      ],
+      "suggestion": "请补充募集方式说明，确认符合监管口径",
+      "rule_ids": [
+        "INIT-ELEMENT-AI-011"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明；关于规范信托公司信托业务分类的通知",
+          "rule_text": "填报说明：是指受托人自主销售或委托符合金融监督管理部门规定的资质条件的其他机构代理销售，参与资金募集的资产管理活动。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-020",
+      "rule_id": "INIT-ELEMENT-AI-012",
+      "issue_summary": "是否满足非公开发行要求填“是”，但未提供合格投资者等依据",
+      "risk_level": "中风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明；关于规范金融机构资产管理业务的指导意见；关于规范信托公司信托业务分类的通知；指导意见",
+        "rule_text": "填报说明：《关于规范金融机构资产管理业务的指导意见》第4条：私募产品面向合格投资者通过非公开方式发行。《关于规范信托公司信托业务分类的通知》明确资产管理信托属于私募资产管理产品，适用《指导意见》。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记申报模板JSON",
+          "location": "业务分类信息.是否满足非公开发行要求",
+          "value": "是"
+        }
+      ],
+      "suggestion": "请补充非公开发行的具体依据及合格投资者情况",
+      "rule_ids": [
+        "INIT-ELEMENT-AI-012"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明；关于规范金融机构资产管理业务的指导意见；关于规范信托公司信托业务分类的通知；指导意见",
+          "rule_text": "填报说明：《关于规范金融机构资产管理业务的指导意见》第4条：私募产品面向合格投资者通过非公开方式发行。《关于规范信托公司信托业务分类的通知》明确资产管理信托属于私募资产管理产品，适用《指导意见》。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-021",
+      "rule_id": "INIT-ELEMENT-AI-014",
+      "issue_summary": "是否证券投资类信托填“否”，但未提供投资方向说明",
+      "risk_level": "中风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明",
+        "rule_text": "填报说明：证券投资类信托：指信托产品项下资金除投向现金类资产外，剩余资金全部或者通过嵌套持牌金融机构发行的特定目的载体全部投资于依法公开发行并在符合法律规定的交易场所公开交易的证券的信托业务。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记申报模板JSON",
+          "location": "产品特征.是否证券投资类信托",
+          "value": "否"
+        }
+      ],
+      "suggestion": "请补充投资范围说明，以判断是否符合证券投资类信托定义",
+      "rule_ids": [
+        "INIT-ELEMENT-AI-014"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "填报说明：证券投资类信托：指信托产品项下资金除投向现金类资产外，剩余资金全部或者通过嵌套持牌金融机构发行的特定目的载体全部投资于依法公开发行并在符合法律规定的交易场所公开交易的证券的信托业务。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-022",
+      "rule_id": "INIT-ELEMENT-HYBRID-010",
+      "issue_summary": "信托业务分类为资产管理信托，但资产管理信托分类未填写。",
+      "risk_level": "中风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明",
+        "rule_text": "条件性必填；相关字段：信托业务分类选择【资产管理信托】，必填。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "业务分类信息.资产管理信托分类",
+          "value": ""
+        }
+      ],
+      "suggestion": "请根据实际业务情况填写资产管理信托分类，如固定收益类、权益类等。",
+      "rule_ids": [
+        "INIT-ELEMENT-HYBRID-010"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "条件性必填；相关字段：信托业务分类选择【资产管理信托】，必填。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-023",
+      "rule_id": "INIT-ELEMENT-HYBRID-022",
+      "issue_summary": "信托业务分类为资产管理信托，但未填写是否以管理契约型私募基金形式开展资产管理信托字段",
+      "risk_level": "中风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明",
+        "rule_text": "条件性必填；相关字段：信托业务分类选择【资产管理信托或待整改业务】，必填。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "业务分类信息",
+          "value": "未填写"
+        }
+      ],
+      "suggestion": "请补充填写是否以管理契约型私募基金形式开展资产管理信托字段",
+      "rule_ids": [
+        "INIT-ELEMENT-HYBRID-022",
+        "INIT-ELEMENT-HYBRID-024"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "条件性必填；相关字段：信托业务分类选择【资产管理信托或待整改业务】，必填。"
+        },
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "条件性必填；相关字段：信托业务分类选择【资产管理信托或资产服务信托或待整改业务】，必填。"
+        }
+      ],
+      "alt_summaries": [
+        "信托业务分类为资产管理信托，但未填写是否为融资方服务的私募投行业务字段"
+      ],
+      "alt_suggestions": [
+        "请补充填写是否为融资方服务的私募投行业务字段"
+      ]
+    },
+    {
+      "issue_id": "ISSUE-024",
+      "rule_id": "INIT-ELEMENT-HYBRID-030",
+      "issue_summary": "信托业务分类为资产管理信托，应填写是否受托境外理财信托（QDII）但缺失",
+      "risk_level": "中风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "初始登记要素表及填表说明",
+        "rule_text": "条件性必填；相关字段：信托业务分类选择【资产管理信托或资产服务信托或待整改业务】，必填。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "产品特征表",
+          "value": "未填写"
+        }
+      ],
+      "suggestion": "请在产品特征表中补充是否受托境外理财信托（QDII）字段，根据实际情况填写是或否",
+      "rule_ids": [
+        "INIT-ELEMENT-HYBRID-030",
+        "INIT-ELEMENT-HYBRID-032",
+        "INIT-ELEMENT-HYBRID-033"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "条件性必填；相关字段：信托业务分类选择【资产管理信托或资产服务信托或待整改业务】，必填。"
+        },
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "条件性必填；相关字段：信托业务分类选择【资产管理信托或资产服务信托或待整改业务】，必填。"
+        },
+        {
+          "basis_type": "内置规则",
+          "basis_file": "初始登记要素表及填表说明",
+          "rule_text": "条件性必填；相关字段：信托业务分类选择【资产管理信托或资产服务信托或待整改业务】，必填。"
+        }
+      ],
+      "alt_summaries": [
+        "信托业务分类为资产管理信托，应填写是否城市更新但缺失",
+        "信托业务分类为资产管理信托，应填写是否资产证券双SPV结构下的资产层信托但缺失"
+      ],
+      "alt_suggestions": [
+        "请在产品特征表中补充是否城市更新字段，根据实际情况填写是或否",
+        "请在产品特征表中补充是否资产证券双SPV结构下的资产层信托字段，根据实际情况填写是或否"
+      ]
+    },
+    {
+      "issue_id": "ISSUE-025",
+      "rule_id": "INIT-FILE-AI-001",
+      "issue_summary": "缺失信托文件样本，申请材料不齐备",
+      "risk_level": "中风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "中国信托登记有限责任公司信托登记业务指南（V3.0）",
+        "rule_text": "信托机构应当对所提供的信托登记相关文件和信息的真实性、准确性、完整性和及时性负责；形式审查意见不构成对信托产品合规情况、投资价值及投资风险的判断或者保证，且不免除受托人落实主体责任、承担管理职责的义务。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "文件列表",
+          "value": "未提供信托文件样本"
+        }
+      ],
+      "suggestion": "请补充上传信托文件样本（如信托合同等）",
+      "rule_ids": [
+        "INIT-FILE-AI-001"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "中国信托登记有限责任公司信托登记业务指南（V3.0）",
+          "rule_text": "信托机构应当对所提供的信托登记相关文件和信息的真实性、准确性、完整性和及时性负责；形式审查意见不构成对信托产品合规情况、投资价值及投资风险的判断或者保证，且不免除受托人落实主体责任、承担管理职责的义务。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-026",
+      "rule_id": "INIT-FILE-AI-006",
+      "issue_summary": "未提交加盖公章的信托文件样本（包括认购风险申明书、信托计划说明书、信托合同等）",
+      "risk_level": "中风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "中国信托登记有限责任公司信托登记业务指南（V3.0）",
+        "rule_text": "初始登记须提交加盖公章的信托文件样本。信托文件包括但不限于认购风险申明书、信托计划说明书、信托合同等。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "产品基本信息",
+          "value": "未提供信托文件样本"
+        }
+      ],
+      "suggestion": "请补充提交加盖公章的信托文件样本，包括认购风险申明书、信托计划说明书、信托合同等。",
+      "rule_ids": [
+        "INIT-FILE-AI-006"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "中国信托登记有限责任公司信托登记业务指南（V3.0）",
+          "rule_text": "初始登记须提交加盖公章的信托文件样本。信托文件包括但不限于认购风险申明书、信托计划说明书、信托合同等。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-027",
+      "rule_id": "INIT-FILE-AI-007",
+      "issue_summary": "产品存在优先、劣后受益权类型，但未分别提交不同版本信托文件",
+      "risk_level": "中风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "中国信托登记有限责任公司信托登记业务指南（V3.0）",
+        "rule_text": "同一信托产品具备不同类型版本信托文件的，应分别提交。示例包括结构化产品设置优先、劣后等不同信托文件，非结构化产品设置A类、B类、C类不同受益权类型信托文件等。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "初始受益权信息",
+          "value": "受益权类型包含优先和劣后，但未提交对应信托文件版本"
+        }
+      ],
+      "suggestion": "请分别提交优先受益权和劣后受益权对应的信托文件。",
+      "rule_ids": [
+        "INIT-FILE-AI-007"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "中国信托登记有限责任公司信托登记业务指南（V3.0）",
+          "rule_text": "同一信托产品具备不同类型版本信托文件的，应分别提交。示例包括结构化产品设置优先、劣后等不同信托文件，非结构化产品设置A类、B类、C类不同受益权类型信托文件等。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    },
+    {
+      "issue_id": "ISSUE-028",
+      "rule_id": "INIT-ELEMENT-AI-021",
+      "issue_summary": "产品特征表缺少“是否资产证券双SPV结构下的资产层信托”字段",
+      "risk_level": "低风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "系统校验规则：1.本字段选择【否】，资产服务信托分类2选择【其他资产证券化服务信托】，系统提示分类错误",
+        "rule_text": "1.本字段选择【否】，资产服务信托分类2选择【其他资产证券化服务信托】，系统提示分类错误"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记申报模板JSON",
+          "location": "产品特征",
+          "value": "缺失"
+        }
+      ],
+      "suggestion": "请补充该字段并选择正确值，若不符则选否",
+      "rule_ids": [
+        "INIT-ELEMENT-AI-021",
+        "INIT-ELEMENT-AI-022"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "系统校验规则：1.本字段选择【否】，资产服务信托分类2选择【其他资产证券化服务信托】，系统提示分类错误",
+          "rule_text": "1.本字段选择【否】，资产服务信托分类2选择【其他资产证券化服务信托】，系统提示分类错误"
+        },
+        {
+          "basis_type": "内置规则",
+          "basis_file": "系统校验规则：2.本字段选择【是】，信托业务分类不属于【待整改业务或其他资产证券化服务信托】，系统提示分类错误。",
+          "rule_text": "2.本字段选择【是】，信托业务分类不属于【待整改业务或其他资产证券化服务信托】，系统提示分类错误。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": [
+        "请补充该字段并确保若选是则业务分类需为待整改业务或其他资产证券化服务信托"
+      ]
+    },
+    {
+      "issue_id": "ISSUE-029",
+      "rule_id": "INIT-FILE-AI-003",
+      "issue_summary": "初始登记数据存在多处不符合填报规则的问题",
+      "risk_level": "低风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "附件6：信托登记系统用户手册（信托公司卷）",
+        "rule_text": "初始登记信息不符合初始登记要素表的数据规范、填报规则或质检规则时，系统校验不通过并退回待办任务，在意见中提示错误；补充材料时页面展示最近一次申请内容和形式审查意见。"
+      },
+      "issue_location": [
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "初始信托规模.募集起始日期/募集结束日期",
+          "value": "募集起始日期: 2026-04-10, 募集结束日期: 2026-04-01"
+        },
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "初始委托人及其财产信息[1].委托人证件号码",
+          "value": "33010619850712003"
+        },
+        {
+          "material_name": "初始登记模板_锦绣稳健1号.json",
+          "location": "初始受益权信息[1].业绩比较基准（下限）%/业绩比较基准（上限）%",
+          "value": "下限: 4.50, 上限: 3.80"
+        }
+      ],
+      "suggestion": "修正募集结束日期晚于起始日期，补充委托人证件号码至18位，调整业绩比较基准使下限不高于上限",
+      "rule_ids": [
+        "INIT-FILE-AI-003"
+      ],
+      "rule_bases": [
+        {
+          "basis_type": "内置规则",
+          "basis_file": "附件6：信托登记系统用户手册（信托公司卷）",
+          "rule_text": "初始登记信息不符合初始登记要素表的数据规范、填报规则或质检规则时，系统校验不通过并退回待办任务，在意见中提示错误；补充材料时页面展示最近一次申请内容和形式审查意见。"
+        }
+      ],
+      "alt_summaries": [],
+      "alt_suggestions": []
+    }
+  ],
+  "human_review_items": [
+    {
+      "rule_id": "INIT-FILE-AI-009",
+      "rule_name": "信托登记系统产品编码记载",
+      "rule_text": "认购风险申明书、信托计划说明书、信托合同等信托文件首页显著位置处应记载信托登记系统产品编码。",
+      "reason": "check_type=版式位置，属于版式/显著位置类，AI 不可靠"
+    }
+  ],
+  "batch_logs": [
+    {
+      "batch_id": "B01",
+      "review_dimension": "监管合规红线规则库(8条)",
+      "rule_count": 8,
+      "status": "success",
+      "issues_found": 5,
+      "duration_seconds": 13.52,
+      "input_tokens": 5719,
+      "output_tokens": 1597,
+      "error": null
+    },
+    {
+      "batch_id": "B02",
+      "review_dimension": "监管合规红线规则库(5条)",
+      "rule_count": 5,
+      "status": "success",
+      "issues_found": 5,
+      "duration_seconds": 17.99,
+      "input_tokens": 4950,
+      "output_tokens": 1585,
+      "error": null
+    },
+    {
+      "batch_id": "B03",
+      "review_dimension": "业务退回/整改案例库(2条)",
+      "rule_count": 2,
+      "status": "success",
+      "issues_found": 1,
+      "duration_seconds": 7.43,
+      "input_tokens": 4288,
+      "output_tokens": 700,
+      "error": null
+    },
+    {
+      "batch_id": "B04",
+      "review_dimension": "登记必填要素规则库(8条)",
+      "rule_count": 8,
+      "status": "success",
+      "issues_found": 2,
+      "duration_seconds": 10.38,
+      "input_tokens": 5549,
+      "output_tokens": 1056,
+      "error": null
+    },
+    {
+      "batch_id": "B05",
+      "review_dimension": "登记必填要素规则库(8条)",
+      "rule_count": 8,
+      "status": "success",
+      "issues_found": 1,
+      "duration_seconds": 6.71,
+      "input_tokens": 5657,
+      "output_tokens": 697,
+      "error": null
+    },
+    {
+      "batch_id": "B06",
+      "review_dimension": "登记必填要素规则库(8条)",
+      "rule_count": 8,
+      "status": "success",
+      "issues_found": 2,
+      "duration_seconds": 16.36,
+      "input_tokens": 5720,
+      "output_tokens": 726,
+      "error": null
+    },
+    {
+      "batch_id": "B07",
+      "review_dimension": "登记必填要素规则库(8条)",
+      "rule_count": 8,
+      "status": "success",
+      "issues_found": 3,
+      "duration_seconds": 10.26,
+      "input_tokens": 5780,
+      "output_tokens": 1263,
+      "error": null
+    },
+    {
+      "batch_id": "B08",
+      "review_dimension": "登记必填要素规则库(8条)",
+      "rule_count": 8,
+      "status": "success",
+      "issues_found": 0,
+      "duration_seconds": 5.12,
+      "input_tokens": 5505,
+      "output_tokens": 516,
+      "error": null
+    },
+    {
+      "batch_id": "B09",
+      "review_dimension": "登记必填要素规则库(8条)",
+      "rule_count": 8,
+      "status": "success",
+      "issues_found": 0,
+      "duration_seconds": 6.35,
+      "input_tokens": 5612,
+      "output_tokens": 585,
+      "error": null
+    },
+    {
+      "batch_id": "B10",
+      "review_dimension": "登记必填要素规则库(7条)",
+      "rule_count": 7,
+      "status": "success",
+      "issues_found": 0,
+      "duration_seconds": 6.66,
+      "input_tokens": 5382,
+      "output_tokens": 679,
+      "error": null
+    },
+    {
+      "batch_id": "B11",
+      "review_dimension": "格式模板规则库(8条)",
+      "rule_count": 8,
+      "status": "success",
+      "issues_found": 4,
+      "duration_seconds": 11.16,
+      "input_tokens": 5459,
+      "output_tokens": 1220,
+      "error": null
+    },
+    {
+      "batch_id": "B12",
+      "review_dimension": "格式模板规则库(8条)",
+      "rule_count": 8,
+      "status": "success",
+      "issues_found": 5,
+      "duration_seconds": 11.09,
+      "input_tokens": 5686,
+      "output_tokens": 1326,
+      "error": null
+    },
+    {
+      "batch_id": "B13",
+      "review_dimension": "格式模板规则库(8条)",
+      "rule_count": 8,
+      "status": "success",
+      "issues_found": 0,
+      "duration_seconds": 4.66,
+      "input_tokens": 5563,
+      "output_tokens": 546,
+      "error": null
+    },
+    {
+      "batch_id": "B14",
+      "review_dimension": "格式模板规则库(8条)",
+      "rule_count": 8,
+      "status": "success",
+      "issues_found": 1,
+      "duration_seconds": 10.97,
+      "input_tokens": 5521,
+      "output_tokens": 1215,
+      "error": null
+    },
+    {
+      "batch_id": "B15",
+      "review_dimension": "格式模板规则库(8条)",
+      "rule_count": 8,
+      "status": "success",
+      "issues_found": 5,
+      "duration_seconds": 15.97,
+      "input_tokens": 5489,
+      "output_tokens": 1924,
+      "error": null
+    },
+    {
+      "batch_id": "B16",
+      "review_dimension": "格式模板规则库(8条)",
+      "rule_count": 8,
+      "status": "success",
+      "issues_found": 3,
+      "duration_seconds": 6.76,
+      "input_tokens": 5621,
+      "output_tokens": 856,
+      "error": null
+    },
+    {
+      "batch_id": "B17",
+      "review_dimension": "格式模板规则库(8条)",
+      "rule_count": 8,
+      "status": "success",
+      "issues_found": 1,
+      "duration_seconds": 11.14,
+      "input_tokens": 5675,
+      "output_tokens": 1146,
+      "error": null
+    },
+    {
+      "batch_id": "B18",
+      "review_dimension": "格式模板规则库(5条)",
+      "rule_count": 5,
+      "status": "success",
+      "issues_found": 0,
+      "duration_seconds": 4.1,
+      "input_tokens": 5006,
+      "output_tokens": 288,
+      "error": null
+    },
+    {
+      "batch_id": "B19",
+      "review_dimension": "跨材料数据逻辑校验库(8条)",
+      "rule_count": 8,
+      "status": "success",
+      "issues_found": 1,
+      "duration_seconds": 7.6,
+      "input_tokens": 5814,
+      "output_tokens": 764,
+      "error": null
+    },
+    {
+      "batch_id": "B20",
+      "review_dimension": "跨材料数据逻辑校验库(8条)",
+      "rule_count": 8,
+      "status": "success",
+      "issues_found": 2,
+      "duration_seconds": 11.21,
+      "input_tokens": 6039,
+      "output_tokens": 1291,
+      "error": null
+    },
+    {
+      "batch_id": "B21",
+      "review_dimension": "跨材料数据逻辑校验库(8条)",
+      "rule_count": 8,
+      "status": "success",
+      "issues_found": 0,
+      "duration_seconds": 12.0,
+      "input_tokens": 5603,
+      "output_tokens": 1279,
+      "error": null
+    },
+    {
+      "batch_id": "B22",
+      "review_dimension": "跨材料数据逻辑校验库(6条)",
+      "rule_count": 6,
+      "status": "success",
+      "issues_found": 2,
+      "duration_seconds": 16.38,
+      "input_tokens": 5156,
+      "output_tokens": 1721,
+      "error": null
+    }
+  ]
+}

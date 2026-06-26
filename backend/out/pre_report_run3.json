@@ -1,0 +1,290 @@
+{
+  "summary": {
+    "registration_type": "事前报告",
+    "total_issues": 10,
+    "high_risk_count": 9,
+    "medium_risk_count": 1,
+    "low_risk_count": 0
+  },
+  "issues": [
+    {
+      "issue_id": "ISSUE-001",
+      "rule_id": "PRE-ELEMENT-AI-003",
+      "issue_summary": "关联交易目的缺失，关联交易事项信息不完整",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "附件2：事前报告要素表及填表说明.xlsx；银行保险机构关联交易管理办法",
+        "rule_text": "本表要求涉及关联方和关联交易的信托项目填报。涉及关联方和关联交易的信托项目，应参照《银行保险机构关联交易管理办法》报送关联方和关联交易信息。"
+      },
+      "issue_location": [
+        {
+          "material_name": "事前报告模板_锦绣8号 17.31.26.json",
+          "location": "关联交易事项[0].关联交易目的",
+          "value": ""
+        }
+      ],
+      "suggestion": "请补充关联交易目的，确保关联交易信息完整披露，符合监管口径。"
+    },
+    {
+      "issue_id": "ISSUE-002",
+      "rule_id": "PRE-ELEMENT-AI-004",
+      "issue_summary": "关联类型选择错误，应为法人类型而非自然人",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "附件2：事前报告要素表及填表说明.xlsx；银行保险机构关联交易管理办法",
+        "rule_text": "关联类型应按数据元说明中1至12类关联方口径选择； \"1-信托公司的自然人控股股东、实际控制人，及其一致行动人、最终受益人 2-持有或控制信托公司5%以上股权的，或持股不足5%但对信托公司经营管理有重大影响的自然人 3-信托公司的董事、监事、总行和重要分行的高级管理人员，以及具有大额授信、资产转移等核心业务审批或决策权的人员 4-第1至3项所列关联方的配偶、父母、成年子女及兄弟姐妹 5-信托公司的法人控股股东、实际控制人，及其一致行动人、最终受益人 6-持有或控制信托公司5%以上股权的，或者持股不足5%但对信托公司经营管理有重大影响的法人或非法人组织，及其控股股东、实际控制人、一致行动人、最终受益人 7-第5、6项所列关联方的董事、监事、高级管理人员 8-第5项所列关联方控制或施加重大影响的法人或非法人组织，第6项所列关联方控制的法人或非法人组织 9-信托公司控制或施加重大影响的法人或非法人组织 10-第1项所列关联方控制或施加重大影响的法人或非法人组织，第2至第4项所列关联方控制的法人或非法人组织 11-信托公司认定的其他自然人、法人或非法人组织 12-金融监管总局或其派出机构认定可能导致信托公司利益转移的自然人、法人或非法人组织\""
+      },
+      "issue_location": [
+        {
+          "material_name": "事前报告模板_锦绣8号 17.31.26.json",
+          "location": "关联交易事项[0].关联类型",
+          "value": "1-信托公司的自然人控股股东、实际控制人，及其一致行动人、最终受益人"
+        }
+      ],
+      "suggestion": "请根据关联方性质选择正确的关联类型，如类型5"
+    },
+    {
+      "issue_id": "ISSUE-003",
+      "rule_id": "PRE-ELEMENT-AI-005",
+      "issue_summary": "关联交易性质认定为一般关联交易，但交易对手为控股股东关联方且金额较大，需重新评估是否为重大关联交易",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "附件2：事前报告要素表及填表说明.xlsx",
+        "rule_text": "区分重大关联交易和一般关联交易，可作为事前报告审查风险识别/分级依据。"
+      },
+      "issue_location": [
+        {
+          "material_name": "事前报告模板_锦绣8号 17.31.26.json",
+          "location": "关联交易事项[0].关联交易性质",
+          "value": "一般关联交易"
+        },
+        {
+          "material_name": "事前报告申请书_锦绣8号 17.31.26.docx",
+          "location": "第13段",
+          "value": "我公司已将上述关联交易认定为一般关联交易。"
+        }
+      ],
+      "suggestion": "根据关联方类型（信托公司自然人控股股东实际控制的企业）及交易金额，建议评估是否应认定为重大关联交易，并补充董事会批准文件。"
+    },
+    {
+      "issue_id": "ISSUE-004",
+      "rule_id": "PRE-ELEMENT-HYBRID-002",
+      "issue_summary": "信托产品全称在申请书与模板中不一致，一个用数字“8”，一个用大写“捌”。",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "标准化意见（事前报告）.xlsx",
+        "rule_text": "信托产品全称与事前报告申请书不一致时，形成标准化退回/补正意见。"
+      },
+      "issue_location": [
+        {
+          "material_name": "事前报告模板JSON",
+          "location": "信托产品事前报告模板.产品基本信息.信托产品全称",
+          "value": "杭州工商信托·锦绣8号集合资金信托计划"
+        },
+        {
+          "material_name": "事前报告申请书",
+          "location": "第8段",
+          "value": "信托产品全称：杭州工商信托·锦绣捌号集合资金信托计划。"
+        }
+      ],
+      "suggestion": "统一信托产品全称，确保申请书与模板一致。"
+    },
+    {
+      "issue_id": "ISSUE-005",
+      "rule_id": "PRE-FILE-AI-002",
+      "issue_summary": "事前报告申请书缺少法定代表人签字",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "标准化意见（事前报告）",
+        "rule_text": "标准化意见中明确“登记申请书缺少填表人签字”为需补正事项。"
+      },
+      "issue_location": [
+        {
+          "material_name": "事前报告申请书_锦绣8号 17.31.26.docx",
+          "location": "第18段",
+          "value": "无签字"
+        }
+      ],
+      "suggestion": "请补充法定代表人或授权代表签字"
+    },
+    {
+      "issue_id": "ISSUE-006",
+      "rule_id": "PRE-FILE-AI-004",
+      "issue_summary": "关联交易目的字段为空，违反必填要求",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "附件2：事前报告要素表及填表说明",
+        "rule_text": "涉及关联方和关联交易的信托项目填报关联交易事项；关联交易类型、关联类型、关联方名称、关联交易金额、关联交易性质、关联事项具体描述、关联交易目的必填；关联交易性质选择“重大关联交易”时，“重大关联交易是否已经董事会批准”为条件性必填。 注意在事前报告要素表中提及该表自2026年1月1日起不再填报。"
+      },
+      "issue_location": [
+        {
+          "material_name": "事前报告模板_锦绣8号 17.31.26.json",
+          "location": "关联交易事项[0].关联交易目的",
+          "value": ""
+        }
+      ],
+      "suggestion": "请填写关联交易目的，说明本次关联交易的目的。"
+    },
+    {
+      "issue_id": "ISSUE-007",
+      "rule_id": "PRE-FILE-AI-005",
+      "issue_summary": "关联交易目的字段缺失，信息披露不完整",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "附件2：事前报告要素表及填表说明；银行保险机构关联交易管理办法",
+        "rule_text": "涉及关联方和关联交易的信托项目，应参照《银行保险机构关联交易管理办法》报送关联方和关联交易信息；关联类型包括自然人/法人控股股东、实际控制人、一致行动人、最终受益人等多类关联方；未尽事宜参照该办法填报。"
+      },
+      "issue_location": [
+        {
+          "material_name": "事前报告模板_锦绣8号 17.31.26.json",
+          "location": "关联交易事项[0].关联交易目的",
+          "value": ""
+        }
+      ],
+      "suggestion": "请补充关联交易的具体目的，如资金用于经营性物业项目建设等"
+    },
+    {
+      "issue_id": "ISSUE-008",
+      "rule_id": "PRE-FILE-HYBRID-001",
+      "issue_summary": "事前报告模板与申请书中信托产品全称不一致",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "标准化意见（事前报告）",
+        "rule_text": "事前报告模板中的“信托产品全称”应与事前报告申请书保持一致；不一致时形成标准化退回意见。"
+      },
+      "issue_location": [
+        {
+          "material_name": "事前报告模板_锦绣8号 17.31.26.json",
+          "location": "信托产品事前报告模板.产品基本信息.信托产品全称",
+          "value": "杭州工商信托·锦绣8号集合资金信托计划"
+        },
+        {
+          "material_name": "事前报告申请书_锦绣8号 17.31.26.docx",
+          "location": "第8段",
+          "value": "杭州工商信托·锦绣捌号集合资金信托计划"
+        }
+      ],
+      "suggestion": "请将事前报告申请书中的信托产品全称修改为与模板一致，或将模板修改为与申请书一致"
+    },
+    {
+      "issue_id": "ISSUE-009",
+      "rule_id": "PRE-FILE-HYBRID-003",
+      "issue_summary": "信托产品全称在申请书与模板中不一致，一个用数字“8”，一个用大写“捌”。",
+      "risk_level": "高风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "标准化意见（事前报告）",
+        "rule_text": "模板字段与申请书不一致时，标准化退回意见为“信托产品全称与事前报告申请书不一致。”"
+      },
+      "issue_location": [
+        {
+          "material_name": "事前报告模板JSON",
+          "location": "信托产品事前报告模板.产品基本信息.信托产品全称",
+          "value": "杭州工商信托·锦绣8号集合资金信托计划"
+        },
+        {
+          "material_name": "事前报告申请书",
+          "location": "第8段",
+          "value": "信托产品全称：杭州工商信托·锦绣捌号集合资金信托计划。"
+        }
+      ],
+      "suggestion": "统一信托产品全称，确保申请书与模板一致。"
+    },
+    {
+      "issue_id": "ISSUE-010",
+      "rule_id": "PRE-ELEMENT-AI-002",
+      "issue_summary": "报告事项内容与栏位监管口径不符，误用于关联交易报告",
+      "risk_level": "中风险",
+      "rule_basis": {
+        "basis_type": "内置规则",
+        "basis_file": "附件2：事前报告要素表及填表说明.xlsx",
+        "rule_text": "资产管理信托在存续期间新增异地推介等事项，可通过此栏位进行报告。"
+      },
+      "issue_location": [
+        {
+          "material_name": "事前报告模板_锦绣8号 17.31.26.json",
+          "location": "产品基本信息.报告事项",
+          "value": "本公司拟以本信托计划信托资金向关联方杭州锦盛实业有限公司发放信托贷款，现就该关联交易事项提交事前报告。"
+        }
+      ],
+      "suggestion": "报告事项仅用于新增异地推介等特定事项，请移除或另选正确栏位"
+    }
+  ],
+  "human_review_items": [],
+  "batch_logs": [
+    {
+      "batch_id": "B01",
+      "review_dimension": "登记必填要素规则库(6条)",
+      "rule_count": 6,
+      "status": "success",
+      "issues_found": 2,
+      "duration_seconds": 12.02,
+      "input_tokens": 2609,
+      "output_tokens": 1340,
+      "error": null
+    },
+    {
+      "batch_id": "B02",
+      "review_dimension": "格式模板规则库(2条)",
+      "rule_count": 2,
+      "status": "success",
+      "issues_found": 2,
+      "duration_seconds": 5.92,
+      "input_tokens": 1945,
+      "output_tokens": 620,
+      "error": null
+    },
+    {
+      "batch_id": "B03",
+      "review_dimension": "跨材料数据逻辑校验库(3条)",
+      "rule_count": 3,
+      "status": "success",
+      "issues_found": 1,
+      "duration_seconds": 4.34,
+      "input_tokens": 1898,
+      "output_tokens": 457,
+      "error": null
+    },
+    {
+      "batch_id": "B04",
+      "review_dimension": "监管合规红线规则库(2条)",
+      "rule_count": 2,
+      "status": "success",
+      "issues_found": 2,
+      "duration_seconds": 9.88,
+      "input_tokens": 1702,
+      "output_tokens": 1036,
+      "error": null
+    },
+    {
+      "batch_id": "B05",
+      "review_dimension": "业务退回/整改案例库(2条)",
+      "rule_count": 2,
+      "status": "success",
+      "issues_found": 2,
+      "duration_seconds": 12.27,
+      "input_tokens": 1688,
+      "output_tokens": 1351,
+      "error": null
+    },
+    {
+      "batch_id": "B06",
+      "review_dimension": "审查风险分级规则库(1条)",
+      "rule_count": 1,
+      "status": "success",
+      "issues_found": 1,
+      "duration_seconds": 6.63,
+      "input_tokens": 1460,
+      "output_tokens": 620,
+      "error": null
+    }
+  ]
+}
