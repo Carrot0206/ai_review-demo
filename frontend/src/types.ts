@@ -39,6 +39,11 @@ export interface UserRule {
   applicable_materials: string[]
   rule_text: string
   risk_level: RiskLevel
+  review_dimension?: string
+  check_type?: string
+  table_name?: string
+  field_name?: string
+  trigger_condition?: string
   created_at: number
   enabled: boolean
 }
@@ -98,6 +103,12 @@ export interface BatchLog {
   output_tokens: number
   error?: string | null
   materials_used?: string[]
+  slice_enabled?: boolean
+  slice_summary?: string
+  original_segment_count?: number
+  sliced_segment_count?: number
+  slice_fallback?: boolean
+  slice_confidence?: string
 }
 
 export interface ReviewSummary {

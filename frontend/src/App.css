@@ -405,6 +405,24 @@
 }
 .upload-item .size { color: var(--c-text-3); font-size: 12px; }
 
+.review-option-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 10px 12px;
+  background: #FAFBFF;
+  border: 1px solid #EDEFFB;
+  border-radius: 8px;
+}
+.review-option-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-text);
+  margin-bottom: 2px;
+}
+
 /* Dragger 紧凑版（已有上传时） */
 .dragger-compact .ant-upload-drag {
   padding: 8px !important;

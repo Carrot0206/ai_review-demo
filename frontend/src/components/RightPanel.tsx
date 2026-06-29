@@ -554,8 +554,20 @@ export default function RightPanel() {
                         {b.review_dimension}（{b.rule_count} 条规则） ·{' '}
                         {b.issues_found} 个问题 · {b.duration_seconds.toFixed(2)}s ·
                         tokens {b.input_tokens}/{b.output_tokens}
+                        {b.slice_enabled && (
+                          <span>
+                            {' '}· 裁剪 {b.original_segment_count}→{b.sliced_segment_count}
+                            {b.slice_fallback ? '（含回退）' : ''}
+                            {b.slice_confidence ? ` · ${b.slice_confidence}` : ''}
+                          </span>
+                        )}
                         {b.error && (
                           <span style={{ color: 'var(--c-risk-high)' }}> · {b.error}</span>
+                        )}
+                        {b.slice_summary && (
+                          <div className="muted" style={{ marginTop: 2, marginLeft: 48 }}>
+                            {b.slice_summary}
+                          </div>
                         )}
                       </div>
                     ))}

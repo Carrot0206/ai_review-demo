@@ -65,6 +65,10 @@ interface AppState {
   stageByProcess: ByProcess<Stage>
   setStage: (s: Stage, process?: ProcessType) => void
 
+  /** 材料片段裁剪开关：按流程保留，关闭时完全沿用原始全文材料逻辑 */
+  materialSliceByProcess: ByProcess<boolean>
+  setMaterialSlice: (enabled: boolean, process?: ProcessType) => void
+
   /** 清除指定流程(默认当前流程)的全部审核状态 */
   clearReviewState: (process?: ProcessType) => void
 
@@ -215,6 +219,17 @@ export const useStore = create<AppState>((set, get) => ({
   setStage: (st, process) => {
     const key = process ?? get().process
     set((s) => ({ stageByProcess: { ...s.stageByProcess, [key]: st } }))
+  },
+
+  materialSliceByProcess: initByProcess<boolean>(false),
+  setMaterialSlice: (enabled, process) => {
+    const key = process ?? get().process
+    set((s) => ({
+      materialSliceByProcess: {
+        ...s.materialSliceByProcess,
+        [key]: enabled,
+      },
+    }))
   },
 
   clearReviewState: (process) => {

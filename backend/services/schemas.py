@@ -19,6 +19,10 @@ class Rule(BaseModel):
 
     rule_id: str
     registration_type: str
+    rule_source: str = "内置规则"
+    source_file: str = ""
+    source_sheet: str = ""
+    source_row: int = 0
     rule_name: str
     rule_text: str
     basis_file: str = ""
@@ -30,6 +34,7 @@ class Rule(BaseModel):
     review_method: str = "ai"
     check_type: str = ""
     trigger_condition: str = ""
+    machine_params: str = ""
     risk_level: RiskLevel = "中风险"
     ai_check_focus: list[str] = Field(default_factory=list)
     evidence_requirement: str = ""
@@ -114,6 +119,12 @@ class BatchLog(BaseModel):
     output_tokens: int = 0
     error: Optional[str] = None
     materials_used: list[str] = Field(default_factory=list)
+    slice_enabled: bool = False
+    slice_summary: str = ""
+    original_segment_count: int = 0
+    sliced_segment_count: int = 0
+    slice_fallback: bool = False
+    slice_confidence: str = ""
 
 
 class ReviewResult(BaseModel):

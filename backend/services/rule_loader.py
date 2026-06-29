@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 from typing import Iterable
 
+from .material_filter import is_explicit_cross_document_rule
 from .schemas import ProcessType, Rule
 
 RULES_DIR = Path(__file__).resolve().parent.parent / "data" / "rules"
@@ -72,14 +73,20 @@ def split_for_ai_and_human(rules: Iterable[Rule]) -> tuple[list[Rule], list[Rule
 
 
 def group_by_dimension(rules: list[Rule], max_group_size: int = MAX_GROUP_SIZE) -> list[list[Rule]]:
-    """按 review_dimension 分组，再按 max_group_size 切片。"""
-    bucket: dict[str, list[Rule]] = {}
+    """按 review_dimension 分组，再按 max_group_size 切片。
+
+    真实跨文件规则单独成桶，避免申请书/信托文件上下文污染同维度下的模板内规则。
+    """
+    bucket: dict[tuple[str, str, str], list[Rule]] = {}
     for r in rules:
-        key = _normalize_dimension(r.review_dimension)
+        dim = _normalize_dimension(r.review_dimension)
+        scope = "cross_document" if is_explicit_cross_document_rule(r) else "template_or_internal"
+        source_sheet = getattr(r, "source_sheet", "") or ""
+        key = (dim, scope, source_sheet)
         bucket.setdefault(key, []).append(r)
 
     groups: list[list[Rule]] = []
-    for dim, items in bucket.items():
+    for _, items in bucket.items():
         for i in range(0, len(items), max_group_size):
             groups.append(items[i : i + max_group_size])
     return groups

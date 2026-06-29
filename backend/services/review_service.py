@@ -8,6 +8,7 @@ from typing import Awaitable, Callable, Iterable, Optional, Union
 from .llm_client import DeepSeekClient
 from .material_filter import filter_materials, materials_needed_by_group
 from .material_parser import parse_material
+from .material_slicer import slice_materials_for_group
 from .prompt_builder import build_messages
 from .rule_loader import (
     describe_group,
@@ -98,6 +99,7 @@ async def _run_batch(
     rules_by_id,
     batch_id: str,
     progress_cb: Optional[ProgressCallback],
+    material_slice_enabled: bool = False,
 ):
     start = time.perf_counter()
     label = describe_group(group)
@@ -106,8 +108,16 @@ async def _run_batch(
         # O1：按本批规则的 applicable_materials 裁剪材料
         needed = materials_needed_by_group(group)
         filtered_materials = filter_materials(materials, needed)
-        materials_used = [m.material_name for m in filtered_materials]
-        messages = build_messages(process, group, materials, material_filter=needed)
+        slice_result = slice_materials_for_group(
+            group,
+            filtered_materials,
+            enabled=material_slice_enabled,
+        )
+        prompt_materials = slice_result.materials
+        materials_used = [m.material_name for m in prompt_materials]
+        if material_slice_enabled:
+            await _emit(progress_cb, f"[{batch_id}] {slice_result.summary}")
+        messages = build_messages(process, group, prompt_materials)
         resp = await client.chat(messages)
         raw_issues = resp.parsed.get("issues") or []
         issues: list[Issue] = []
@@ -127,6 +137,12 @@ async def _run_batch(
             input_tokens=resp.input_tokens,
             output_tokens=resp.output_tokens,
             materials_used=materials_used,
+            slice_enabled=slice_result.enabled,
+            slice_summary=slice_result.summary,
+            original_segment_count=slice_result.original_segment_count,
+            sliced_segment_count=slice_result.sliced_segment_count,
+            slice_fallback=slice_result.fallback,
+            slice_confidence=slice_result.confidence,
         )
         await _emit(
             progress_cb,
@@ -435,6 +451,7 @@ async def review(
     progress_cb: Optional[ProgressCallback] = None,
     rule_id_whitelist: Optional[set] = None,
     on_batch_done: Optional[BatchDoneCallback] = None,
+    material_slice_enabled: bool = False,
 ) -> ReviewResult:
     """主流程：加载规则→解析材料→分批并发调 LLM→合并结果。
 
@@ -499,7 +516,14 @@ async def review(
         async with sem:
             batch_id = f"B{idx+1:02d}"
             issues, log = await _run_batch(
-                client, process, group, materials, rules_by_id, batch_id, progress_cb
+                client,
+                process,
+                group,
+                materials,
+                rules_by_id,
+                batch_id,
+                progress_cb,
+                material_slice_enabled,
             )
             # O6：批次完成立即推送（流式渲染）
             await _emit_batch_done(on_batch_done, issues, log)

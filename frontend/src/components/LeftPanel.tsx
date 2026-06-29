@@ -7,6 +7,7 @@ import {
   Modal,
   Popconfirm,
   Select,
+  Switch,
   Tag,
   Tooltip,
   Upload,
@@ -37,6 +38,27 @@ import type { RiskLevel } from '../types'
 
 const { Dragger } = Upload
 
+const REVIEW_DIMENSION_OPTIONS = [
+  { value: '用户新增规则', label: '用户新增规则' },
+  { value: '登记必填要素规则库', label: '登记必填要素规则库' },
+  { value: '格式模板规则库', label: '格式模板规则库' },
+  { value: '跨材料数据逻辑校验库', label: '跨材料数据逻辑校验库' },
+  { value: '监管合规红线规则库', label: '监管合规红线规则库' },
+  { value: '业务退回/整改案例库', label: '业务退回/整改案例库' },
+  { value: '审查风险分级规则库', label: '审查风险分级规则库' },
+]
+
+const CHECK_TYPE_OPTIONS = [
+  { value: '语义条件判断', label: '语义条件判断' },
+  { value: '条件性必填', label: '条件性必填' },
+  { value: '跨材料一致性', label: '跨材料一致性' },
+  { value: '监管口径符合性', label: '监管口径符合性' },
+  { value: '字段类型格式', label: '字段类型格式' },
+  { value: '签字盖章存在性', label: '签字盖章存在性' },
+  { value: '风险分级', label: '风险分级' },
+  { value: '其他', label: '其他' },
+]
+
 function fmtSize(b: number) {
   if (b < 1024) return b + ' B'
   if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB'
@@ -62,6 +84,8 @@ export default function LeftPanel() {
   const setBatchTotal = useStore((s) => s.setBatchTotal)
   const resetBatchProgress = useStore((s) => s.resetBatchProgress)
   const jobStatus = useStore((s) => s.jobStatusByProcess[s.process])
+  const materialSliceEnabled = useStore((s) => s.materialSliceByProcess[s.process])
+  const setMaterialSlice = useStore((s) => s.setMaterialSlice)
 
   const [creating, setCreating] = useState(false)
   // 正在编辑的规则 id；为 null 表示新增模式
@@ -166,6 +190,11 @@ export default function LeftPanel() {
           applicable_materials: vals.applicable_materials || [],
           rule_text: vals.rule_text,
           risk_level: vals.risk_level as RiskLevel,
+          review_dimension: vals.review_dimension || '用户新增规则',
+          check_type: vals.check_type || '语义条件判断',
+          table_name: vals.table_name || '',
+          field_name: vals.field_name || '',
+          trigger_condition: vals.trigger_condition || '',
         })
         message.success('已保存修改')
       } else {
@@ -174,6 +203,11 @@ export default function LeftPanel() {
           applicable_materials: vals.applicable_materials || [],
           rule_text: vals.rule_text,
           risk_level: vals.risk_level as RiskLevel,
+          review_dimension: vals.review_dimension || '用户新增规则',
+          check_type: vals.check_type || '语义条件判断',
+          table_name: vals.table_name || '',
+          field_name: vals.field_name || '',
+          trigger_condition: vals.trigger_condition || '',
         })
         message.success('已新增规则')
       }
@@ -191,6 +225,11 @@ export default function LeftPanel() {
     rule_text: string
     risk_level: RiskLevel
     applicable_materials?: string[]
+    review_dimension?: string
+    check_type?: string
+    table_name?: string
+    field_name?: string
+    trigger_condition?: string
   }) {
     setEditingRuleId(rule.rule_id)
     setCreating(true)
@@ -200,6 +239,11 @@ export default function LeftPanel() {
         rule_text: rule.rule_text,
         risk_level: rule.risk_level,
         applicable_materials: rule.applicable_materials || [],
+        review_dimension: rule.review_dimension || '用户新增规则',
+        check_type: rule.check_type || '语义条件判断',
+        table_name: rule.table_name || '',
+        field_name: rule.field_name || '',
+        trigger_condition: rule.trigger_condition || '',
       })
     }, 0)
   }
@@ -226,6 +270,7 @@ export default function LeftPanel() {
         process: reviewProcess,
         file_ids: currentUploads.map((u) => u.file_id),
         max_concurrency: 4,
+        material_slice_enabled: materialSliceEnabled,
       })
       setJobId(job_id, reviewProcess)
       setJobStatus('running', reviewProcess)
@@ -370,6 +415,13 @@ export default function LeftPanel() {
                               {r.risk_level}
                             </Tag>
                             {r.rule_text}
+                            <div className="muted" style={{ marginTop: 2 }}>
+                              {r.review_dimension || '用户新增规则'}
+                              {r.check_type ? ` · ${r.check_type}` : ''}
+                              {r.table_name || r.field_name
+                                ? ` · ${[r.table_name, r.field_name].filter(Boolean).join('.')}`
+                                : ''}
+                            </div>
                           </span>
                           <Tooltip title="编辑">
                             <Button
@@ -475,6 +527,20 @@ export default function LeftPanel() {
             </>
           )}
 
+          <div className="review-option-row">
+            <div>
+              <div className="review-option-title">材料片段裁剪</div>
+              <div className="muted">
+                开启后优先发送规则相关片段给 AI；命中不足时自动回退全文
+              </div>
+            </div>
+            <Switch
+              checked={materialSliceEnabled}
+              onChange={(checked) => setMaterialSlice(checked, process)}
+              disabled={running}
+            />
+          </div>
+
           <Button
             type="primary"
             block
@@ -510,7 +576,11 @@ export default function LeftPanel() {
         <Form
           layout="vertical"
           form={form}
-          initialValues={{ risk_level: '中风险' }}
+          initialValues={{
+            risk_level: '中风险',
+            review_dimension: '用户新增规则',
+            check_type: '语义条件判断',
+          }}
           preserve={false}
         >
           <Form.Item
@@ -543,6 +613,42 @@ export default function LeftPanel() {
               dropdownStyle={{ maxWidth: 'unset' }}
             />
           </Form.Item>
+          <Collapse
+            size="small"
+            ghost
+            items={[
+              {
+                key: 'advanced',
+                label: (
+                  <span style={{ fontSize: 13, fontWeight: 600 }}>
+                    高级定位信息（可选）
+                  </span>
+                ),
+                children: (
+                  <>
+                    <div className="muted" style={{ marginBottom: 10 }}>
+                      用于提升材料裁剪和 AI 定位准确性；不填写时会按规则文本弱检索，命中不足自动回退全文。
+                    </div>
+                    <Form.Item label="审核维度" name="review_dimension">
+                      <Select options={REVIEW_DIMENSION_OPTIONS} />
+                    </Form.Item>
+                    <Form.Item label="校验类型" name="check_type">
+                      <Select options={CHECK_TYPE_OPTIONS} />
+                    </Form.Item>
+                    <Form.Item label="表名" name="table_name">
+                      <Input placeholder="例：产品特征" allowClear />
+                    </Form.Item>
+                    <Form.Item label="字段名" name="field_name">
+                      <Input placeholder="例：约定优先劣后受益权比例" allowClear />
+                    </Form.Item>
+                    <Form.Item label="触发条件" name="trigger_condition">
+                      <Input placeholder="例：是否结构化信托=是" allowClear />
+                    </Form.Item>
+                  </>
+                ),
+              },
+            ]}
+          />
         </Form>
       </Modal>
     </>
