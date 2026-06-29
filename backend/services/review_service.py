@@ -224,13 +224,24 @@ def _defect_pairs(issue: Issue) -> frozenset:
 
     用于跨规则去重——两条 issue 若指向完全相同的 (material, leaf_field) 集合，
     或一个是另一个的子集（leaf 集合一致），视作同一事实错误。
+
+    特殊：当 loc.value 以 "缺失:" 开头时（约定的缺失字段占位），
+    用 ("__MISSING__", <target>) 替代正常的 (material, leaf) pair。
+    这样同一缺失目标（例如 "缺失:信托文件样本"）由不同材料报出时也能归一聚合。
     """
     if not issue.issue_location:
         return frozenset()
-    pairs = {
-        ((loc.material_name or "").strip(), _leaf_field(loc))
-        for loc in issue.issue_location
-    }
+    pairs: set[tuple[str, str]] = set()
+    for loc in issue.issue_location:
+        value = (loc.value or "").strip()
+        if value.startswith("缺失:") or value.startswith("缺失："):
+            # 取冒号后的目标
+            target = value.split(":", 1)[-1] if ":" in value else value.split("：", 1)[-1]
+            target = target.strip()
+            if target:
+                pairs.add(("__MISSING__", target))
+                continue
+        pairs.add(((loc.material_name or "").strip(), _leaf_field(loc)))
     # 丢掉 leaf 抽不出的（避免空 leaf 误聚）
     return frozenset(p for p in pairs if p[1])
 
@@ -318,7 +329,10 @@ def _merge_issues(issues: list[Issue]) -> list[Issue]:
                 continue
             if small < big:  # 真子集
                 big_leaves = {leaf for _, leaf in big}
-                if small_leaves == big_leaves and len(big) > best_size:
+                # 放宽：small.leaves ⊆ big.leaves 即可（不再要求完全相等）
+                # pairs ⊂ 已是强约束，足以避免误并；
+                # 允许 big 含 small 没有的额外 leaf（如同字段不同路径表述）。
+                if small_leaves <= big_leaves and len(big) > best_size:
                     best_big = big
                     best_size = len(big)
         if best_big is not None:

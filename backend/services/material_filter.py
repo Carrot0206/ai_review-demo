@@ -54,16 +54,44 @@ def _normalize_rule_tag(tag: str) -> Optional[str]:
     return None
 
 
+def _is_cross_material_rule(r: Rule) -> bool:
+    """判断一条规则是否属于"跨材料一致性"类，需要全发材料。
+
+    严格触发条件（任一即可）：
+    - check_type == "跨材料一致性"
+    - rule_name 含「一致性」
+
+    特别地：以前曾把 "监管合规红线" review_dimension、"含 一致" check_type
+    也算跨材料，这样会让大量"模板专属"规则（监管口径符合性/条件性必填等）
+    被整批降级全发，把申请书塞进对它们无意义的输入。按用户原则——模板字段
+    类规则的数据来源仅为申报模板 JSON——这里收紧到严格匹配。
+    """
+    ct = (r.check_type or "")
+    rn = (r.rule_name or "")
+    if ct == "跨材料一致性":
+        return True
+    if "一致性" in rn:
+        return True
+    return False
+
+
 def materials_needed_by_group(rules: Iterable[Rule]) -> Optional[set[str]]:
     """计算本批规则需要的 material_type 集合。
 
     返回：
-      - set[str]：需要的 material_type 集合
-      - None：表示"全发降级"——本批至少有一条规则没填 applicable_materials，
-        无法判断它依赖哪些材料，为保稳起见把全部材料都送进去。
+      - set[str]：本批规则的 applicable_materials 归一并集
+      - None：表示"全发降级"——本批至少有一条规则属于跨材料一致性类，
+        或缺标签 / 含无法归一化的标签。
+
+    注意：不再无条件追加"申请书"。模板字段类检查不应让 LLM 在申请书里查找。
     """
+    rules_list = list(rules)
+    # 一致性 / 跨材料类规则 → 强制全发（让申请书与模板都在）
+    if any(_is_cross_material_rule(r) for r in rules_list):
+        return None
+
     needed: set[str] = set()
-    for r in rules:
+    for r in rules_list:
         tags = r.applicable_materials or []
         if not tags:
             # 任意一条规则缺标签 → 降级
