@@ -1,6 +1,7 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Collapse, Empty, Popconfirm, Space, Tag, message } from 'antd'
 import {
+  CheckCircleOutlined,
   DeleteOutlined,
   DownloadOutlined,
   FilterOutlined,
@@ -12,13 +13,45 @@ import html2canvas from 'html2canvas'
 import { useStore } from '../store'
 import IssueCard from './IssueCard'
 import ThreeStageLoading from './ThreeStageLoading'
+import type { Issue } from '../types'
 
 type R = '高风险' | '中风险' | '低风险'
 const RISK_ORDER: Record<R, number> = { 高风险: 0, 中风险: 1, 低风险: 2 }
 
+const DIMENSION_ORDER = [
+  '登记必填要素规则库',
+  '格式模板规则库',
+  '跨材料数据逻辑校验库',
+  '监管合规红线规则库',
+  '业务退回/整改案例库',
+  '审查风险分级规则库',
+  '用户新增规则',
+  '其他',
+]
+
+function normalizeDimension(raw?: string) {
+  const text = (raw || '').replace(/\n/g, '').trim()
+  if (!text) return '其他'
+  return text.split('；')[0].split(';')[0].trim() || '其他'
+}
+
+function displayDimension(dim: string) {
+  return dim.endsWith('规则库') ? dim.slice(0, -3) : dim
+}
+
+function dimensionSort(a: string, b: string) {
+  const ai = DIMENSION_ORDER.indexOf(a)
+  const bi = DIMENSION_ORDER.indexOf(b)
+  const ar = ai === -1 ? 999 : ai
+  const br = bi === -1 ? 999 : bi
+  if (ar !== br) return ar - br
+  return a.localeCompare(b, 'zh-Hans-CN')
+}
+
 export default function RightPanel() {
   const process = useStore((s) => s.process)
   const result = useStore((s) => s.resultByProcess[s.process])
+  const rules = useStore((s) => s.rules)
   const jobStatus = useStore((s) => s.jobStatusByProcess[s.process])
   const progress = useStore((s) => s.progressByProcess[s.process])
   const batchProgress = useStore((s) => s.batchProgressByProcess[s.process])
@@ -27,6 +60,7 @@ export default function RightPanel() {
   const toggleRisk = useStore((s) => s.toggleRisk)
   const exportRef = useRef<HTMLDivElement>(null)
   const [exporting, setExporting] = useState(false)
+  const [filterDimensions, setFilterDimensions] = useState<Set<string>>(new Set())
 
   const running = jobStatus === 'pending' || jobStatus === 'running'
 
@@ -37,10 +71,107 @@ export default function RightPanel() {
     )
   }, [result])
 
-  const filtered = useMemo(
+  const ruleDimensionMap = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const r of rules?.rules || []) {
+      map.set(r.rule_id, normalizeDimension(r.review_dimension))
+    }
+    return map
+  }, [rules])
+
+  const allDimensions = useMemo(() => {
+    const dims = new Set<string>()
+    for (const r of rules?.rules || []) {
+      dims.add(normalizeDimension(r.review_dimension))
+    }
+    for (const issue of result?.issues || []) {
+      dims.add(
+        normalizeDimension(
+          issue.review_dimension || ruleDimensionMap.get(issue.rule_id),
+        ),
+      )
+    }
+    return Array.from(dims).sort(dimensionSort)
+  }, [result, ruleDimensionMap, rules])
+
+  useEffect(() => {
+    setFilterDimensions((prev) => {
+      if (prev.size === 0) return prev
+      const available = new Set(allDimensions)
+      const next = new Set(Array.from(prev).filter((d) => available.has(d)))
+      if (next.size === prev.size) return prev
+      return next
+    })
+  }, [allDimensions])
+
+  const activeDimensions = useMemo(() => {
+    const available = new Set(allDimensions)
+    const selected = Array.from(filterDimensions).filter((d) => available.has(d))
+    return selected.length > 0 ? selected.sort(dimensionSort) : allDimensions
+  }, [allDimensions, filterDimensions])
+
+  const activeDimensionSet = useMemo(
+    () => new Set(activeDimensions),
+    [activeDimensions],
+  )
+
+  const riskFiltered = useMemo(
     () => sortedIssues.filter((i) => filterRisks.has(i.risk_level as R)),
     [sortedIssues, filterRisks],
   )
+
+  const filtered = useMemo(
+    () =>
+      riskFiltered.filter((issue) =>
+        activeDimensionSet.has(
+          normalizeDimension(
+            issue.review_dimension || ruleDimensionMap.get(issue.rule_id),
+          ),
+        ),
+      ),
+    [activeDimensionSet, riskFiltered, ruleDimensionMap],
+  )
+
+  const allIssuesByDimension = useMemo(() => {
+    const grouped = new Map<string, Issue[]>()
+    for (const issue of sortedIssues) {
+      const dim = normalizeDimension(
+        issue.review_dimension || ruleDimensionMap.get(issue.rule_id),
+      )
+      const items = grouped.get(dim) || []
+      items.push(issue)
+      grouped.set(dim, items)
+    }
+    return grouped
+  }, [ruleDimensionMap, sortedIssues])
+
+  const issuesByDimension = useMemo(() => {
+    const grouped = new Map<string, Issue[]>()
+    for (const issue of filtered) {
+      const dim = normalizeDimension(
+        issue.review_dimension || ruleDimensionMap.get(issue.rule_id),
+      )
+      const items = grouped.get(dim) || []
+      items.push(issue)
+      grouped.set(dim, items)
+    }
+    return grouped
+  }, [filtered, ruleDimensionMap])
+
+  const filteredIndexMap = useMemo(() => {
+    const map = new Map<string, number>()
+    filtered.forEach((issue, idx) => map.set(issue.issue_id, idx))
+    return map
+  }, [filtered])
+
+  function toggleDimension(dim: string) {
+    setFilterDimensions((prev) => {
+      const next = new Set(prev)
+      if (next.has(dim)) next.delete(dim)
+      else next.add(dim)
+      return next
+    })
+  }
 
   async function handleExportPDF() {
     if (!exportRef.current || !result) return
@@ -246,34 +377,112 @@ export default function RightPanel() {
 
       {/* 筛选栏 */}
       <div className="filter-bar">
-        <FilterOutlined style={{ color: 'var(--c-text-2)' }} />
-        <span className="lbl">按风险筛选：</span>
-        {(['高风险', '中风险', '低风险'] as R[]).map((r) => {
-          const active = filterRisks.has(r)
-          const cls = r === '高风险' ? 'high' : r === '中风险' ? 'mid' : 'low'
-          return (
-            <span
-              key={r}
-              className={`filter-chip ${cls} ${active ? 'active' : ''}`}
-              onClick={() => toggleRisk(r)}
-            >
-              {active ? '✓ ' : ''}
-              {r}
-            </span>
-          )
-        })}
-        <div className="right">
-          <span className="muted">显示 {filtered.length} / {sortedIssues.length} 条</span>
+        <div className="filter-row">
+          <FilterOutlined style={{ color: 'var(--c-text-2)' }} />
+          <span className="lbl">按风险筛选：</span>
+          {(['高风险', '中风险', '低风险'] as R[]).map((r) => {
+            const active = filterRisks.has(r)
+            const cls = r === '高风险' ? 'high' : r === '中风险' ? 'mid' : 'low'
+            return (
+              <span
+                key={r}
+                className={`filter-chip ${cls} ${active ? 'active' : ''}`}
+                onClick={() => toggleRisk(r)}
+              >
+                {active ? '✓ ' : ''}
+                {r}
+              </span>
+            )
+          })}
+          <div className="right">
+            <span className="muted">显示 {filtered.length} / {sortedIssues.length} 条</span>
+          </div>
+        </div>
+        <div className="filter-row">
+          <span className="lbl">按审核类别筛选：</span>
+          <span
+            className={`filter-chip dimension ${filterDimensions.size === 0 ? 'active' : ''}`}
+            onClick={() => setFilterDimensions(new Set())}
+          >
+            全部类别
+          </span>
+          {allDimensions.map((dim) => {
+            const active = filterDimensions.has(dim)
+            return (
+              <span
+                key={dim}
+                className={`filter-chip dimension ${active ? 'active' : ''}`}
+                onClick={() => toggleDimension(dim)}
+              >
+                {active ? '✓ ' : ''}
+                {displayDimension(dim)}
+              </span>
+            )
+          })}
         </div>
       </div>
 
       <div className="panel-body" style={{ flex: 1, minHeight: 0 }}>
-        {filtered.length === 0 ? (
-          <Empty description="未发现命中规则的问题" style={{ padding: 24 }} />
+        {activeDimensions.length === 0 ? (
+          <Empty description="暂无可展示的审核维度" style={{ padding: 24 }} />
         ) : (
-          filtered.map((iss, idx) => (
-            <IssueCard key={iss.issue_id} index={idx} issue={iss} defaultOpen={idx < 2} />
-          ))
+          <div className="dimension-groups">
+            {activeDimensions.map((dim) => {
+              const issues = issuesByDimension.get(dim) || []
+              const totalInDim = allIssuesByDimension.get(dim)?.length || 0
+              const passed = totalInDim === 0
+              const title = displayDimension(dim)
+
+              return (
+                <Collapse
+                  key={dim}
+                  className={`dimension-collapse ${passed ? 'passed' : ''}`}
+                  defaultActiveKey={passed ? [] : [dim]}
+                  items={[
+                    {
+                      key: dim,
+                      label: (
+                        <span className="dimension-label">
+                          <span className="dimension-title">
+                            {title}
+                            {passed ? '（通过）' : `（${totalInDim}条）`}
+                          </span>
+                          {!passed && issues.length !== totalInDim && (
+                            <span className="dimension-filter-note">
+                              当前筛选显示 {issues.length} 条
+                            </span>
+                          )}
+                        </span>
+                      ),
+                      children: passed ? (
+                        <div className="dimension-pass">
+                          <CheckCircleOutlined />
+                          <span>AI 审查通过，未发现{title}问题。</span>
+                        </div>
+                      ) : issues.length === 0 ? (
+                        <Empty
+                          description="当前风险筛选下暂无该类别问题"
+                          style={{ padding: 16 }}
+                        />
+                      ) : (
+                        issues.map((iss) => {
+                          const displayIndex = filteredIndexMap.get(iss.issue_id) ?? 0
+                          return (
+                            <IssueCard
+                              key={iss.issue_id}
+                              index={displayIndex}
+                              issue={iss}
+                              defaultOpen={displayIndex < 2}
+                            />
+                          )
+                        })
+                      ),
+                    },
+                  ]}
+                />
+              )
+            })}
+          </div>
         )}
 
         {/* 需人工复核 */}

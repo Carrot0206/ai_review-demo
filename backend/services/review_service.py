@@ -77,6 +77,7 @@ def _build_issue_from_model(raw: dict, rules_by_id: dict, ) -> Optional[Issue]:
     return Issue(
         issue_id="",  # 在合并阶段统一编号
         rule_id=rule_id,
+        review_dimension=rule.review_dimension,
         issue_summary=str(raw.get("issue_summary", "") or "").strip(),
         risk_level=rule.risk_level,  # 后端回填
         rule_basis=RuleBasis(
@@ -386,6 +387,7 @@ def _merge_issues(issues: list[Issue]) -> list[Issue]:
                 best_pairs_size = other_size
 
         rule_ids = [head.rule_id]
+        rule_dimensions = [head.review_dimension]
         rule_bases = [head.rule_basis]
         alt_summaries: list[str] = []
         alt_suggestions: list[str] = []
@@ -393,6 +395,7 @@ def _merge_issues(issues: list[Issue]) -> list[Issue]:
         for other in group[1:]:
             if other.rule_id not in rule_ids:
                 rule_ids.append(other.rule_id)
+                rule_dimensions.append(other.review_dimension)
                 rule_bases.append(other.rule_basis)
             if other.issue_summary and other.issue_summary != head.issue_summary:
                 if other.issue_summary not in alt_summaries:
@@ -405,12 +408,14 @@ def _merge_issues(issues: list[Issue]) -> list[Issue]:
             Issue(
                 issue_id=head.issue_id,
                 rule_id=head.rule_id,
+                review_dimension=head.review_dimension,
                 issue_summary=head.issue_summary,
                 risk_level=head.risk_level,
                 rule_basis=head.rule_basis,
                 issue_location=best_locations,
                 suggestion=head.suggestion,
                 rule_ids=rule_ids,
+                rule_dimensions=rule_dimensions,
                 rule_bases=rule_bases,
                 alt_summaries=alt_summaries,
                 alt_suggestions=alt_suggestions,

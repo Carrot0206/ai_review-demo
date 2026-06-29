@@ -70,6 +70,7 @@ class RuleBasis(BaseModel):
 class Issue(BaseModel):
     issue_id: str
     rule_id: str  # 主命中规则（向后兼容；合并后取首条）
+    review_dimension: str = ""  # 主命中规则所属审核维度，用于前端按规则类别归组
     issue_summary: str
     risk_level: RiskLevel
     rule_basis: RuleBasis  # 主规则的依据（向后兼容）
@@ -77,6 +78,7 @@ class Issue(BaseModel):
     suggestion: str = ""
     # 合并字段：当多条规则共同命中同一事实错误时，这里给出全部 rule_id / 规则依据 / 各自摘要与建议
     rule_ids: list[str] = Field(default_factory=list)
+    rule_dimensions: list[str] = Field(default_factory=list)
     rule_bases: list[RuleBasis] = Field(default_factory=list)
     alt_summaries: list[str] = Field(default_factory=list)
     alt_suggestions: list[str] = Field(default_factory=list)
