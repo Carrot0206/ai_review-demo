@@ -54,25 +54,33 @@ def _normalize_rule_tag(tag: str) -> Optional[str]:
     return None
 
 
-def _is_cross_material_rule(r: Rule) -> bool:
-    """判断一条规则是否属于"跨材料一致性"类，需要全发材料。
+def is_explicit_cross_document_rule(r: Rule) -> bool:
+    """判断一条规则是否真的需要跨文件核对。
 
-    严格触发条件（任一即可）：
-    - check_type == "跨材料一致性"
-    - rule_name 含「一致性」
-
-    特别地：以前曾把 "监管合规红线" review_dimension、"含 一致" check_type
-    也算跨材料，这样会让大量"模板专属"规则（监管口径符合性/条件性必填等）
-    被整批降级全发，把申请书塞进对它们无意义的输入。按用户原则——模板字段
-    类规则的数据来源仅为申报模板 JSON——这里收紧到严格匹配。
+    初始登记要素审查中，"跨材料数据逻辑校验库"和"跨材料一致性"经常表示
+    申报模板 JSON 内部跨表/跨字段逻辑，不等于申请书与模板核对。只有规则的
+    适用材料和规则文本同时明确指向申请书/信托文件，才按跨文件处理。
     """
-    ct = (r.check_type or "")
-    rn = (r.rule_name or "")
-    if ct == "跨材料一致性":
-        return True
-    if "一致性" in rn:
-        return True
-    return False
+    tags = " ".join(r.applicable_materials or [])
+    has_template = "模板" in tags or "JSON" in tags
+    has_external_doc = "申请书" in tags or "信托文件" in tags or "信托合同" in tags
+    if not (has_template and has_external_doc):
+        return False
+
+    text = " ".join(
+        str(x or "")
+        for x in [
+            r.rule_name,
+            r.rule_text,
+            r.check_type,
+            r.trigger_condition,
+            getattr(r, "machine_params", ""),
+            " ".join(r.ai_check_focus or []),
+        ]
+    )
+    mentions_external_doc = "申请书" in text or "信托文件" in text or "信托合同" in text
+    mentions_compare = "一致" in text or "==" in text or "相同" in text or "对应" in text
+    return mentions_external_doc and mentions_compare
 
 
 def materials_needed_by_group(rules: Iterable[Rule]) -> Optional[set[str]]:
@@ -87,7 +95,7 @@ def materials_needed_by_group(rules: Iterable[Rule]) -> Optional[set[str]]:
     """
     rules_list = list(rules)
     # 一致性 / 跨材料类规则 → 强制全发（让申请书与模板都在）
-    if any(_is_cross_material_rule(r) for r in rules_list):
+    if any(is_explicit_cross_document_rule(r) for r in rules_list):
         return None
 
     needed: set[str] = set()

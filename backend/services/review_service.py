@@ -8,6 +8,7 @@ from typing import Awaitable, Callable, Iterable, Optional, Union
 from .llm_client import DeepSeekClient
 from .material_filter import filter_materials, materials_needed_by_group
 from .material_parser import parse_material
+from .material_slicer import slice_materials_for_group
 from .prompt_builder import build_messages
 from .rule_loader import (
     describe_group,
@@ -53,6 +54,21 @@ async def _emit_batch_done(
         await res
 
 
+def _display_location(raw: str) -> str:
+    """Convert JSON array paths to one-based business-facing paths.
+
+    The parser keeps array indexes internally (for example
+    "初始受益权信息[0].受益凭据编号"). Review output keeps the record marker,
+    but uses one-based indexes: "[0]" -> "[1]", "[1]" -> "[2]".
+    """
+    import re
+
+    def repl(match: re.Match) -> str:
+        return f"[{int(match.group(1)) + 1}]"
+
+    return re.sub(r"\[(\d+)\]", repl, str(raw or ""))
+
+
 def _build_issue_from_model(raw: dict, rules_by_id: dict, ) -> Optional[Issue]:
     """把模型返回的一个 issue 字典套用本地规则回填 → Issue。"""
     rule_id = (raw.get("rule_id") or "").strip()
@@ -69,7 +85,7 @@ def _build_issue_from_model(raw: dict, rules_by_id: dict, ) -> Optional[Issue]:
         locations.append(
             IssueLocation(
                 material_name=str(loc.get("material_name", "") or ""),
-                location=str(loc.get("location", "") or ""),
+                location=_display_location(str(loc.get("location", "") or "")),
                 value=str(loc.get("value", "") or ""),
             )
         )
@@ -77,6 +93,7 @@ def _build_issue_from_model(raw: dict, rules_by_id: dict, ) -> Optional[Issue]:
     return Issue(
         issue_id="",  # 在合并阶段统一编号
         rule_id=rule_id,
+        review_dimension=rule.review_dimension,
         issue_summary=str(raw.get("issue_summary", "") or "").strip(),
         risk_level=rule.risk_level,  # 后端回填
         rule_basis=RuleBasis(
@@ -97,6 +114,7 @@ async def _run_batch(
     rules_by_id,
     batch_id: str,
     progress_cb: Optional[ProgressCallback],
+    material_slice_enabled: bool = False,
 ):
     start = time.perf_counter()
     label = describe_group(group)
@@ -105,8 +123,16 @@ async def _run_batch(
         # O1：按本批规则的 applicable_materials 裁剪材料
         needed = materials_needed_by_group(group)
         filtered_materials = filter_materials(materials, needed)
-        materials_used = [m.material_name for m in filtered_materials]
-        messages = build_messages(process, group, materials, material_filter=needed)
+        slice_result = slice_materials_for_group(
+            group,
+            filtered_materials,
+            enabled=material_slice_enabled,
+        )
+        prompt_materials = slice_result.materials
+        materials_used = [m.material_name for m in prompt_materials]
+        if material_slice_enabled:
+            await _emit(progress_cb, f"[{batch_id}] {slice_result.summary}")
+        messages = build_messages(process, group, prompt_materials)
         resp = await client.chat(messages)
         raw_issues = resp.parsed.get("issues") or []
         issues: list[Issue] = []
@@ -126,6 +152,12 @@ async def _run_batch(
             input_tokens=resp.input_tokens,
             output_tokens=resp.output_tokens,
             materials_used=materials_used,
+            slice_enabled=slice_result.enabled,
+            slice_summary=slice_result.summary,
+            original_segment_count=slice_result.original_segment_count,
+            sliced_segment_count=slice_result.sliced_segment_count,
+            slice_fallback=slice_result.fallback,
+            slice_confidence=slice_result.confidence,
         )
         await _emit(
             progress_cb,
@@ -386,6 +418,7 @@ def _merge_issues(issues: list[Issue]) -> list[Issue]:
                 best_pairs_size = other_size
 
         rule_ids = [head.rule_id]
+        rule_dimensions = [head.review_dimension]
         rule_bases = [head.rule_basis]
         alt_summaries: list[str] = []
         alt_suggestions: list[str] = []
@@ -393,6 +426,7 @@ def _merge_issues(issues: list[Issue]) -> list[Issue]:
         for other in group[1:]:
             if other.rule_id not in rule_ids:
                 rule_ids.append(other.rule_id)
+                rule_dimensions.append(other.review_dimension)
                 rule_bases.append(other.rule_basis)
             if other.issue_summary and other.issue_summary != head.issue_summary:
                 if other.issue_summary not in alt_summaries:
@@ -405,12 +439,14 @@ def _merge_issues(issues: list[Issue]) -> list[Issue]:
             Issue(
                 issue_id=head.issue_id,
                 rule_id=head.rule_id,
+                review_dimension=head.review_dimension,
                 issue_summary=head.issue_summary,
                 risk_level=head.risk_level,
                 rule_basis=head.rule_basis,
                 issue_location=best_locations,
                 suggestion=head.suggestion,
                 rule_ids=rule_ids,
+                rule_dimensions=rule_dimensions,
                 rule_bases=rule_bases,
                 alt_summaries=alt_summaries,
                 alt_suggestions=alt_suggestions,
@@ -426,10 +462,11 @@ async def review(
     materials_preloaded: Optional[list] = None,
     extra_rules: Optional[list] = None,
     client: Optional[DeepSeekClient] = None,
-    max_concurrency: int = 4,
+    max_concurrency: int = 48,
     progress_cb: Optional[ProgressCallback] = None,
     rule_id_whitelist: Optional[set] = None,
     on_batch_done: Optional[BatchDoneCallback] = None,
+    material_slice_enabled: bool = False,
 ) -> ReviewResult:
     """主流程：加载规则→解析材料→分批并发调 LLM→合并结果。
 
@@ -494,7 +531,14 @@ async def review(
         async with sem:
             batch_id = f"B{idx+1:02d}"
             issues, log = await _run_batch(
-                client, process, group, materials, rules_by_id, batch_id, progress_cb
+                client,
+                process,
+                group,
+                materials,
+                rules_by_id,
+                batch_id,
+                progress_cb,
+                material_slice_enabled,
             )
             # O6：批次完成立即推送（流式渲染）
             await _emit_batch_done(on_batch_done, issues, log)
@@ -511,11 +555,11 @@ async def review(
 
     # 4.1 同一事实错误合并：按 issue_location 指纹聚类
     raw_count = len(all_issues)
-    all_issues = _merge_issues(all_issues)
-    if raw_count != len(all_issues):
+    deduped_issues = _merge_issues(all_issues)
+    if raw_count != len(deduped_issues):
         await _emit(
             progress_cb,
-            f"问题合并：{raw_count} → {len(all_issues)}（同一事实错误的多条规则命中已合并）",
+            f"问题合并：{raw_count} → {len(deduped_issues)}（同一事实错误的多条规则命中已合并）",
         )
 
     # 5. 编号 + 排序（高→中→低，规则内按 rule_id 稳定排序）
@@ -523,6 +567,9 @@ async def review(
     all_issues.sort(key=lambda x: (risk_order.get(x.risk_level, 9), x.rule_id))
     for i, it in enumerate(all_issues, start=1):
         it.issue_id = f"ISSUE-{i:03d}"
+    deduped_issues.sort(key=lambda x: (risk_order.get(x.risk_level, 9), x.rule_id))
+    for i, it in enumerate(deduped_issues, start=1):
+        it.issue_id = f"DEDUPED-ISSUE-{i:03d}"
 
     human_items = [
         HumanReviewItem(
@@ -537,6 +584,8 @@ async def review(
     return ReviewResult(
         summary=_summarize(process, all_issues),
         issues=all_issues,
+        deduped_summary=_summarize(process, deduped_issues),
+        deduped_issues=deduped_issues,
         human_review_items=human_items,
         batch_logs=batch_logs,
     )

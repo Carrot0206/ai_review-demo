@@ -22,12 +22,22 @@ class UserRuleCreate(BaseModel):
     applicable_materials: list = []
     rule_text: str
     risk_level: RiskLevel = "中风险"
+    review_dimension: str = "用户新增规则"
+    check_type: str = "语义条件判断"
+    table_name: str = ""
+    field_name: str = ""
+    trigger_condition: str = ""
 
 
 class UserRuleUpdate(BaseModel):
     applicable_materials: Optional[list] = None
     rule_text: Optional[str] = None
     risk_level: Optional[RiskLevel] = None
+    review_dimension: Optional[str] = None
+    check_type: Optional[str] = None
+    table_name: Optional[str] = None
+    field_name: Optional[str] = None
+    trigger_condition: Optional[str] = None
 
 
 @router.get("")
@@ -44,6 +54,11 @@ def create_user_rule(payload: UserRuleCreate):
         applicable_materials=payload.applicable_materials,
         rule_text=payload.rule_text,
         risk_level=payload.risk_level,
+        review_dimension=payload.review_dimension,
+        check_type=payload.check_type,
+        table_name=payload.table_name,
+        field_name=payload.field_name,
+        trigger_condition=payload.trigger_condition,
     )
     return rule.model_dump()
 
@@ -57,6 +72,11 @@ def edit_user_rule(rule_id: str, payload: UserRuleUpdate):
         applicable_materials=payload.applicable_materials,
         rule_text=payload.rule_text,
         risk_level=payload.risk_level,
+        review_dimension=payload.review_dimension,
+        check_type=payload.check_type,
+        table_name=payload.table_name,
+        field_name=payload.field_name,
+        trigger_condition=payload.trigger_condition,
     )
     if rule is None:
         raise HTTPException(status_code=404, detail=f"规则 {rule_id} 不存在")

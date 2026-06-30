@@ -1,0 +1,13 @@
+{
+  "file_id": "836779031385",
+  "original_name": "初始登记模板_测试样例_含错误.json",
+  "size_bytes": 8123,
+  "size_human": "7.9 KB",
+  "material_type": "申报模板",
+  "process": "initial",
+  "uploaded_at": 1782806515,
+  "parse_status": "已解析",
+  "parse_error": null,
+  "segments_count": 160,
+  "file_kind": "json"
+}

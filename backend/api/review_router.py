@@ -22,7 +22,8 @@ class ReviewStart(BaseModel):
     process: ProcessType
     file_ids: list[str]
     user_rule_ids: Optional[list[str]] = None  # None = 用全部已启用的用户规则；空列表 = 不用
-    max_concurrency: int = 4
+    max_concurrency: int = 48
+    material_slice_enabled: bool = False
 
 
 async def _run_review_job(job: ReviewJob, payload: ReviewStart):
@@ -68,6 +69,7 @@ async def _run_review_job(job: ReviewJob, payload: ReviewStart):
             max_concurrency=payload.max_concurrency,
             progress_cb=cb,
             on_batch_done=batch_cb,
+            material_slice_enabled=payload.material_slice_enabled,
         )
         job.result = result
         job.status = "done"

@@ -39,6 +39,11 @@ export interface UserRule {
   applicable_materials: string[]
   rule_text: string
   risk_level: RiskLevel
+  review_dimension?: string
+  check_type?: string
+  table_name?: string
+  field_name?: string
+  trigger_condition?: string
   created_at: number
   enabled: boolean
 }
@@ -74,12 +79,14 @@ export interface IssueLocation {
 export interface Issue {
   issue_id: string
   rule_id: string
+  review_dimension?: string
   issue_summary: string
   risk_level: RiskLevel
   rule_basis: RuleBasis
   issue_location: IssueLocation[]
   suggestion: string
   rule_ids: string[]
+  rule_dimensions?: string[]
   rule_bases: RuleBasis[]
   alt_summaries: string[]
   alt_suggestions: string[]
@@ -96,6 +103,12 @@ export interface BatchLog {
   output_tokens: number
   error?: string | null
   materials_used?: string[]
+  slice_enabled?: boolean
+  slice_summary?: string
+  original_segment_count?: number
+  sliced_segment_count?: number
+  slice_fallback?: boolean
+  slice_confidence?: string
 }
 
 export interface ReviewSummary {
@@ -109,6 +122,8 @@ export interface ReviewSummary {
 export interface ReviewResult {
   summary: ReviewSummary
   issues: Issue[]
+  deduped_summary?: ReviewSummary | null
+  deduped_issues?: Issue[]
   human_review_items: HumanReviewItem[]
   batch_logs: BatchLog[]
 }

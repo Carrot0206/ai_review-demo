@@ -25,6 +25,21 @@ function renderBasisLine(b: RuleBasis) {
   )
 }
 
+function recordLabelFromLocation(location: string) {
+  const match = (location || '').match(/\[(\d+)\]/)
+  if (!match) return ''
+  const n = Number(match[1])
+  if (!Number.isFinite(n) || n <= 0) return ''
+  const chinese = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十']
+  const label = n <= 10 ? chinese[n] : String(n)
+  return `第${label}条`
+}
+
+function shouldShowRecordLabel(recordLabel: string, reason: string) {
+  if (!recordLabel) return false
+  return !(reason || '').includes(recordLabel)
+}
+
 interface Props {
   index: number
   issue: Issue
@@ -73,6 +88,8 @@ export default function IssueCard({ index, issue, defaultOpen = false }: Props) 
             ) : (
               locations.map((loc, i) => {
                 const reason = allSummaries[i] || allSummaries[0]
+                const recordLabel = recordLabelFromLocation(loc.location)
+                const showRecordLabel = shouldShowRecordLabel(recordLabel, reason)
                 return (
                   <div className="content" key={i} style={{ marginBottom: 6 }}>
                     <div style={{ fontSize: 12, color: 'var(--c-text-3)' }}>
@@ -95,6 +112,11 @@ export default function IssueCard({ index, issue, defaultOpen = false }: Props) 
                       <span style={{ color: 'var(--c-text-3)', marginRight: 4 }}>
                         原因：
                       </span>
+                      {showRecordLabel && (
+                        <span style={{ fontWeight: 600, marginRight: 4 }}>
+                          {recordLabel}
+                        </span>
+                      )}
                       {reason}
                     </div>
                   </div>

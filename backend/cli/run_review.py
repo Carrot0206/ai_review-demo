@@ -47,8 +47,8 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--max-concurrency",
         type=int,
-        default=4,
-        help="并发批次数上限（默认 4）",
+        default=16,
+        help="并发批次数上限（默认 16）",
     )
     p.add_argument(
         "--rules",

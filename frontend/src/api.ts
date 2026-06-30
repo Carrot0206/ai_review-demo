@@ -36,6 +36,11 @@ export async function createUserRule(payload: {
   applicable_materials: string[]
   rule_text: string
   risk_level: RiskLevel
+  review_dimension?: string
+  check_type?: string
+  table_name?: string
+  field_name?: string
+  trigger_condition?: string
 }): Promise<UserRule> {
   const { data } = await http.post('/user-rules', payload)
   return data
@@ -52,6 +57,11 @@ export async function updateUserRule(
     applicable_materials?: string[]
     rule_text?: string
     risk_level?: RiskLevel
+    review_dimension?: string
+    check_type?: string
+    table_name?: string
+    field_name?: string
+    trigger_condition?: string
   },
 ): Promise<UserRule> {
   const { data } = await http.put(`/user-rules/${rule_id}`, payload)
@@ -99,6 +109,7 @@ export async function startReview(payload: {
   file_ids: string[]
   user_rule_ids?: string[] | null
   max_concurrency?: number
+  material_slice_enabled?: boolean
 }): Promise<{ job_id: string; status: string }> {
   const { data } = await http.post('/review', payload)
   return data
