@@ -10,6 +10,7 @@ from ..services.upload_store import (
     delete_upload,
     find_duplicate,
     list_uploads,
+    load_extracted,
     load_meta,
     save_upload,
 )
@@ -65,6 +66,14 @@ def get_upload_meta(file_id: str):
     if not meta:
         raise HTTPException(status_code=404, detail=f"文件 {file_id} 不存在")
     return meta
+
+
+@router.get("/{file_id}/extracted")
+def get_upload_extracted(file_id: str):
+    extracted = load_extracted(file_id)
+    if not extracted:
+        raise HTTPException(status_code=404, detail=f"文件 {file_id} 未解析或不存在")
+    return extracted
 
 
 @router.delete("/{file_id}")

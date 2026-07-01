@@ -64,6 +64,18 @@ export interface UploadMeta {
   parse_error?: string | null
 }
 
+export interface ExtractedSegment {
+  location: string
+  text: string
+}
+
+export interface ExtractedMaterial {
+  material_name: string
+  material_type: string
+  file_kind: 'json' | 'pdf' | 'docx' | 'txt' | 'unknown'
+  segments: ExtractedSegment[]
+}
+
 export interface RuleBasis {
   basis_type: '内置规则' | '用户新增规则'
   basis_file: string

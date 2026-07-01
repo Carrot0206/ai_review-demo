@@ -72,6 +72,14 @@ interface AppState {
   /** 清除指定流程(默认当前流程)的全部审核状态 */
   clearReviewState: (process?: ProcessType) => void
 
+  /** 左侧字段与右侧问题卡片联动选中态 */
+  selectedIssueIdByProcess: ByProcess<string | null>
+  selectedIssueNonceByProcess: ByProcess<number>
+  selectedFieldLocationByProcess: ByProcess<string | null>
+  setSelectedIssue: (issueId: string | null, process?: ProcessType) => void
+  clearSelectedIssue: (process?: ProcessType) => void
+  setSelectedFieldLocation: (location: string | null, process?: ProcessType) => void
+
   /** 筛选(全局共享) */
   filterRisks: Set<'高风险' | '中风险' | '低风险'>
   toggleRisk: (r: '高风险' | '中风险' | '低风险') => void
@@ -243,6 +251,48 @@ export const useStore = create<AppState>((set, get) => ({
       batchProgressByProcess: {
         ...s.batchProgressByProcess,
         [key]: { done: 0, total: 0 },
+      },
+      selectedIssueIdByProcess: { ...s.selectedIssueIdByProcess, [key]: null },
+      selectedIssueNonceByProcess: { ...s.selectedIssueNonceByProcess, [key]: 0 },
+      selectedFieldLocationByProcess: { ...s.selectedFieldLocationByProcess, [key]: null },
+    }))
+  },
+
+  selectedIssueIdByProcess: initByProcess<string | null>(null),
+  selectedIssueNonceByProcess: initByProcess<number>(0),
+  selectedFieldLocationByProcess: initByProcess<string | null>(null),
+  setSelectedIssue: (issueId, process) => {
+    const key = process ?? get().process
+    set((s) => ({
+      selectedIssueIdByProcess: {
+        ...s.selectedIssueIdByProcess,
+        [key]: issueId,
+      },
+      selectedIssueNonceByProcess: {
+        ...s.selectedIssueNonceByProcess,
+        [key]: s.selectedIssueNonceByProcess[key] + 1,
+      },
+    }))
+  },
+  clearSelectedIssue: (process) => {
+    const key = process ?? get().process
+    set((s) => ({
+      selectedIssueIdByProcess: {
+        ...s.selectedIssueIdByProcess,
+        [key]: null,
+      },
+      selectedIssueNonceByProcess: {
+        ...s.selectedIssueNonceByProcess,
+        [key]: s.selectedIssueNonceByProcess[key] + 1,
+      },
+    }))
+  },
+  setSelectedFieldLocation: (location, process) => {
+    const key = process ?? get().process
+    set((s) => ({
+      selectedFieldLocationByProcess: {
+        ...s.selectedFieldLocationByProcess,
+        [key]: location,
       },
     }))
   },

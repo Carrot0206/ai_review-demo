@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
 import { DownOutlined } from '@ant-design/icons'
 import type { Issue, RuleBasis } from '../types'
 
@@ -44,9 +44,15 @@ interface Props {
   index: number
   issue: Issue
   defaultOpen?: boolean
+  forceOpen?: boolean
+  selected?: boolean
+  onSelect?: (issueId: string) => void
 }
 
-export default function IssueCard({ index, issue, defaultOpen = false }: Props) {
+const IssueCard = forwardRef<HTMLDivElement, Props>(function IssueCard(
+  { issue, defaultOpen = false, forceOpen = false, selected = false, onSelect },
+  ref,
+) {
   const [open, setOpen] = useState(defaultOpen)
   const cls = riskClass(issue.risk_level)
   const locations = issue.issue_location || []
@@ -54,15 +60,24 @@ export default function IssueCard({ index, issue, defaultOpen = false }: Props) 
   const allSummaries = [issue.issue_summary, ...(issue.alt_summaries || [])]
   const allSuggestions = [issue.suggestion, ...(issue.alt_suggestions || [])].filter(Boolean)
 
+  useEffect(() => {
+    if (forceOpen) setOpen(true)
+  }, [forceOpen])
+
   return (
-    <div className={`issue-card ${cls}`}>
-      <div className="issue-head" onClick={() => setOpen((v) => !v)}>
-        <span className="seq">#{index + 1}</span>
-        <span className={`risk-tag ${cls}`}>
-          {issue.risk_level}
-        </span>
+    <div className={`issue-card ${cls} ${selected ? 'selected' : ''}`} ref={ref}>
+      <div
+        className="issue-head"
+        onClick={() => {
+          onSelect?.(issue.issue_id)
+          setOpen((v) => !v)
+        }}
+      >
         <span className="title" title={issue.issue_summary}>
           {issue.issue_summary}
+        </span>
+        <span className={`risk-tag ${cls}`}>
+          {issue.risk_level}
         </span>
         <DownOutlined className={`chev ${open ? 'open' : ''}`} />
       </div>
@@ -167,4 +182,6 @@ export default function IssueCard({ index, issue, defaultOpen = false }: Props) 
       )}
     </div>
   )
-}
+})
+
+export default IssueCard

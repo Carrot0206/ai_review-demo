@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   Collapse,
+  Empty,
   Form,
   Input,
   Modal,
@@ -25,6 +26,7 @@ import {
   createUserRule,
   deleteUpload,
   deleteUserRule,
+  getUploadExtracted,
   getRules,
   listUploads,
   loadSamples,
@@ -34,9 +36,47 @@ import {
   uploadFile,
 } from '../api'
 import { useStore } from '../store'
-import type { RiskLevel } from '../types'
+import type { ExtractedMaterial, Issue, ProcessType, RiskLevel, UploadMeta } from '../types'
 
 const { Dragger } = Upload
+
+const TEMPLATE_SECTIONS: Record<ProcessType, string[]> = {
+  initial: [
+    '产品基本信息',
+    '业务分类信息',
+    '产品特征',
+    '互联网贷款信息',
+    '信托费用信息',
+    '初始信托规模',
+    '共同受托人信息',
+    '初始委托人及其财产信息',
+    '初始受益权信息',
+  ],
+  pre_report: ['产品基本信息', '关联交易事项'],
+}
+
+const RISK_WEIGHT: Record<RiskLevel, number> = {
+  高风险: 3,
+  中风险: 2,
+  低风险: 1,
+}
+
+interface TemplateField {
+  label: string
+  value: string
+  location: string
+}
+
+interface TemplateRecord {
+  index: number
+  fields: TemplateField[]
+}
+
+interface TemplateSectionData {
+  name: string
+  fields: TemplateField[]
+  records: TemplateRecord[]
+}
 
 const REVIEW_DIMENSION_OPTIONS = [
   { value: '用户新增规则', label: '用户新增规则' },
@@ -65,6 +105,148 @@ function fmtSize(b: number) {
   return (b / 1024 / 1024).toFixed(1) + ' MB'
 }
 
+function isTemplateUpload(u: UploadMeta) {
+  return u.material_type === '申报模板' || u.original_name.includes('模板')
+}
+
+function normalizeLocationToSection(location: string, sections: string[]) {
+  const raw = (location || '').trim()
+  if (!raw) return ''
+  for (const section of sections) {
+    if (raw === section || raw.startsWith(`${section}.`) || raw.startsWith(`${section}[`)) {
+      return raw
+    }
+    const marker = `.${section}`
+    const idx = raw.indexOf(marker)
+    if (idx >= 0) return raw.slice(idx + 1)
+  }
+  return raw
+}
+
+function shiftArrayIndexes(location: string, delta: number) {
+  return location.replace(/\[(\d+)\]/g, (_, n: string) => {
+    const next = Number(n) + delta
+    return next >= 0 ? `[${next}]` : `[${n}]`
+  })
+}
+
+function locationVariants(location: string, sections: string[]) {
+  const normalized = normalizeLocationToSection(location, sections)
+  return new Set([
+    (location || '').trim(),
+    normalized,
+    shiftArrayIndexes(normalized, 1),
+    shiftArrayIndexes(normalized, -1),
+  ].filter(Boolean))
+}
+
+function fieldMatchesIssueLocation(fieldLocation: string, issueLocation: string, sections: string[]) {
+  const fieldKeys = locationVariants(fieldLocation, sections)
+  const issueKeys = locationVariants(issueLocation, sections)
+  for (const key of fieldKeys) {
+    if (issueKeys.has(key)) return true
+  }
+  return false
+}
+
+function buildTemplateSections(material: ExtractedMaterial | null, process: ProcessType) {
+  const sectionNames = TEMPLATE_SECTIONS[process]
+  const sections: TemplateSectionData[] = sectionNames.map((name) => ({
+    name,
+    fields: [],
+    records: [],
+  }))
+  if (!material) return sections
+
+  const byName = new Map(sections.map((section) => [section.name, section]))
+  const recordsBySection = new Map<string, Map<number, TemplateRecord>>()
+  for (const segment of material.segments || []) {
+    const normalized = normalizeLocationToSection(segment.location, sectionNames)
+    const sectionName = sectionNames.find(
+      (name) =>
+        normalized === name ||
+        normalized.startsWith(`${name}.`) ||
+        normalized.startsWith(`${name}[`),
+    )
+    if (!sectionName) continue
+    const section = byName.get(sectionName)
+    if (!section) continue
+    const rest = normalized.slice(sectionName.length)
+    const arrayMatch = rest.match(/^\[(\d+)\]\.(.+)$/)
+    if (arrayMatch) {
+      const rowIndex = arrayMatch[1]
+      const fieldName = arrayMatch[2]
+      const recordIndex = Number(rowIndex) + 1
+      let sectionRecords = recordsBySection.get(sectionName)
+      if (!sectionRecords) {
+        sectionRecords = new Map()
+        recordsBySection.set(sectionName, sectionRecords)
+      }
+      let record = sectionRecords.get(recordIndex)
+      if (!record) {
+        record = { index: recordIndex, fields: [] }
+        sectionRecords.set(recordIndex, record)
+        section.records.push(record)
+      }
+      record.fields.push({
+        label: fieldName,
+        value: segment.text,
+        location: segment.location,
+      })
+      continue
+    }
+
+    const fieldMatch = rest.match(/^\.(.+)$/)
+    if (!fieldMatch) continue
+    const fieldName = fieldMatch[1]
+    if (fieldName.includes('.')) continue
+    section.fields.push({
+      label: fieldName,
+      value: segment.text,
+      location: segment.location,
+    })
+  }
+
+  for (const section of sections) {
+    section.records.sort((a, b) => a.index - b.index)
+    if (section.records.length === 1 && section.fields.length === 0) {
+      section.fields = section.records[0].fields
+      section.records = []
+    }
+  }
+
+  return sections
+}
+
+function getIssuesForField(
+  location: string,
+  issues: Issue[],
+  material: ExtractedMaterial | null,
+  sections: string[],
+) {
+  if (!material || !location) return []
+  return issues.filter((issue) =>
+    (issue.issue_location || []).some((loc) => {
+      if (loc.material_name && loc.material_name !== material.material_name) return false
+      return fieldMatchesIssueLocation(location, loc.location, sections)
+    }),
+  )
+}
+
+function topRisk(issues: Issue[]) {
+  return issues.reduce<RiskLevel | null>((risk, issue) => {
+    if (!risk) return issue.risk_level
+    return RISK_WEIGHT[issue.risk_level] > RISK_WEIGHT[risk] ? issue.risk_level : risk
+  }, null)
+}
+
+function riskClass(level: RiskLevel | null) {
+  if (level === '高风险') return 'high'
+  if (level === '中风险') return 'mid'
+  if (level === '低风险') return 'low'
+  return ''
+}
+
 export default function LeftPanel() {
   const process = useStore((s) => s.process)
   const rules = useStore((s) => s.rules)
@@ -84,10 +266,17 @@ export default function LeftPanel() {
   const setBatchTotal = useStore((s) => s.setBatchTotal)
   const resetBatchProgress = useStore((s) => s.resetBatchProgress)
   const jobStatus = useStore((s) => s.jobStatusByProcess[s.process])
+  const result = useStore((s) => s.resultByProcess[s.process])
   const materialSliceEnabled = useStore((s) => s.materialSliceByProcess[s.process])
   const setMaterialSlice = useStore((s) => s.setMaterialSlice)
+  const filterRisks = useStore((s) => s.filterRisks)
+  const setSelectedIssue = useStore((s) => s.setSelectedIssue)
+  const selectedFieldLocation = useStore((s) => s.selectedFieldLocationByProcess[s.process])
 
   const [creating, setCreating] = useState(false)
+  const [templateMaterial, setTemplateMaterial] = useState<ExtractedMaterial | null>(null)
+  const [templateLoading, setTemplateLoading] = useState(false)
+  const fieldRefs = useRef(new Map<string, HTMLDivElement>())
   // 正在编辑的规则 id；为 null 表示新增模式
   const [editingRuleId, setEditingRuleId] = useState<string | null>(null)
   const [form] = Form.useForm()
@@ -127,6 +316,65 @@ export default function LeftPanel() {
 
   // 当前流程下的上传文件（演示版：全部都展示）
   const currentUploads = uploads
+  const templateUpload = useMemo(() => {
+    return [...currentUploads]
+      .filter(isTemplateUpload)
+      .sort((a, b) => (b.uploaded_at || 0) - (a.uploaded_at || 0))[0]
+  }, [currentUploads])
+
+  useEffect(() => {
+    let canceled = false
+    if (!templateUpload) {
+      setTemplateMaterial(null)
+      setTemplateLoading(false)
+      return
+    }
+    setTemplateLoading(true)
+    getUploadExtracted(templateUpload.file_id)
+      .then((data) => {
+        if (!canceled) setTemplateMaterial(data)
+      })
+      .catch(() => {
+        if (!canceled) setTemplateMaterial(null)
+      })
+      .finally(() => {
+        if (!canceled) setTemplateLoading(false)
+      })
+    return () => {
+      canceled = true
+    }
+  }, [templateUpload])
+
+  const displayIssues = useMemo(
+    () => result?.issues || [],
+    [result],
+  )
+  const visibleIssueIds = useMemo(
+    () => new Set(displayIssues.filter((issue) => filterRisks.has(issue.risk_level)).map((issue) => issue.issue_id)),
+    [displayIssues, filterRisks],
+  )
+  const templateSections = useMemo(
+    () => buildTemplateSections(templateMaterial, process),
+    [process, templateMaterial],
+  )
+
+  useEffect(() => {
+    if (!selectedFieldLocation) return
+    window.requestAnimationFrame(() => {
+      const node = fieldRefs.current.get(selectedFieldLocation)
+      node?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    })
+  }, [selectedFieldLocation])
+
+  function handleSelectFieldIssue(issues: Issue[]) {
+    if (issues.length === 0) return
+    const visible = issues.find((issue) => visibleIssueIds.has(issue.issue_id))
+    if (!visible) {
+      message.warning('关联问题当前被筛选隐藏，请调整右侧筛选条件后查看')
+      return
+    }
+    setSelectedIssue(visible.issue_id, process)
+  }
 
   async function refreshUploads() {
     const list = await listUploads(process)
@@ -315,185 +563,260 @@ export default function LeftPanel() {
 
   const running = jobStatus === 'pending' || jobStatus === 'running'
 
+  function renderIssueBadge(issues: Issue[]) {
+    const risk = topRisk(issues)
+    if (!risk) return null
+    return (
+      <span className={`template-issue-badge ${riskClass(risk)}`}>
+        !
+      </span>
+    )
+  }
+
+  function renderFieldValue(value: string, location: string) {
+    const issues = getIssuesForField(
+      location,
+      displayIssues,
+      templateMaterial,
+      TEMPLATE_SECTIONS[process],
+    )
+    const risk = topRisk(issues)
+    const clickable = issues.length > 0
+    return (
+      <button
+        type="button"
+        className={`template-field-value ${riskClass(risk)} ${clickable ? 'has-issue' : ''}`}
+        onClick={() => handleSelectFieldIssue(issues)}
+        disabled={!clickable}
+        title={clickable ? '点击查看关联问题' : undefined}
+      >
+        <span>{value || '（空）'}</span>
+        {renderIssueBadge(issues)}
+      </button>
+    )
+  }
+
+  function renderTemplateSection(section: TemplateSectionData) {
+    if (section.fields.length === 0 && section.records.length === 0) {
+      return <div className="template-empty-row">暂无数据</div>
+    }
+
+    function renderFields(fields: TemplateField[]) {
+      const rows: TemplateField[][] = []
+      for (let i = 0; i < fields.length; i += 2) {
+        rows.push(fields.slice(i, i + 2))
+      }
+      return rows.map((row, idx) => (
+        <div className="template-field-row" key={idx}>
+          {row.map((field) => (
+            <div
+              className="template-field-cell"
+              key={field.location}
+              ref={(node) => {
+                if (node) fieldRefs.current.set(field.location, node)
+                else fieldRefs.current.delete(field.location)
+              }}
+            >
+              <div className="template-field-label">{field.label}：</div>
+              <div className="template-field-content">
+                {renderFieldValue(field.value, field.location)}
+              </div>
+            </div>
+          ))}
+          {row.length === 1 && <div className="template-field-cell empty" />}
+        </div>
+      ))
+    }
+
+    return (
+      <div className="template-field-table">
+        {section.fields.length > 0 && renderFields(section.fields)}
+        {section.records.map((record, idx) => (
+          <div className="template-record-block" key={record.index}>
+            <div className="template-record-title">
+              {section.name}[{record.index}]：
+            </div>
+            {renderFields(record.fields)}
+            {idx < section.records.length - 1 && <div className="template-record-divider" />}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
   return (
     <>
-      {/* ===== 规则面板 ===== */}
-      <div className="panel">
+      <div className="panel action-panel">
         <div className="panel-header">
-          <h3>📚 {processLabel}规则集</h3>
+          <h3>审核工作台 · {processLabel}</h3>
           <div className="right">
-            <Tag color="processing">内置 {builtinRules.length}</Tag>
-            <Tag color="purple">用户 {userRules.length}</Tag>
+            <Tag color="processing">内置规则 {builtinRules.length}</Tag>
+            <Tag color="purple">用户规则 {userRules.length}</Tag>
+            <Tag color={currentUploads.length > 0 ? 'success' : 'default'}>
+              材料 {currentUploads.length}
+            </Tag>
           </div>
         </div>
-        <div className="panel-body" style={{ maxHeight: 320 }}>
-          <Collapse
-            size="small"
-            ghost
-            defaultActiveKey={['builtin', 'user']}
-            items={[
-              {
-                key: 'builtin',
-                label: (
-                  <span style={{ fontSize: 13, fontWeight: 600 }}>
-                    内置规则（{builtinRules.length}）
-                  </span>
-                ),
-                children: (
-                  <div style={{ maxHeight: 200, overflowY: 'auto' }}>
-                    {builtinRules.length === 0 && (
-                      <div className="muted" style={{ padding: '4px 0' }}>
-                        暂未加载到内置规则（请检查后端是否已启动）
-                      </div>
-                    )}
-                    {builtinRules.slice(0, 60).map((r) => (
-                      <div key={r.rule_id} className="rule-row">
-                        <span className="rid">{r.rule_id}</span>
-                        <span className="txt">
-                          <Tooltip title={r.rule_text}>
-                            <span>
-                              <strong>{r.rule_name}</strong>
-                              <span className="muted" style={{ marginLeft: 6 }}>
-                                · {r.review_dimension}
-                              </span>
-                            </span>
-                          </Tooltip>
-                        </span>
-                      </div>
-                    ))}
-                    {builtinRules.length > 60 && (
-                      <div className="muted" style={{ textAlign: 'center', padding: 6 }}>
-                        … 还有 {builtinRules.length - 60} 条，仅展示前 60 条
-                      </div>
-                    )}
-                  </div>
-                ),
-              },
-              {
-                key: 'user',
-                label: (
-                  <span style={{ fontSize: 13, fontWeight: 600 }}>
-                    用户新增规则（{userRules.length}）
-                  </span>
-                ),
-                children: (
-                  <>
-                    <div style={{ marginBottom: 8 }}>
-                      <Button
-                        type="dashed"
-                        size="small"
-                        icon={<PlusOutlined />}
-                        onClick={() => {
-                          setEditingRuleId(null)
-                          form.resetFields()
-                          setCreating(true)
-                        }}
-                        block
-                      >
-                        新增一条规则
-                      </Button>
-                    </div>
-                    {userRules.length === 0 ? (
-                      <div className="muted" style={{ padding: '4px 0' }}>
-                        暂无用户规则
-                      </div>
-                    ) : (
-                      userRules.map((r) => (
-                        <div key={r.rule_id} className="rule-row">
-                          <span className="rid">{r.rule_id.slice(0, 8)}</span>
-                          <span className="txt">
-                            <Tag
-                              color={
-                                r.risk_level === '高风险'
-                                  ? 'error'
-                                  : r.risk_level === '中风险'
-                                  ? 'warning'
-                                  : 'success'
-                              }
-                              style={{ marginRight: 6 }}
-                            >
-                              {r.risk_level}
-                            </Tag>
-                            {r.rule_text}
-                            <div className="muted" style={{ marginTop: 2 }}>
-                              {r.review_dimension || '用户新增规则'}
-                              {r.check_type ? ` · ${r.check_type}` : ''}
-                              {r.table_name || r.field_name
-                                ? ` · ${[r.table_name, r.field_name].filter(Boolean).join('.')}`
-                                : ''}
-                            </div>
-                          </span>
-                          <Tooltip title="编辑">
-                            <Button
-                              type="text"
-                              size="small"
-                              icon={<EditOutlined />}
-                              onClick={() => handleOpenEdit(r)}
-                            />
-                          </Tooltip>
-                          <Popconfirm
-                            title="删除该规则？"
-                            onConfirm={() => handleDeleteUserRule(r.rule_id)}
-                          >
-                            <Button
-                              type="text"
-                              size="small"
-                              icon={<DeleteOutlined />}
-                              danger
-                            />
-                          </Popconfirm>
-                        </div>
-                      ))
-                    )}
-                  </>
-                ),
-              },
-            ]}
-          />
-        </div>
-      </div>
-
-      {/* ===== 上传 / 剧本模式 ===== */}
-      <div className="panel">
-        <div className="panel-header">
-          <h3>📥 材料上传</h3>
-          <div className="right">
-            <Button
+        <div className="panel-body action-grid">
+          <section className="action-block rules-block">
+            <div className="action-block-title">规则</div>
+            <Collapse
               size="small"
-              icon={<ThunderboltOutlined />}
-              onClick={handleLoadSamples}
-            >
-              一键载入样例
-            </Button>
-          </div>
-        </div>
-        <div className="panel-body">
-          <div className={currentUploads.length > 0 ? 'dragger-compact' : ''}>
-            <Dragger
-              multiple
-              beforeUpload={handleUpload}
-              showUploadList={false}
-              accept=".json,.pdf,.docx,.txt"
-              style={{ background: '#FAFBFF', borderColor: '#CBD5E1' }}
-            >
-              <p className="ant-upload-drag-icon" style={{ marginBottom: 4 }}>
-                <InboxOutlined style={{ color: '#5B5BD6' }} />
-              </p>
-              <p style={{ fontSize: 13, color: 'var(--c-text)', margin: 0 }}>
-                点击或拖拽上传材料
-              </p>
-              <p style={{ fontSize: 12, color: 'var(--c-text-3)', margin: 0 }}>
-                支持 JSON / PDF / DOCX / TXT
-              </p>
-            </Dragger>
-          </div>
+              ghost
+              items={[
+                {
+                  key: 'builtin',
+                  label: (
+                    <span style={{ fontSize: 13, fontWeight: 600 }}>
+                      内置规则（{builtinRules.length}）
+                    </span>
+                  ),
+                  children: (
+                    <div className="compact-scroll">
+                      {builtinRules.length === 0 && (
+                        <div className="muted" style={{ padding: '4px 0' }}>
+                          暂未加载到内置规则
+                        </div>
+                      )}
+                      {builtinRules.slice(0, 40).map((r) => (
+                        <div key={r.rule_id} className="rule-row">
+                          <span className="rid">{r.rule_id}</span>
+                          <span className="txt">
+                            <Tooltip title={r.rule_text}>
+                              <span>
+                                <strong>{r.rule_name}</strong>
+                                <span className="muted" style={{ marginLeft: 6 }}>
+                                  · {r.review_dimension}
+                                </span>
+                              </span>
+                            </Tooltip>
+                          </span>
+                        </div>
+                      ))}
+                      {builtinRules.length > 40 && (
+                        <div className="muted" style={{ textAlign: 'center', padding: 6 }}>
+                          … 还有 {builtinRules.length - 40} 条
+                        </div>
+                      )}
+                    </div>
+                  ),
+                },
+                {
+                  key: 'user',
+                  label: (
+                    <span style={{ fontSize: 13, fontWeight: 600 }}>
+                      用户新增规则（{userRules.length}）
+                    </span>
+                  ),
+                  children: (
+                    <>
+                      <div style={{ marginBottom: 8 }}>
+                        <Button
+                          type="dashed"
+                          size="small"
+                          icon={<PlusOutlined />}
+                          onClick={() => {
+                            setEditingRuleId(null)
+                            form.resetFields()
+                            setCreating(true)
+                          }}
+                          block
+                        >
+                          新增一条规则
+                        </Button>
+                      </div>
+                      <div className="compact-scroll">
+                        {userRules.length === 0 ? (
+                          <div className="muted" style={{ padding: '4px 0' }}>
+                            暂无用户规则
+                          </div>
+                        ) : (
+                          userRules.map((r) => (
+                            <div key={r.rule_id} className="rule-row">
+                              <span className="rid">{r.rule_id.slice(0, 8)}</span>
+                              <span className="txt">
+                                <Tag
+                                  color={
+                                    r.risk_level === '高风险'
+                                      ? 'error'
+                                      : r.risk_level === '中风险'
+                                      ? 'warning'
+                                      : 'success'
+                                  }
+                                  style={{ marginRight: 6 }}
+                                >
+                                  {r.risk_level}
+                                </Tag>
+                                {r.rule_text}
+                                <div className="muted" style={{ marginTop: 2 }}>
+                                  {r.review_dimension || '用户新增规则'}
+                                  {r.check_type ? ` · ${r.check_type}` : ''}
+                                  {r.table_name || r.field_name
+                                    ? ` · ${[r.table_name, r.field_name].filter(Boolean).join('.')}`
+                                    : ''}
+                                </div>
+                              </span>
+                              <Tooltip title="编辑">
+                                <Button
+                                  type="text"
+                                  size="small"
+                                  icon={<EditOutlined />}
+                                  onClick={() => handleOpenEdit(r)}
+                                />
+                              </Tooltip>
+                              <Popconfirm
+                                title="删除该规则？"
+                                onConfirm={() => handleDeleteUserRule(r.rule_id)}
+                              >
+                                <Button
+                                  type="text"
+                                  size="small"
+                                  icon={<DeleteOutlined />}
+                                  danger
+                                />
+                              </Popconfirm>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </>
+                  ),
+                },
+              ]}
+            />
+          </section>
 
-          {currentUploads.length > 0 && (
-            <>
-              <div className="section-title" style={{ marginTop: 12 }}>
-                已上传 {currentUploads.length} 份
-              </div>
-              <div className="upload-list">
+          <section className="action-block upload-block">
+            <div className="action-block-title">
+              材料上传
+              <Button
+                size="small"
+                icon={<ThunderboltOutlined />}
+                onClick={handleLoadSamples}
+              >
+                一键载入样例
+              </Button>
+            </div>
+            <div className={currentUploads.length > 0 ? 'dragger-compact' : ''}>
+              <Dragger
+                multiple
+                beforeUpload={handleUpload}
+                showUploadList={false}
+                accept=".json,.pdf,.docx,.txt"
+              >
+                <p className="ant-upload-drag-icon" style={{ marginBottom: 4 }}>
+                  <InboxOutlined />
+                </p>
+                <p style={{ fontSize: 13, color: 'var(--c-text)', margin: 0 }}>
+                  点击或拖拽上传材料
+                </p>
+                <p style={{ fontSize: 12, color: 'var(--c-text-3)', margin: 0 }}>
+                  支持 JSON / PDF / DOCX / TXT
+                </p>
+              </Dragger>
+            </div>
+            {currentUploads.length > 0 && (
+              <div className="upload-list compact">
                 {currentUploads.map((u) => (
                   <div key={u.file_id} className="upload-item">
                     <span className="icn">📄</span>
@@ -502,9 +825,10 @@ export default function LeftPanel() {
                         {u.original_name}
                       </div>
                       <div className="sub">
-                        {u.material_type && (
-                          <Tag color="purple" style={{ marginRight: 6 }}>
-                            {u.material_type}
+                        {u.material_type && <Tag color="geekblue">{u.material_type}</Tag>}
+                        {u.parse_status && (
+                          <Tag color={u.parse_status === '已解析' ? 'success' : 'warning'}>
+                            {u.parse_status}
                           </Tag>
                         )}
                         <span className="size">{fmtSize(u.size_bytes)}</span>
@@ -524,34 +848,74 @@ export default function LeftPanel() {
                   </div>
                 ))}
               </div>
-            </>
-          )}
+            )}
+          </section>
 
-          <div className="review-option-row">
-            <div>
-              <div className="review-option-title">材料片段裁剪</div>
-              <div className="muted">
-                开启后优先发送规则相关片段给 AI；命中不足时自动回退全文
+          <section className="action-block start-block">
+            <div className="action-block-title">开始审核</div>
+            <div className="review-option-row">
+              <div>
+                <div className="review-option-title">材料片段裁剪</div>
+                <div className="muted">优先发送规则相关片段，命中不足自动回退全文</div>
               </div>
+              <Switch
+                checked={materialSliceEnabled}
+                onChange={(checked) => setMaterialSlice(checked, process)}
+                disabled={running}
+              />
             </div>
-            <Switch
-              checked={materialSliceEnabled}
-              onChange={(checked) => setMaterialSlice(checked, process)}
-              disabled={running}
-            />
-          </div>
+            <Button
+              type="primary"
+              block
+              size="large"
+              icon={<RocketOutlined />}
+              onClick={handleStart}
+              loading={running}
+              style={{ marginTop: 12, fontWeight: 600 }}
+            >
+              {running ? 'AI 审核中…' : '开始 AI 审核'}
+            </Button>
+            <div className="start-note">
+              当前预览模板：
+              <strong>{templateUpload?.original_name || '未上传申报模板'}</strong>
+            </div>
+          </section>
+        </div>
+      </div>
 
-          <Button
-            type="primary"
-            block
-            size="large"
-            icon={<RocketOutlined />}
-            onClick={handleStart}
-            loading={running}
-            style={{ marginTop: 14, fontWeight: 600 }}
-          >
-            {running ? 'AI 审核中…' : '开始 AI 审核'}
-          </Button>
+      <div className="panel template-panel">
+        <div className="panel-header">
+          <h3>申报模板内容</h3>
+          <div className="right">
+            {templateMaterial && <Tag color="geekblue">{templateMaterial.material_name}</Tag>}
+            {displayIssues.length > 0 && <Tag color="error">字段问题 {displayIssues.length}</Tag>}
+          </div>
+        </div>
+        <div className="panel-body template-panel-body">
+          {!templateUpload ? (
+            <Empty description="暂无申报模板，请先上传或一键载入样例" style={{ padding: 48 }} />
+          ) : templateLoading ? (
+            <div className="template-empty-row">正在读取申报模板…</div>
+          ) : !templateMaterial ? (
+            <Empty description="申报模板未解析或解析失败" style={{ padding: 48 }} />
+          ) : (
+            <Collapse
+              className="template-section-collapse"
+              defaultActiveKey={[templateSections[0]?.name].filter(Boolean)}
+              items={templateSections.map((section) => ({
+                key: section.name,
+                label: (
+                  <span className="template-section-label">
+                    <span>{section.name}</span>
+                    <span className="muted">
+                      {`${section.fields.length} 个字段`}
+                    </span>
+                  </span>
+                ),
+                children: renderTemplateSection(section),
+              }))}
+            />
+          )}
         </div>
       </div>
 

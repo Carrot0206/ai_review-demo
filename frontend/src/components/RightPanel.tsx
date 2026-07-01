@@ -58,18 +58,29 @@ export default function RightPanel() {
   const clearReviewState = useStore((s) => s.clearReviewState)
   const filterRisks = useStore((s) => s.filterRisks)
   const toggleRisk = useStore((s) => s.toggleRisk)
+  const selectedIssueId = useStore((s) => s.selectedIssueIdByProcess[s.process])
+  const selectedIssueNonce = useStore((s) => s.selectedIssueNonceByProcess[s.process])
+  const setSelectedIssue = useStore((s) => s.setSelectedIssue)
+  const clearSelectedIssue = useStore((s) => s.clearSelectedIssue)
+  const setSelectedFieldLocation = useStore((s) => s.setSelectedFieldLocation)
   const exportRef = useRef<HTMLDivElement>(null)
+  const issueRefs = useRef(new Map<string, HTMLDivElement>())
   const [exporting, setExporting] = useState(false)
   const [filterDimensions, setFilterDimensions] = useState<Set<string>>(new Set())
   const [showDeduped, setShowDeduped] = useState(false)
 
   const running = jobStatus === 'pending' || jobStatus === 'running'
-  const displayIssues =
-    showDeduped && result?.deduped_issues?.length
-      ? result.deduped_issues
-      : result?.issues || []
-  const displaySummary =
-    showDeduped && result?.deduped_summary ? result.deduped_summary : result?.summary
+  const displayIssues = useMemo(
+    () =>
+      showDeduped && result?.deduped_issues?.length
+        ? result.deduped_issues
+        : result?.issues || [],
+    [result, showDeduped],
+  )
+  const displaySummary = useMemo(
+    () => (showDeduped && result?.deduped_summary ? result.deduped_summary : result?.summary),
+    [result, showDeduped],
+  )
 
   const sortedIssues = useMemo(() => {
     return [...displayIssues].sort(
@@ -141,6 +152,32 @@ export default function RightPanel() {
       ),
     [activeDimensionSet, riskFiltered, ruleDimensionMap],
   )
+
+  const filteredIssueIds = useMemo(
+    () => new Set(filtered.map((issue) => issue.issue_id)),
+    [filtered],
+  )
+
+  useEffect(() => {
+    if (!selectedIssueId) return
+    if (!filteredIssueIds.has(selectedIssueId)) {
+      clearSelectedIssue(process)
+      message.warning('关联问题当前被筛选隐藏，请调整筛选条件后查看')
+      return
+    }
+    window.requestAnimationFrame(() => {
+      const node = issueRefs.current.get(selectedIssueId)
+      node?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    })
+  }, [clearSelectedIssue, filteredIssueIds, process, selectedIssueId, selectedIssueNonce])
+
+  function handleSelectIssue(issue: Issue) {
+    setSelectedIssue(issue.issue_id, process)
+    const firstTemplateLocation = (issue.issue_location || []).find((loc) =>
+      loc.material_name.includes('模板') || loc.material_name.includes('申报'),
+    ) || issue.issue_location?.[0]
+    setSelectedFieldLocation(firstTemplateLocation?.location || null, process)
+  }
 
   const allIssuesByDimension = useMemo(() => {
     const grouped = new Map<string, Issue[]>()
@@ -218,7 +255,7 @@ export default function RightPanel() {
     return (
       <div className="panel" style={{ flex: 1 }}>
         <div className="panel-header">
-          <h3><ThunderboltOutlined style={{ color: 'var(--c-primary)' }} /> AI 审核结果</h3>
+          <h3><ThunderboltOutlined style={{ color: 'var(--c-primary)' }} /> AI 审查结果</h3>
         </div>
         <div className="empty-state">
           <div className="ico">📋</div>
@@ -273,6 +310,13 @@ export default function RightPanel() {
               key={iss.issue_id}
               index={idx}
               issue={iss}
+              ref={(node) => {
+                if (node) issueRefs.current.set(iss.issue_id, node)
+                else issueRefs.current.delete(iss.issue_id)
+              }}
+              forceOpen={selectedIssueId === iss.issue_id}
+              selected={selectedIssueId === iss.issue_id}
+              onSelect={() => handleSelectIssue(iss)}
             />
           ))}
         </div>
@@ -314,7 +358,7 @@ export default function RightPanel() {
     return (
       <div className="panel">
         <div className="panel-header">
-          <h3><ThunderboltOutlined style={{ color: 'var(--c-primary)' }} /> AI 审核结果</h3>
+          <h3><ThunderboltOutlined style={{ color: 'var(--c-primary)' }} /> AI 审查结果</h3>
         </div>
         <Empty description="暂无审核结果" style={{ padding: 48 }} />
       </div>
@@ -326,17 +370,23 @@ export default function RightPanel() {
 
   return (
     <div className="panel" style={{ flex: 1, minHeight: 0 }} ref={exportRef}>
-      <div className="panel-header">
-        <h3><ThunderboltOutlined style={{ color: 'var(--c-primary)' }} /> AI 审核结果 · {summary.registration_type}</h3>
-        <div className="right">
-          <Space>
-            <Tag color="success">已完成</Tag>
+      <div className="review-result-head">
+        <div className="review-result-title-row">
+          <h3>
+            <ThunderboltOutlined style={{ color: 'var(--c-primary)' }} /> AI 审查结果
+          </h3>
+          <div className="dedupe-control">
+            <span className="muted">合并去重</span>
             <Switch
               size="small"
               checked={showDeduped}
               onChange={setShowDeduped}
             />
-            <span className="muted">合并去重</span>
+          </div>
+        </div>
+        <div className="review-result-actions">
+          <Tag color="success">已完成</Tag>
+          <Space size={8}>
             <Button
               size="small"
               type="primary"
@@ -354,6 +404,7 @@ export default function RightPanel() {
               okButtonProps={{ danger: true }}
               onConfirm={() => {
                 clearReviewState(process)
+                issueRefs.current.clear()
                 message.success('已清除当前流程的审核结果')
               }}
             >
@@ -480,6 +531,13 @@ export default function RightPanel() {
                             key={iss.issue_id}
                             index={idx}
                             issue={iss}
+                            ref={(node) => {
+                              if (node) issueRefs.current.set(iss.issue_id, node)
+                              else issueRefs.current.delete(iss.issue_id)
+                            }}
+                            forceOpen={selectedIssueId === iss.issue_id}
+                            selected={selectedIssueId === iss.issue_id}
+                            onSelect={() => handleSelectIssue(iss)}
                           />
                         ))
                       ),

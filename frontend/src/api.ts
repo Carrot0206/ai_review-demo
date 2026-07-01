@@ -1,6 +1,7 @@
 import axios from 'axios'
 import type {
   BatchLog,
+  ExtractedMaterial,
   Issue,
   JobInfo,
   ProcessType,
@@ -91,6 +92,11 @@ export async function uploadFile(
 
 export async function deleteUpload(file_id: string) {
   const { data } = await http.delete(`/upload/${file_id}`)
+  return data
+}
+
+export async function getUploadExtracted(file_id: string): Promise<ExtractedMaterial> {
+  const { data } = await http.get(`/upload/${file_id}/extracted`)
   return data
 }
 
