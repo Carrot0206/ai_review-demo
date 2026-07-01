@@ -168,12 +168,6 @@ export default function RightPanel() {
     return grouped
   }, [filtered, ruleDimensionMap])
 
-  const filteredIndexMap = useMemo(() => {
-    const map = new Map<string, number>()
-    filtered.forEach((issue, idx) => map.set(issue.issue_id, idx))
-    return map
-  }, [filtered])
-
   function toggleDimension(dim: string) {
     setFilterDimensions((prev) => {
       const next = new Set(prev)
@@ -279,7 +273,6 @@ export default function RightPanel() {
               key={iss.issue_id}
               index={idx}
               issue={iss}
-              defaultOpen={idx < 2}
             />
           ))}
         </div>
@@ -482,17 +475,13 @@ export default function RightPanel() {
                           style={{ padding: 16 }}
                         />
                       ) : (
-                        issues.map((iss) => {
-                          const displayIndex = filteredIndexMap.get(iss.issue_id) ?? 0
-                          return (
-                            <IssueCard
-                              key={iss.issue_id}
-                              index={displayIndex}
-                              issue={iss}
-                              defaultOpen={displayIndex < 2}
-                            />
-                          )
-                        })
+                        issues.map((iss, idx) => (
+                          <IssueCard
+                            key={iss.issue_id}
+                            index={idx}
+                            issue={iss}
+                          />
+                        ))
                       ),
                     },
                   ]}
