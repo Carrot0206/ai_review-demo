@@ -2,6 +2,7 @@
 
 支持：
 - JSON（申报模板）：递归扁平化为 "表名.字段名: 值" 列表
+- XLSX/XLSM（申报模板）：按“要素表”元数据抽取字段与多行表
 - PDF（文本型）：PyMuPDF 按页提取
 - DOCX：python-docx 按段落 + 表格提取
 - TXT：按段落提取
@@ -22,6 +23,7 @@ MATERIAL_TYPE_RULES = [
     ("申请书", "申请书"),
     ("信托文件", "信托文件样本"),
     ("信托合同", "信托文件样本"),
+    ("清算报告", "其他附件"),
 ]
 
 
@@ -30,6 +32,8 @@ def guess_material_type(filename: str) -> str:
     for kw, mtype in MATERIAL_TYPE_RULES:
         if kw in name:
             return mtype
+    if Path(filename).suffix.lower() in {".xlsx", ".xlsm"}:
+        return "申报模板"
     return "其他附件"
 
 
@@ -68,6 +72,125 @@ def parse_json_template(path: Path, material_type: str | None = None) -> Extract
         material_name=path.name,
         material_type=material_type or guess_material_type(path.name),
         file_kind="json",
+        segments=segments,
+    )
+
+
+def _clean_cell(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, float) and value.is_integer():
+        return str(int(value))
+    return str(value).strip()
+
+
+def _clean_section_name(name: str) -> str:
+    cleaned = name.split(".", 1)[1].strip() if "." in name else name.strip()
+    if cleaned == "关联交易事项":
+        return "关联交易信息"
+    return cleaned
+
+
+def _is_section_name(name: str) -> bool:
+    stripped = name.strip()
+    return len(stripped) > 2 and stripped[0].isdigit() and "." in stripped[:3]
+
+
+def _excel_cell_value(wb: Any, sheet_name: str, col: str, row: Any) -> str:
+    if sheet_name not in wb.sheetnames:
+        return ""
+    try:
+        row_no = int(row)
+    except (TypeError, ValueError):
+        return ""
+    return _clean_cell(wb[sheet_name][f"{col}{row_no}"].value)
+
+
+def parse_excel_template(path: Path, material_type: str | None = None) -> ExtractedMaterial:
+    try:
+        from openpyxl import load_workbook
+    except ImportError as e:
+        raise RuntimeError("缺少依赖 openpyxl，请先 pip install -r requirements.txt") from e
+
+    wb = load_workbook(path, read_only=False, data_only=True, keep_vba=False)
+    segments: list[MaterialSegment] = []
+
+    if "要素表" not in wb.sheetnames:
+        for ws in wb.worksheets:
+            for row_no, row in enumerate(ws.iter_rows(values_only=True), start=1):
+                values = [_clean_cell(v) for v in row if _clean_cell(v)]
+                if values:
+                    segments.append(
+                        MaterialSegment(location=f"{ws.title}!R{row_no}", text=" | ".join(values))
+                    )
+        return ExtractedMaterial(
+            material_name=path.name,
+            material_type=material_type or guess_material_type(path.name),
+            file_kind="excel",
+            segments=segments,
+        )
+
+    meta_ws = wb["要素表"]
+    current_section = ""
+    grid_fields: dict[str, dict[str, Any]] = {}
+
+    for row in meta_ws.iter_rows(min_row=2, values_only=True):
+        values = list(row) + [None] * 18
+        name = _clean_cell(values[1])
+        value_col = _clean_cell(values[5])
+        value_row = _clean_cell(values[6])
+        sheet_name = _clean_cell(values[13])
+        if not name:
+            continue
+        if _is_section_name(name):
+            current_section = _clean_section_name(name)
+            continue
+        if not current_section or not value_col or not value_row:
+            continue
+        if sheet_name and sheet_name != "产品要素":
+            grid = grid_fields.setdefault(
+                current_section,
+                {"sheet_name": sheet_name, "fields": []},
+            )
+            grid["fields"].append((name, value_col))
+            continue
+        text = _excel_cell_value(wb, "产品要素", value_col, value_row)
+        segments.append(
+            MaterialSegment(location=f"{current_section}.{name}", text=text)
+        )
+
+    for section, grid in grid_fields.items():
+        sheet_name = grid["sheet_name"]
+        fields = grid["fields"]
+        if sheet_name not in wb.sheetnames:
+            continue
+        ws = wb[sheet_name]
+        row_index = 0
+        empty_streak = 0
+        for row_no in range(5, ws.max_row + 1):
+            row_values = [
+                _clean_cell(ws[f"{col}{row_no}"].value)
+                for _, col in fields
+            ]
+            if not any(row_values):
+                empty_streak += 1
+                if empty_streak >= 20 and row_index > 0:
+                    break
+                continue
+            empty_streak = 0
+            for field_idx, (field_name, _) in enumerate(fields):
+                segments.append(
+                    MaterialSegment(
+                        location=f"{section}[{row_index}].{field_name}",
+                        text=row_values[field_idx],
+                    )
+                )
+            row_index += 1
+
+    return ExtractedMaterial(
+        material_name=path.name,
+        material_type=material_type or guess_material_type(path.name),
+        file_kind="excel",
         segments=segments,
     )
 
@@ -159,6 +282,8 @@ def parse_material(path: str | Path, material_type: str | None = None) -> Extrac
     suffix = p.suffix.lower()
     if suffix == ".json":
         return parse_json_template(p, material_type)
+    if suffix in {".xlsx", ".xlsm"}:
+        return parse_excel_template(p, material_type)
     if suffix == ".pdf":
         return parse_pdf(p, material_type)
     if suffix == ".docx":

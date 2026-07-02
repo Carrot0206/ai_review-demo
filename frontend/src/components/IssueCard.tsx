@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
 import { DownOutlined } from '@ant-design/icons'
 import type { Issue, RuleBasis } from '../types'
 
@@ -25,29 +25,60 @@ function renderBasisLine(b: RuleBasis) {
   )
 }
 
+function recordLabelFromLocation(location: string) {
+  const match = (location || '').match(/\[(\d+)\]/)
+  if (!match) return ''
+  const n = Number(match[1])
+  if (!Number.isFinite(n) || n <= 0) return ''
+  const chinese = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十']
+  const label = n <= 10 ? chinese[n] : String(n)
+  return `第${label}条`
+}
+
+function shouldShowRecordLabel(recordLabel: string, reason: string) {
+  if (!recordLabel) return false
+  return !(reason || '').includes(recordLabel)
+}
+
 interface Props {
   index: number
   issue: Issue
   defaultOpen?: boolean
+  forceOpen?: boolean
+  selected?: boolean
+  onSelect?: (issueId: string) => void
 }
 
-export default function IssueCard({ index, issue, defaultOpen = false }: Props) {
+const IssueCard = forwardRef<HTMLDivElement, Props>(function IssueCard(
+  { issue, defaultOpen = false, forceOpen = false, selected = false, onSelect },
+  ref,
+) {
   const [open, setOpen] = useState(defaultOpen)
   const cls = riskClass(issue.risk_level)
   const locations = issue.issue_location || []
   const allBases = issue.rule_bases?.length ? issue.rule_bases : [issue.rule_basis]
   const allSummaries = [issue.issue_summary, ...(issue.alt_summaries || [])]
   const allSuggestions = [issue.suggestion, ...(issue.alt_suggestions || [])].filter(Boolean)
+  const isRiskHint = issue.severity_type === 'risk_hint'
+
+  useEffect(() => {
+    if (forceOpen) setOpen(true)
+  }, [forceOpen])
 
   return (
-    <div className={`issue-card ${cls}`}>
-      <div className="issue-head" onClick={() => setOpen((v) => !v)}>
-        <span className="seq">#{index + 1}</span>
-        <span className={`risk-tag ${cls}`}>
-          {issue.risk_level}
-        </span>
+    <div className={`issue-card ${cls} ${selected ? 'selected' : ''}`} ref={ref}>
+      <div
+        className="issue-head"
+        onClick={() => {
+          onSelect?.(issue.issue_id)
+          setOpen((v) => !v)
+        }}
+      >
         <span className="title" title={issue.issue_summary}>
           {issue.issue_summary}
+        </span>
+        <span className={`risk-tag ${cls}`}>
+          {isRiskHint ? '风险提示' : issue.risk_level}
         </span>
         <DownOutlined className={`chev ${open ? 'open' : ''}`} />
       </div>
@@ -73,6 +104,8 @@ export default function IssueCard({ index, issue, defaultOpen = false }: Props) 
             ) : (
               locations.map((loc, i) => {
                 const reason = allSummaries[i] || allSummaries[0]
+                const recordLabel = recordLabelFromLocation(loc.location)
+                const showRecordLabel = shouldShowRecordLabel(recordLabel, reason)
                 return (
                   <div className="content" key={i} style={{ marginBottom: 6 }}>
                     <div style={{ fontSize: 12, color: 'var(--c-text-3)' }}>
@@ -95,6 +128,11 @@ export default function IssueCard({ index, issue, defaultOpen = false }: Props) 
                       <span style={{ color: 'var(--c-text-3)', marginRight: 4 }}>
                         原因：
                       </span>
+                      {showRecordLabel && (
+                        <span style={{ fontWeight: 600, marginRight: 4 }}>
+                          {recordLabel}
+                        </span>
+                      )}
                       {reason}
                     </div>
                   </div>
@@ -123,7 +161,7 @@ export default function IssueCard({ index, issue, defaultOpen = false }: Props) 
 
           {/* 3. AI 整改建议 */}
           <div className="issue-section">
-            <div className="label">③ AI 整改建议</div>
+            <div className="label">③ {isRiskHint ? '重点关注建议' : 'AI 整改建议'}</div>
             <div className="content suggestion">
               {allSuggestions.length === 0 ? (
                 <span className="muted">（无）</span>
@@ -145,4 +183,6 @@ export default function IssueCard({ index, issue, defaultOpen = false }: Props) 
       )}
     </div>
   )
-}
+})
+
+export default IssueCard

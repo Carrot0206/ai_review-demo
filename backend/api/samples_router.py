@@ -21,29 +21,40 @@ SAMPLES_DIR = Path(__file__).resolve().parent.parent / "samples"
 PROCESS_KEYWORDS = {
     "pre_report": ["事前报告", "事前报告模板", "事前报告申请书"],
     "initial": ["初始登记", "初始登记模板", "初始登记申请书", "信托文件样本"],
+    "pre_registration": ["预登记", "预登记模板", "预登记申请书"],
+    "termination": ["终止登记", "终止登记模板", "终止登记申请书", "清算报告"],
 }
 
 
 def _classify_file(name: str) -> Optional[str]:
     if "事前报告" in name:
         return "pre_report"
+    if "预登记" in name:
+        return "pre_registration"
     if "初始登记" in name:
         return "initial"
     if "信托文件" in name:
         return "initial"
+    if "终止登记" in name or "清算报告" in name:
+        return "termination"
     return None
 
 
 @router.get("")
 def list_samples():
     """按流程列出 samples/ 下的所有样例文件。"""
-    groups: dict[str, list[dict]] = {"pre_report": [], "initial": []}
+    groups: dict[str, list[dict]] = {
+        "pre_report": [],
+        "initial": [],
+        "pre_registration": [],
+        "termination": [],
+    }
     if not SAMPLES_DIR.exists():
         return groups
     for p in sorted(SAMPLES_DIR.iterdir()):
         if not p.is_file() or p.name.startswith("."):
             continue
-        if p.suffix.lower() not in {".json", ".pdf", ".docx", ".txt"}:
+        if p.suffix.lower() not in {".json", ".pdf", ".docx", ".txt", ".xlsx", ".xlsm"}:
             continue
         process = _classify_file(p.name)
         if process is None:
@@ -59,7 +70,7 @@ def list_samples():
 
 
 class SampleLoad(BaseModel):
-    process: Literal["pre_report", "initial"]
+    process: Literal["pre_report", "initial", "pre_registration", "termination"]
 
 
 @router.post("/load")
@@ -76,7 +87,7 @@ def load_samples(payload: SampleLoad):
     for p in sorted(SAMPLES_DIR.iterdir()):
         if not p.is_file() or p.name.startswith("."):
             continue
-        if p.suffix.lower() not in {".json", ".pdf", ".docx", ".txt"}:
+        if p.suffix.lower() not in {".json", ".pdf", ".docx", ".txt", ".xlsx", ".xlsm"}:
             continue
         if _classify_file(p.name) != payload.process:
             continue

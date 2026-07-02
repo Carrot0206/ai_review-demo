@@ -7,7 +7,7 @@ const STAGES = [
 ] as const
 
 export default function ThreeStageLoading() {
-  const stage = useStore((s) => s.stage)
+  const stage = useStore((s) => s.stageByProcess[s.process])
   const order = ['parse', 'batch', 'merge', 'done']
   const cur = order.indexOf(stage as string)
 

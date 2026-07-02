@@ -1,0 +1,6 @@
+.DS_Store
+backend/.env
+backend/.venv/
+__pycache__/
+*.pyc
+backend/uploads/

@@ -8,6 +8,12 @@ export default function ProcessBar() {
     <div className="process-bar">
       <span className="label">登记流程：</span>
       <span
+        className={`process-pill ${process === 'pre_registration' ? 'active' : ''}`}
+        onClick={() => setProcess('pre_registration')}
+      >
+        📄 预登记
+      </span>
+      <span
         className={`process-pill ${process === 'pre_report' ? 'active' : ''}`}
         onClick={() => setProcess('pre_report')}
       >
@@ -18,6 +24,12 @@ export default function ProcessBar() {
         onClick={() => setProcess('initial')}
       >
         📑 初始登记
+      </span>
+      <span
+        className={`process-pill ${process === 'termination' ? 'active' : ''}`}
+        onClick={() => setProcess('termination')}
+      >
+        🧾 终止登记
       </span>
       <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--c-text-3)' }}>
         切换流程将重新加载对应规则集

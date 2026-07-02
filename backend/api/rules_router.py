@@ -30,6 +30,8 @@ def get_rules(process: ProcessType = Query(...)):
             "applicable_materials": r.applicable_materials,
             "basis_file": r.basis_file,
             "needs_human": r.needs_human,
+            "severity_type": r.severity_type,
+            "issue_type": r.issue_type,
         }
 
     return {

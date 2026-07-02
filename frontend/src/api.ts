@@ -1,5 +1,8 @@
 import axios from 'axios'
 import type {
+  BatchLog,
+  ExtractedMaterial,
+  Issue,
   JobInfo,
   ProcessType,
   RiskLevel,
@@ -34,6 +37,11 @@ export async function createUserRule(payload: {
   applicable_materials: string[]
   rule_text: string
   risk_level: RiskLevel
+  review_dimension?: string
+  check_type?: string
+  table_name?: string
+  field_name?: string
+  trigger_condition?: string
 }): Promise<UserRule> {
   const { data } = await http.post('/user-rules', payload)
   return data
@@ -50,6 +58,11 @@ export async function updateUserRule(
     applicable_materials?: string[]
     rule_text?: string
     risk_level?: RiskLevel
+    review_dimension?: string
+    check_type?: string
+    table_name?: string
+    field_name?: string
+    trigger_condition?: string
   },
 ): Promise<UserRule> {
   const { data } = await http.put(`/user-rules/${rule_id}`, payload)
@@ -82,6 +95,11 @@ export async function deleteUpload(file_id: string) {
   return data
 }
 
+export async function getUploadExtracted(file_id: string): Promise<ExtractedMaterial> {
+  const { data } = await http.get(`/upload/${file_id}/extracted`)
+  return data
+}
+
 export async function listSamples(): Promise<SampleListResponse> {
   const { data } = await http.get('/samples')
   return data
@@ -97,6 +115,7 @@ export async function startReview(payload: {
   file_ids: string[]
   user_rule_ids?: string[] | null
   max_concurrency?: number
+  material_slice_enabled?: boolean
 }): Promise<{ job_id: string; status: string }> {
   const { data } = await http.post('/review', payload)
   return data
@@ -113,6 +132,7 @@ export function subscribeReviewStream(
   onMsg: (msg: string) => void,
   onDone: () => void,
   onFailed: (err: string) => void,
+  onBatchDone?: (payload: { batch: BatchLog; issues: Issue[] }) => void,
 ): () => void {
   const url = `/api/review/${job_id}/stream`
   const es = new EventSource(url)
@@ -124,6 +144,15 @@ export function subscribeReviewStream(
       /* keep-alive */
     }
   }
+  es.addEventListener('batch_done', (e) => {
+    if (!onBatchDone) return
+    try {
+      const data = JSON.parse((e as MessageEvent).data)
+      onBatchDone(data as { batch: BatchLog; issues: Issue[] })
+    } catch {
+      /* ignore */
+    }
+  })
   es.addEventListener('done', () => {
     onDone()
     es.close()

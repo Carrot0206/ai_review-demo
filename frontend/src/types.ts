@@ -1,5 +1,5 @@
 // 与后端 schemas 对齐
-export type ProcessType = 'pre_report' | 'initial'
+export type ProcessType = 'pre_report' | 'initial' | 'pre_registration' | 'termination'
 export type RiskLevel = '高风险' | '中风险' | '低风险'
 
 export interface Rule {
@@ -15,6 +15,8 @@ export interface Rule {
   applicable_materials: string[]
   basis_file: string
   risk_level: RiskLevel
+  severity_type?: 'issue' | 'risk_hint'
+  issue_type?: string
 }
 
 export interface HumanReviewItem {
@@ -39,6 +41,11 @@ export interface UserRule {
   applicable_materials: string[]
   rule_text: string
   risk_level: RiskLevel
+  review_dimension?: string
+  check_type?: string
+  table_name?: string
+  field_name?: string
+  trigger_condition?: string
   created_at: number
   enabled: boolean
 }
@@ -59,6 +66,18 @@ export interface UploadMeta {
   parse_error?: string | null
 }
 
+export interface ExtractedSegment {
+  location: string
+  text: string
+}
+
+export interface ExtractedMaterial {
+  material_name: string
+  material_type: string
+  file_kind: 'json' | 'pdf' | 'docx' | 'txt' | 'excel' | 'unknown'
+  segments: ExtractedSegment[]
+}
+
 export interface RuleBasis {
   basis_type: '内置规则' | '用户新增规则'
   basis_file: string
@@ -74,12 +93,16 @@ export interface IssueLocation {
 export interface Issue {
   issue_id: string
   rule_id: string
+  review_dimension?: string
   issue_summary: string
   risk_level: RiskLevel
   rule_basis: RuleBasis
   issue_location: IssueLocation[]
   suggestion: string
+  severity_type?: 'issue' | 'risk_hint'
+  issue_type?: string
   rule_ids: string[]
+  rule_dimensions?: string[]
   rule_bases: RuleBasis[]
   alt_summaries: string[]
   alt_suggestions: string[]
@@ -95,6 +118,13 @@ export interface BatchLog {
   input_tokens: number
   output_tokens: number
   error?: string | null
+  materials_used?: string[]
+  slice_enabled?: boolean
+  slice_summary?: string
+  original_segment_count?: number
+  sliced_segment_count?: number
+  slice_fallback?: boolean
+  slice_confidence?: string
 }
 
 export interface ReviewSummary {
@@ -103,11 +133,14 @@ export interface ReviewSummary {
   high_risk_count: number
   medium_risk_count: number
   low_risk_count: number
+  risk_hint_count?: number
 }
 
 export interface ReviewResult {
   summary: ReviewSummary
   issues: Issue[]
+  deduped_summary?: ReviewSummary | null
+  deduped_issues?: Issue[]
   human_review_items: HumanReviewItem[]
   batch_logs: BatchLog[]
 }
@@ -132,4 +165,6 @@ export interface SampleFile {
 export interface SampleListResponse {
   pre_report: SampleFile[]
   initial: SampleFile[]
+  pre_registration: SampleFile[]
+  termination: SampleFile[]
 }

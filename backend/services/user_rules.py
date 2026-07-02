@@ -9,7 +9,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from .schemas import ProcessType, RiskLevel
+from .schemas import PROCESS_LABEL, ProcessType, RiskLevel
 
 USER_RULES_FILE = Path(__file__).resolve().parent.parent / "data" / "user_rules.json"
 USER_RULES_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -17,10 +17,15 @@ USER_RULES_FILE.parent.mkdir(parents=True, exist_ok=True)
 
 class UserRule(BaseModel):
     rule_id: str
-    process: ProcessType  # pre_report | initial
+    process: ProcessType
     applicable_materials: list[str] = Field(default_factory=list)
     rule_text: str
     risk_level: RiskLevel = "中风险"
+    review_dimension: str = "用户新增规则"
+    check_type: str = "语义条件判断"
+    table_name: str = ""
+    field_name: str = ""
+    trigger_condition: str = ""
     created_at: int = 0
     enabled: bool = True
 
@@ -56,6 +61,11 @@ def add_user_rule(
     applicable_materials: list[str],
     rule_text: str,
     risk_level: RiskLevel = "中风险",
+    review_dimension: str = "用户新增规则",
+    check_type: str = "语义条件判断",
+    table_name: str = "",
+    field_name: str = "",
+    trigger_condition: str = "",
 ) -> UserRule:
     rules = _load_all()
     new_rule = UserRule(
@@ -64,6 +74,11 @@ def add_user_rule(
         applicable_materials=applicable_materials,
         rule_text=rule_text.strip(),
         risk_level=risk_level,
+        review_dimension=(review_dimension or "用户新增规则").strip(),
+        check_type=(check_type or "语义条件判断").strip(),
+        table_name=(table_name or "").strip(),
+        field_name=(field_name or "").strip(),
+        trigger_condition=(trigger_condition or "").strip(),
         created_at=int(time.time()),
         enabled=True,
     )
@@ -87,6 +102,11 @@ def update_user_rule(
     applicable_materials: Optional[list[str]] = None,
     rule_text: Optional[str] = None,
     risk_level: Optional[RiskLevel] = None,
+    review_dimension: Optional[str] = None,
+    check_type: Optional[str] = None,
+    table_name: Optional[str] = None,
+    field_name: Optional[str] = None,
+    trigger_condition: Optional[str] = None,
 ) -> Optional[UserRule]:
     """按 rule_id 局部更新用户规则。返回更新后的规则；找不到则返回 None。"""
     rules = _load_all()
@@ -99,6 +119,16 @@ def update_user_rule(
             r.rule_text = rule_text.strip()
         if risk_level is not None:
             r.risk_level = risk_level
+        if review_dimension is not None:
+            r.review_dimension = (review_dimension or "用户新增规则").strip()
+        if check_type is not None:
+            r.check_type = (check_type or "语义条件判断").strip()
+        if table_name is not None:
+            r.table_name = (table_name or "").strip()
+        if field_name is not None:
+            r.field_name = (field_name or "").strip()
+        if trigger_condition is not None:
+            r.trigger_condition = (trigger_condition or "").strip()
         rules[i] = r
         _save_all(rules)
         return r
@@ -111,15 +141,18 @@ def to_review_rule(ur: UserRule):
 
     return Rule(
         rule_id=ur.rule_id,
-        registration_type="事前报告" if ur.process == "pre_report" else "初始登记",
+        registration_type=PROCESS_LABEL.get(ur.process, ur.process),
         rule_name="用户新增规则",
         rule_text=ur.rule_text,
         basis_file="用户新增规则",
         basis_text=ur.rule_text,
-        review_dimension="用户新增规则",
+        review_dimension=ur.review_dimension or "用户新增规则",
+        table_name=ur.table_name or "",
+        field_name=ur.field_name or "",
         applicable_materials=ur.applicable_materials,
         review_method="ai",
-        check_type="语义条件判断",
+        check_type=ur.check_type or "语义条件判断",
+        trigger_condition=ur.trigger_condition or "",
         risk_level=ur.risk_level,
         ai_check_focus=["按规则文本判断材料是否存在违规或不规范"],
         evidence_requirement="请指出涉及的材料、表名、字段、页码或文本片段。",

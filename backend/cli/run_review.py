@@ -29,9 +29,9 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--process",
-        choices=["pre_report", "initial"],
+        choices=["pre_report", "initial", "pre_registration", "termination"],
         required=True,
-        help="登记流程：pre_report=事前报告 / initial=初始登记",
+        help="登记流程：pre_report=事前报告 / initial=初始登记 / pre_registration=预登记 / termination=终止登记",
     )
     p.add_argument(
         "--materials",
@@ -47,8 +47,8 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--max-concurrency",
         type=int,
-        default=4,
-        help="并发批次数上限（默认 4）",
+        default=16,
+        help="并发批次数上限（默认 16）",
     )
     p.add_argument(
         "--rules",
