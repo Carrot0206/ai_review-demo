@@ -15,11 +15,18 @@ type Stage = 'idle' | 'parse' | 'batch' | 'merge' | 'done' | 'failed'
 
 type ByProcess<T> = Record<ProcessType, T>
 
-const PROCESSES: ProcessType[] = ['pre_report', 'initial', 'pre_registration', 'termination']
+const PROCESSES: ProcessType[] = [
+  'pre_report',
+  'initial',
+  'pre_registration',
+  'pre_registration_reapply',
+  'termination',
+]
 const PROCESS_LABELS: Record<ProcessType, string> = {
   pre_report: '事前报告',
   initial: '初始登记',
   pre_registration: '预登记',
+  pre_registration_reapply: '重新申请预登记',
   termination: '终止登记',
 }
 function initByProcess<T>(value: T): ByProcess<T> {

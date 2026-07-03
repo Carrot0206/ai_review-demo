@@ -309,6 +309,21 @@ def _material_present(materials: list[ExtractedMaterial], *keywords: str) -> boo
     return False
 
 
+def _materials_contain_any(materials: list[ExtractedMaterial], keywords: tuple[str, ...]) -> bool:
+    for material in materials:
+        haystack = f"{material.material_name} {material.material_type}"
+        if any(kw in haystack for kw in keywords):
+            return True
+        for segment in material.segments:
+            if any(kw in f"{segment.location} {segment.text}" for kw in keywords):
+                return True
+    return False
+
+
+def _material_type_present(materials: list[ExtractedMaterial], material_type: str) -> bool:
+    return any(material.material_type == material_type for material in materials)
+
+
 def _template_lookup(materials: list[ExtractedMaterial]) -> dict[str, str]:
     out: dict[str, str] = {}
     for material in materials:
@@ -317,6 +332,33 @@ def _template_lookup(materials: list[ExtractedMaterial]) -> dict[str, str]:
         for seg in material.segments:
             out[seg.location] = seg.text
     return out
+
+
+def _has_reapply_baseline(materials: list[ExtractedMaterial]) -> bool:
+    for material in materials:
+        haystack = f"{material.material_name} {material.material_type}".lower()
+        if material.material_type in {"原预登记申报模板JSON", "原预登记系统记录"}:
+            return True
+        if "原预登记" in haystack or "baseline" in haystack:
+            return True
+    return False
+
+
+def _requires_reapply_baseline(rule: Rule) -> bool:
+    text = " ".join(
+        str(value or "")
+        for value in [
+            rule.rule_id,
+            rule.rule_name,
+            rule.rule_text,
+            rule.trigger_condition,
+            rule.machine_params,
+            rule.skip_when,
+            " ".join(rule.applicable_materials or []),
+            " ".join(rule.ai_check_focus or []),
+        ]
+    )
+    return "requires_baseline=true" in text or "baseline_missing" in text
 
 
 def _section_has_any(lookup: dict[str, str], section: str) -> bool:
@@ -394,12 +436,19 @@ def _issue_from_rule(
 def _pre_registration_deterministic_issues(
     rules_by_id: dict[str, Rule],
     materials: list[ExtractedMaterial],
+    *,
+    process: ProcessType = "pre_registration",
 ) -> list[Issue]:
     issues: list[Issue] = []
     has_application = _material_present(materials, "申请书")
     has_commitment = _material_present(materials, "合规承诺")
     if not has_application:
-        rule = _get_rule(rules_by_id, "PREG-FILE-AI-001") or _get_rule(rules_by_id, "PREG-ELEMENT-AI-001")
+        application_rule_ids = (
+            ["REREG-FILE-AI-003", "REREG-FILE-AI-001", "REREG-PREG-ELEMENT-AI-001"]
+            if process == "pre_registration_reapply"
+            else ["PREG-FILE-AI-001", "PREG-ELEMENT-AI-001"]
+        )
+        rule = next((_get_rule(rules_by_id, rid) for rid in application_rule_ids if _get_rule(rules_by_id, rid)), None)
         if rule:
             issues.append(
                 _issue_from_rule(
@@ -409,11 +458,19 @@ def _pre_registration_deterministic_issues(
                     location="预登记申请书",
                     value="缺失:预登记申请书",
                     suggestion="请补充上传预登记申请书PDF。",
-                    rule_ids=[rid for rid in ["PREG-FILE-AI-001", "PREG-FILE-AI-002", "PREG-ELEMENT-AI-001"] if rid in rules_by_id],
+                    rule_ids=[
+                        rid
+                        for rid in (
+                            application_rule_ids
+                            if process == "pre_registration_reapply"
+                            else ["PREG-FILE-AI-001", "PREG-FILE-AI-002", "PREG-ELEMENT-AI-001"]
+                        )
+                        if rid in rules_by_id
+                    ],
                     rules_by_id=rules_by_id,
                 )
             )
-    if not has_commitment:
+    if process == "pre_registration" and not has_commitment:
         rule = _get_rule(rules_by_id, "PREG-ELEMENT-AI-002")
         if rule:
             issues.append(
@@ -431,9 +488,41 @@ def _pre_registration_deterministic_issues(
     return issues
 
 
-def _pre_registration_skip_rule(rule: Rule, lookup: dict[str, str], materials: list[ExtractedMaterial]) -> bool:
+def _pre_registration_skip_rule(
+    rule: Rule,
+    lookup: dict[str, str],
+    materials: list[ExtractedMaterial],
+    *,
+    process: ProcessType = "pre_registration",
+) -> bool:
     has_application = _material_present(materials, "申请书")
     has_commitment = _material_present(materials, "合规承诺")
+
+    if process == "pre_registration_reapply" and _requires_reapply_baseline(rule):
+        return not _has_reapply_baseline(materials)
+
+    if process == "pre_registration_reapply":
+        if "申请书缺失" in rule.skip_when or "申报模板缺失" in rule.skip_when:
+            if "申请书缺失" in rule.skip_when and not has_application:
+                return True
+            if "申报模板缺失" in rule.skip_when and not _material_type_present(materials, "申报模板"):
+                return True
+        if "信托预登记要素报告表PDF缺失" in rule.skip_when:
+            return not _material_present(materials, "要素报告表")
+        if "CA认证登录状态 unknown" in rule.skip_when:
+            return True
+        if "未识别到政信类业务特征" in rule.skip_when:
+            has_government_credit_material = _material_present(materials, "政信") or _material_present(materials, "融资平台债务")
+            has_hidden_debt_flag = _any_field_equals(lookup, "交易对手是否隐债主体", "是", "底层资产及交易对手")
+            if not (has_government_credit_material or has_hidden_debt_flag):
+                return True
+        if "资产服务信托分类2 != 新型资产服务信托" in rule.skip_when:
+            return not _any_field_equals(lookup, "资产服务信托分类2", "新型资产服务信托", "业务分类信息")
+        if "未识别到资产证券化信托业务特征" in rule.skip_when:
+            return not _materials_contain_any(
+                materials,
+                ("资产证券化", "资产支持证券", "资产支持票据", "ABS", "其他资产证券化信托"),
+            )
 
     if not has_application and rule.rule_id in {
         "PREG-FILE-AI-001",
@@ -441,9 +530,19 @@ def _pre_registration_skip_rule(rule: Rule, lookup: dict[str, str], materials: l
         "PREG-FILE-AI-003",
         "PREG-ELEMENT-AI-001",
         "PREG-ELEMENT-AI-003",
+        "REREG-FILE-AI-001",
+        "REREG-FILE-AI-003",
+        "REREG-FILE-AI-004",
+        "REREG-PREG-ELEMENT-AI-001",
+        "REREG-PREG-ELEMENT-AI-003",
     }:
         return True
-    if not has_commitment and rule.rule_id in {"PREG-ELEMENT-AI-002", "PREG-ELEMENT-AI-004"}:
+    if not has_commitment and rule.rule_id in {
+        "PREG-ELEMENT-AI-002",
+        "PREG-ELEMENT-AI-004",
+        "REREG-PREG-ELEMENT-AI-002",
+        "REREG-PREG-ELEMENT-AI-004",
+    }:
         return True
 
     # 退回补正、情况说明等规则没有本次退回意见/新型资产服务信托触发事实时不进入 AI。
@@ -479,11 +578,21 @@ def _pre_registration_skip_rule(rule: Rule, lookup: dict[str, str], materials: l
 def _preprocess_pre_registration_rules(
     rules: list[Rule],
     materials: list[ExtractedMaterial],
+    *,
+    process: ProcessType = "pre_registration",
 ) -> tuple[list[Rule], list[Issue], int]:
     rules_by_id = {r.rule_id: r for r in rules}
     lookup = _template_lookup(materials)
-    deterministic = _pre_registration_deterministic_issues(rules_by_id, materials)
-    filtered = [r for r in rules if not _pre_registration_skip_rule(r, lookup, materials)]
+    deterministic = _pre_registration_deterministic_issues(
+        rules_by_id,
+        materials,
+        process=process,
+    )
+    filtered = [
+        r
+        for r in rules
+        if not _pre_registration_skip_rule(r, lookup, materials, process=process)
+    ]
     return filtered, deterministic, len(rules) - len(filtered)
 
 
@@ -987,14 +1096,16 @@ async def review(
         await _emit(progress_cb, f"已解析材料：{m.material_name}（{len(m.segments)} 个片段）")
 
     deterministic_issues: list[Issue] = []
-    if process == "pre_registration":
+    if process in {"pre_registration", "pre_registration_reapply"}:
         ai_rules, deterministic_issues, skipped_count = _preprocess_pre_registration_rules(
             ai_rules,
             materials,
+            process=process,
         )
+        process_label = PROCESS_LABEL.get(process, process)
         await _emit(
             progress_cb,
-            f"预登记前置判断完成：确定性问题 {len(deterministic_issues)} 个，跳过未触发规则 {skipped_count} 条，进入 AI 规则 {len(ai_rules)} 条",
+            f"{process_label}前置判断完成：确定性问题 {len(deterministic_issues)} 个，跳过未触发规则 {skipped_count} 条，进入 AI 规则 {len(ai_rules)} 条",
         )
 
     if not ai_rules:

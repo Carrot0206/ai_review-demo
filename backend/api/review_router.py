@@ -34,7 +34,10 @@ async def _run_review_job(job: ReviewJob, payload: ReviewStart):
         for fid in payload.file_ids:
             m = load_extracted(fid)
             if m is None:
-                raise RuntimeError(f"文件 {fid} 尚未解析或不存在")
+                meta = load_meta(fid) or {}
+                err = meta.get("parse_error")
+                suffix = f"：{err}" if err else ""
+                raise RuntimeError(f"文件 {fid} 尚未解析或不存在{suffix}")
             materials.append(m)
 
         # 2. 用户新增规则
@@ -88,6 +91,10 @@ async def start_review(payload: ReviewStart):
     for fid in payload.file_ids:
         if load_meta(fid) is None:
             raise HTTPException(status_code=400, detail=f"文件 {fid} 不存在")
+        if load_extracted(fid) is None:
+            meta = load_meta(fid) or {}
+            err = meta.get("parse_error") or "未知解析错误"
+            raise HTTPException(status_code=400, detail=f"文件 {fid} 解析失败：{err}")
 
     job = create_job(payload.process, payload.file_ids)
     asyncio.create_task(_run_review_job(job, payload))

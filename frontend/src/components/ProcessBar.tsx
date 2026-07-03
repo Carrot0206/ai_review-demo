@@ -14,6 +14,12 @@ export default function ProcessBar() {
         📄 预登记
       </span>
       <span
+        className={`process-pill ${process === 'pre_registration_reapply' ? 'active' : ''}`}
+        onClick={() => setProcess('pre_registration_reapply')}
+      >
+        📝 重新申请预登记
+      </span>
+      <span
         className={`process-pill ${process === 'pre_report' ? 'active' : ''}`}
         onClick={() => setProcess('pre_report')}
       >

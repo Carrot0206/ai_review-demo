@@ -20,7 +20,16 @@ RULE_TAG_TO_MATERIAL_TYPE: dict[str, str] = {
     "初始登记申报模板JSON": "申报模板",
     "事前报告模板JSON": "申报模板",
     "终止登记申报模板JSON": "申报模板",
+    "预登记产品EXCEL模板.json": "申报模板",
     "申报模板": "申报模板",
+    # 重新申请预登记 baseline / 专项附件
+    "原预登记申报模板JSON": "原预登记申报模板JSON",
+    "原预登记系统记录": "原预登记系统记录",
+    "baseline": "原预登记申报模板JSON",
+    "Baseline": "原预登记申报模板JSON",
+    "政信类证明材料": "政信类证明材料",
+    "新型资产服务信托情况说明": "新型资产服务信托情况说明",
+    "信托预登记要素报告表": "其他附件",
     # 申请书
     "初始登记申请书": "申请书",
     "事前报告申请书": "申请书",
@@ -50,6 +59,8 @@ def _normalize_rule_tag(tag: str) -> Optional[str]:
         return RULE_TAG_TO_MATERIAL_TYPE[t]
     # 兜底：包含关键字
     if "模板" in t:
+        if "原预登记" in t:
+            return "原预登记申报模板JSON"
         return "申报模板"
     if "申请书" in t:
         return "申请书"
@@ -57,6 +68,14 @@ def _normalize_rule_tag(tag: str) -> Optional[str]:
         return "信托文件样本"
     if "清算报告" in t:
         return "其他附件"
+    if "原预登记" in t or "baseline" in t.lower():
+        return "原预登记申报模板JSON"
+    if "系统记录" in t:
+        return "原预登记系统记录"
+    if "政信" in t or "融资平台债务" in t:
+        return "政信类证明材料"
+    if "情况说明" in t or "新型资产服务信托" in t:
+        return "新型资产服务信托情况说明"
     return None
 
 

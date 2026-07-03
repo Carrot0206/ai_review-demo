@@ -52,6 +52,17 @@ const TEMPLATE_SECTIONS: Record<ProcessType, string[]> = {
     '异地推介信息',
     '关联交易信息',
   ],
+  pre_registration_reapply: [
+    '产品基本信息',
+    '业务分类信息',
+    '交易结构',
+    '底层资产及交易对手',
+    '托管信息',
+    '风险控制信息',
+    '房地产项目信息',
+    '异地推介信息',
+    '关联交易信息',
+  ],
   initial: [
     '产品基本信息',
     '业务分类信息',
@@ -69,6 +80,7 @@ const TEMPLATE_SECTIONS: Record<ProcessType, string[]> = {
 
 const PROCESS_LABELS: Record<ProcessType, string> = {
   pre_registration: '预登记',
+  pre_registration_reapply: '重新申请预登记',
   pre_report: '事前报告',
   initial: '初始登记',
   termination: '终止登记',
@@ -124,7 +136,18 @@ function fmtSize(b: number) {
   return (b / 1024 / 1024).toFixed(1) + ' MB'
 }
 
+function isBaselineUpload(u: UploadMeta) {
+  const haystack = `${u.original_name || ''} ${u.material_type || ''}`.toLowerCase()
+  return (
+    u.material_type === '原预登记申报模板JSON' ||
+    u.material_type === '原预登记系统记录' ||
+    haystack.includes('原预登记') ||
+    haystack.includes('baseline')
+  )
+}
+
 function isTemplateUpload(u: UploadMeta) {
+  if (isBaselineUpload(u)) return false
   return u.material_type === '申报模板' || u.original_name.includes('模板')
 }
 
@@ -337,6 +360,19 @@ export default function LeftPanel() {
         },
       ]
     }
+    if (process === 'pre_registration_reapply') {
+      return [
+        ...commonOptions,
+        { value: '原预登记申报模板JSON', label: '原预登记申报模板JSON' },
+        { value: '原预登记系统记录', label: '原预登记系统记录' },
+        { value: '政信类证明材料', label: '政信类证明材料' },
+        { value: '新型资产服务信托情况说明', label: '新型资产服务信托情况说明' },
+        {
+          value: '法律、行政法规、国家金融监督管理总局要求的其他文件',
+          label: '法律、行政法规、国家金融监督管理总局要求的其他文件',
+        },
+      ]
+    }
     if (process === 'termination') {
       return [
         ...commonOptions,
@@ -359,6 +395,10 @@ export default function LeftPanel() {
 
   // 当前流程下的上传文件（演示版：全部都展示）
   const currentUploads = uploads
+  const hasReapplyBaseline = useMemo(
+    () => currentUploads.some(isBaselineUpload),
+    [currentUploads],
+  )
   const templateUpload = useMemo(() => {
     return [...currentUploads]
       .filter(isTemplateUpload)
@@ -866,6 +906,11 @@ export default function LeftPanel() {
                 </p>
               </Dragger>
             </div>
+            {process === 'pre_registration_reapply' && (
+              <div className="muted" style={{ marginTop: 8, fontSize: 12 }}>
+                原预登记材料为可选 baseline；上传后启用差异比对，不上传仍审核当前申报模板和本次材料。
+              </div>
+            )}
             {currentUploads.length > 0 && (
               <div className="upload-list compact">
                 {currentUploads.map((u) => (
@@ -930,6 +975,12 @@ export default function LeftPanel() {
               当前预览模板：
               <strong>{templateUpload?.original_name || '未上传申报模板'}</strong>
             </div>
+            {process === 'pre_registration_reapply' && (
+              <div className="start-note">
+                baseline：
+                <strong>{hasReapplyBaseline ? '已上传，启用差异比对' : '未上传，差异规则将跳过'}</strong>
+              </div>
+            )}
           </section>
         </div>
       </div>

@@ -1,5 +1,10 @@
 // 与后端 schemas 对齐
-export type ProcessType = 'pre_report' | 'initial' | 'pre_registration' | 'termination'
+export type ProcessType =
+  | 'pre_report'
+  | 'initial'
+  | 'pre_registration'
+  | 'pre_registration_reapply'
+  | 'termination'
 export type RiskLevel = '高风险' | '中风险' | '低风险'
 
 export interface Rule {
@@ -166,5 +171,6 @@ export interface SampleListResponse {
   pre_report: SampleFile[]
   initial: SampleFile[]
   pre_registration: SampleFile[]
+  pre_registration_reapply: SampleFile[]
   termination: SampleFile[]
 }

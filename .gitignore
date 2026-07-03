@@ -4,3 +4,16 @@ backend/.venv/
 __pycache__/
 *.pyc
 backend/uploads/
+# macOS
+.DS_Store
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Backup files
+*.bak*
+backend/out/
+
+# Office temp files
+~$*

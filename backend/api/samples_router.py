@@ -11,7 +11,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from ..services.material_parser import guess_material_type
-from ..services.upload_store import find_duplicate, save_upload
+from ..services.upload_store import find_duplicate, reparse_upload, save_upload
 
 router = APIRouter(prefix="/api/samples", tags=["samples"])
 
@@ -21,6 +21,7 @@ SAMPLES_DIR = Path(__file__).resolve().parent.parent / "samples"
 PROCESS_KEYWORDS = {
     "pre_report": ["事前报告", "事前报告模板", "事前报告申请书"],
     "initial": ["初始登记", "初始登记模板", "初始登记申请书", "信托文件样本"],
+    "pre_registration_reapply": ["重新申请预登记"],
     "pre_registration": ["预登记", "预登记模板", "预登记申请书"],
     "termination": ["终止登记", "终止登记模板", "终止登记申请书", "清算报告"],
 }
@@ -29,6 +30,8 @@ PROCESS_KEYWORDS = {
 def _classify_file(name: str) -> Optional[str]:
     if "事前报告" in name:
         return "pre_report"
+    if "重新申请预登记" in name:
+        return "pre_registration_reapply"
     if "预登记" in name:
         return "pre_registration"
     if "初始登记" in name:
@@ -46,6 +49,7 @@ def list_samples():
     groups: dict[str, list[dict]] = {
         "pre_report": [],
         "initial": [],
+        "pre_registration_reapply": [],
         "pre_registration": [],
         "termination": [],
     }
@@ -70,7 +74,13 @@ def list_samples():
 
 
 class SampleLoad(BaseModel):
-    process: Literal["pre_report", "initial", "pre_registration", "termination"]
+    process: Literal[
+        "pre_report",
+        "initial",
+        "pre_registration",
+        "pre_registration_reapply",
+        "termination",
+    ]
 
 
 @router.post("/load")
@@ -98,6 +108,10 @@ def load_samples(payload: SampleLoad):
             process=payload.process,
         )
         if dup is not None:
+            if dup.get("parse_status") != "已解析":
+                reparsed = reparse_upload(dup["file_id"]) or dup
+                loaded.append(reparsed)
+                continue
             skipped.append({"name": p.name, "reason": "已存在，跳过"})
             continue
         meta = save_upload(

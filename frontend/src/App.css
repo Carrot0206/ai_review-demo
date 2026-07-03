@@ -47,6 +47,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
 }
 .process-bar .label {
   font-size: 13px;
@@ -155,6 +156,7 @@
 .compact-scroll {
   max-height: 188px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .start-note {
@@ -776,6 +778,8 @@
   display: flex;
   gap: 8px;
   align-items: flex-start;
+  min-width: 0;
+  overflow: hidden;
 }
 .rule-row .rid {
   font-family: ui-monospace, Consolas, monospace;
@@ -785,8 +789,24 @@
   padding: 1px 6px;
   border-radius: 4px;
   flex-shrink: 0;
+  max-width: 132px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.rule-row .txt { flex: 1; line-height: 1.6; }
+.rule-row .txt {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.6;
+  overflow: hidden;
+}
+.rule-row .txt > span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 /* ===== Footer ===== */
 .app-footer {

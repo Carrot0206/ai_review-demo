@@ -25,6 +25,14 @@ def _file_dir(file_id: str) -> Path:
     return UPLOADS_DIR / file_id
 
 
+def _original_path(file_id: str) -> Optional[Path]:
+    fdir = _file_dir(file_id)
+    for p in fdir.glob("original.*"):
+        if p.is_file():
+            return p
+    return None
+
+
 def _human_size(size: int) -> str:
     if size < 1024:
         return f"{size} B"
@@ -83,6 +91,12 @@ def save_upload(
     return meta
 
 
+def _write_meta(file_id: str, meta: dict) -> None:
+    (_file_dir(file_id) / "meta.json").write_text(
+        json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
+
 def load_meta(file_id: str) -> Optional[dict]:
     p = _file_dir(file_id) / "meta.json"
     if not p.exists():
@@ -90,10 +104,49 @@ def load_meta(file_id: str) -> Optional[dict]:
     return json.loads(p.read_text(encoding="utf-8"))
 
 
+def reparse_upload(file_id: str) -> Optional[dict]:
+    """重新解析已有上传；用于依赖补齐后恢复历史失败缓存。"""
+    meta = load_meta(file_id)
+    if meta is None:
+        return None
+
+    original_path = _original_path(file_id)
+    if original_path is None:
+        meta["parse_status"] = "解析失败"
+        meta["parse_error"] = "原始文件不存在"
+        meta["segments_count"] = 0
+        _write_meta(file_id, meta)
+        return meta
+
+    stale_extracted = _file_dir(file_id) / "extracted.json"
+    try:
+        extracted = parse_material(original_path, meta.get("material_type"))
+        extracted.material_name = meta.get("original_name") or original_path.name
+        stale_extracted.write_text(
+            json.dumps(extracted.model_dump(), ensure_ascii=False),
+            encoding="utf-8",
+        )
+        meta["parse_status"] = "已解析"
+        meta["parse_error"] = None
+        meta["segments_count"] = len(extracted.segments)
+        meta["file_kind"] = extracted.file_kind
+    except Exception as e:
+        if stale_extracted.exists():
+            stale_extracted.unlink()
+        meta["parse_status"] = "解析失败"
+        meta["parse_error"] = str(e)
+        meta["segments_count"] = 0
+
+    _write_meta(file_id, meta)
+    return meta
+
+
 def load_extracted(file_id: str) -> Optional[ExtractedMaterial]:
     p = _file_dir(file_id) / "extracted.json"
     if not p.exists():
-        return None
+        meta = reparse_upload(file_id)
+        if meta is None or meta.get("parse_status") != "已解析":
+            return None
     return ExtractedMaterial.model_validate(json.loads(p.read_text(encoding="utf-8")))
 
 

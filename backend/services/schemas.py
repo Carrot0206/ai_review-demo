@@ -6,12 +6,19 @@ from typing import Literal, Optional
 from pydantic import BaseModel, Field
 
 RiskLevel = Literal["高风险", "中风险", "低风险"]
-ProcessType = Literal["pre_report", "initial", "pre_registration", "termination"]
+ProcessType = Literal[
+    "pre_report",
+    "initial",
+    "pre_registration",
+    "pre_registration_reapply",
+    "termination",
+]
 
 PROCESS_LABEL = {
     "pre_report": "事前报告",
     "initial": "初始登记",
     "pre_registration": "预登记",
+    "pre_registration_reapply": "重新申请预登记",
     "termination": "终止登记",
 }
 

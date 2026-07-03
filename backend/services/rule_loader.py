@@ -20,6 +20,7 @@ RULE_FILE_MAP = {
     "pre_report": "rules_pre_report.json",
     "initial": "rules_initial_registration_structured.json",
     "pre_registration": "rules_pre_registration.json",
+    "pre_registration_reapply": "rules_pre_registration_reapply.json",
     "termination": "rules_termination.json",
 }
 
