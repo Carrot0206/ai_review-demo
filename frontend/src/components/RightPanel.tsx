@@ -199,14 +199,14 @@ export default function RightPanel() {
     [activeDimensionSet, riskFiltered, ruleDimensionMap],
   )
 
-  const filteredIssueIds = useMemo(
-    () => new Set(filtered.map((issue) => issue.issue_id)),
-    [filtered],
+  const selectableIssueIds = useMemo(
+    () => new Set([...filtered, ...sortedRiskHints].map((issue) => issue.issue_id)),
+    [filtered, sortedRiskHints],
   )
 
   useEffect(() => {
     if (!selectedIssueId) return
-    if (!filteredIssueIds.has(selectedIssueId)) {
+    if (!selectableIssueIds.has(selectedIssueId)) {
       const sourceIssue = result?.issues?.find((issue) => issue.issue_id === selectedIssueId)
       const mappedIssue =
         showDeduped && sourceIssue
@@ -217,7 +217,6 @@ export default function RightPanel() {
         return
       }
       clearSelectedIssue(process)
-      message.warning('关联问题当前被筛选隐藏，请调整筛选条件后查看')
       return
     }
     window.requestAnimationFrame(() => {
@@ -227,9 +226,9 @@ export default function RightPanel() {
   }, [
     clearSelectedIssue,
     filtered,
-    filteredIssueIds,
     process,
     result,
+    selectableIssueIds,
     selectedIssueId,
     selectedIssueNonce,
     setSelectedIssue,

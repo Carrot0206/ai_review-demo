@@ -21,6 +21,7 @@ RULE_FILE_MAP = {
     "initial": "rules_initial_registration_structured.json",
     "pre_registration": "rules_pre_registration.json",
     "pre_registration_reapply": "rules_pre_registration_reapply.json",
+    "pre_registration_supplement": "rules_pre_registration_supplement.json",
     "termination": "rules_termination.json",
     "change_general": "rules_change_general.json",
     "correction_general": "rules_correction_general.json",

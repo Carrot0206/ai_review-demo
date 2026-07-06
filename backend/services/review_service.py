@@ -1096,7 +1096,11 @@ async def review(
         await _emit(progress_cb, f"已解析材料：{m.material_name}（{len(m.segments)} 个片段）")
 
     deterministic_issues: list[Issue] = []
-    if process in {"pre_registration", "pre_registration_reapply"}:
+    if process in {
+        "pre_registration",
+        "pre_registration_reapply",
+        "pre_registration_supplement",
+    }:
         ai_rules, deterministic_issues, skipped_count = _preprocess_pre_registration_rules(
             ai_rules,
             materials,

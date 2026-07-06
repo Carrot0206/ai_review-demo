@@ -4,6 +4,7 @@ export type ProcessType =
   | 'initial'
   | 'pre_registration'
   | 'pre_registration_reapply'
+  | 'pre_registration_supplement'
   | 'termination'
   | 'change_general'
   | 'correction_general'
@@ -174,6 +175,7 @@ export interface SampleListResponse {
   initial: SampleFile[]
   pre_registration: SampleFile[]
   pre_registration_reapply: SampleFile[]
+  pre_registration_supplement: SampleFile[]
   termination: SampleFile[]
   change_general: SampleFile[]
   correction_general: SampleFile[]

@@ -67,6 +67,17 @@ const TEMPLATE_SECTIONS: Record<ProcessType, string[]> = {
     '异地推介信息',
     '关联交易信息',
   ],
+  pre_registration_supplement: [
+    '产品基本信息',
+    '业务分类信息',
+    '交易结构',
+    '底层资产及交易对手',
+    '托管信息',
+    '风险控制信息',
+    '房地产项目信息',
+    '异地推介信息',
+    '关联交易信息',
+  ],
   initial: [
     '产品基本信息',
     '业务分类信息',
@@ -107,6 +118,7 @@ const TEMPLATE_SECTIONS: Record<ProcessType, string[]> = {
 const PROCESS_LABELS: Record<ProcessType, string> = {
   pre_registration: '预登记',
   pre_registration_reapply: '重新申请预登记',
+  pre_registration_supplement: '补充预登记',
   pre_report: '事前报告',
   initial: '初始登记',
   termination: '终止登记',
@@ -476,6 +488,15 @@ export default function LeftPanel() {
         },
       ]
     }
+    if (process === 'pre_registration_supplement') {
+      return [
+        { value: '申报模板', label: '申报模板' },
+        { value: '申请书', label: '申请书' },
+        { value: '信托预登记要素报告表', label: '信托预登记要素报告表' },
+        { value: '补充说明材料', label: '补充说明材料' },
+        { value: '其他附件', label: '其他附件' },
+      ]
+    }
     if (process === 'termination') {
       return [
         ...commonOptions,
@@ -585,7 +606,6 @@ export default function LeftPanel() {
     if (issues.length === 0) return
     const visible = issues.find((issue) => visibleIssueIds.has(issue.issue_id))
     if (!visible) {
-      message.warning('关联问题当前被筛选隐藏，请调整右侧筛选条件后查看')
       return
     }
     setSelectedIssue(visible.issue_id, process)
@@ -761,6 +781,13 @@ export default function LeftPanel() {
   async function handleStart() {
     if (currentUploads.length === 0) {
       message.warning('请先上传材料或一键载入样例')
+      return
+    }
+    const availableRuleCount =
+      (builtinRulesEnabled ? builtinRules.length : 0) +
+      userRules.filter((rule) => rule.enabled).length
+    if (availableRuleCount === 0) {
+      message.warning('当前流程没有可用审核规则，请先生成内置规则或新增用户规则')
       return
     }
     // 锁定本次审核所属流程,避免审核过程中用户切流程时回调写到错误流程
@@ -1182,6 +1209,11 @@ export default function LeftPanel() {
             {process === 'pre_registration_reapply' && (
               <div className="muted" style={{ marginTop: 8, fontSize: 12 }}>
                 原预登记材料为可选 baseline；上传后启用差异比对，不上传仍审核当前申报模板和本次材料。
+              </div>
+            )}
+            {process === 'pre_registration_supplement' && (
+              <div className="muted" style={{ marginTop: 8, fontSize: 12 }}>
+                补充说明材料用于补充事项说明；当前申报模板 JSON 仍为字段唯一数据源。
               </div>
             )}
             {process === 'change_general' && (
