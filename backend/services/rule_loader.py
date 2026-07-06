@@ -22,6 +22,8 @@ RULE_FILE_MAP = {
     "pre_registration": "rules_pre_registration.json",
     "pre_registration_reapply": "rules_pre_registration_reapply.json",
     "termination": "rules_termination.json",
+    "change_general": "rules_change_general.json",
+    "correction_general": "rules_correction_general.json",
 }
 
 # 触发"需人工复核"的关键字（命中即剥离出 AI 批次）

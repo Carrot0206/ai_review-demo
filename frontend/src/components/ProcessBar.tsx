@@ -37,6 +37,18 @@ export default function ProcessBar() {
       >
         🧾 终止登记
       </span>
+      <span
+        className={`process-pill ${process === 'change_general' ? 'active' : ''}`}
+        onClick={() => setProcess('change_general')}
+      >
+        🔄 变更登记
+      </span>
+      <span
+        className={`process-pill ${process === 'correction_general' ? 'active' : ''}`}
+        onClick={() => setProcess('correction_general')}
+      >
+        🛠 更正登记
+      </span>
       <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--c-text-3)' }}>
         切换流程将重新加载对应规则集
       </span>

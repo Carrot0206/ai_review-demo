@@ -5,6 +5,8 @@ export type ProcessType =
   | 'pre_registration'
   | 'pre_registration_reapply'
   | 'termination'
+  | 'change_general'
+  | 'correction_general'
 export type RiskLevel = '高风险' | '中风险' | '低风险'
 
 export interface Rule {
@@ -173,4 +175,6 @@ export interface SampleListResponse {
   pre_registration: SampleFile[]
   pre_registration_reapply: SampleFile[]
   termination: SampleFile[]
+  change_general: SampleFile[]
+  correction_general: SampleFile[]
 }

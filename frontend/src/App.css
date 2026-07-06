@@ -159,6 +159,30 @@
   overflow-x: hidden;
 }
 
+.rule-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.rule-actions .ant-upload,
+.rule-actions .ant-btn {
+  width: 100%;
+}
+
+.rule-bulk-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--c-border-2);
+  border-radius: 3px;
+  background: #FAFAFA;
+}
+
 .start-note {
   margin-top: 10px;
   font-size: 12px;
@@ -208,6 +232,11 @@
   font-size: 13px;
   font-weight: 700;
   color: var(--c-text);
+}
+
+.template-section-issue-count {
+  color: #B45309;
+  font-weight: 600;
 }
 
 .template-field-table {
@@ -677,6 +706,22 @@
 }
 .upload-item .size { color: var(--c-text-3); font-size: 12px; }
 
+.change-upload-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.change-upload-section {
+  min-width: 0;
+}
+
+.change-upload-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-text);
+  margin-bottom: 6px;
+}
+
 .review-option-row {
   display: flex;
   align-items: center;
@@ -687,6 +732,10 @@
   background: #FAFAFA;
   border: 1px solid #E8E8E8;
   border-radius: 3px;
+}
+.review-option-row.compact-rule-option {
+  margin: 0 0 8px;
+  padding: 8px 10px;
 }
 .review-option-title {
   font-size: 13px;
@@ -793,6 +842,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.rule-row .ant-checkbox-wrapper,
+.rule-row .ant-checkbox {
+  flex-shrink: 0;
 }
 .rule-row .txt {
   flex: 1;

@@ -21,6 +21,8 @@ const PROCESSES: ProcessType[] = [
   'pre_registration',
   'pre_registration_reapply',
   'termination',
+  'change_general',
+  'correction_general',
 ]
 const PROCESS_LABELS: Record<ProcessType, string> = {
   pre_report: '事前报告',
@@ -28,6 +30,8 @@ const PROCESS_LABELS: Record<ProcessType, string> = {
   pre_registration: '预登记',
   pre_registration_reapply: '重新申请预登记',
   termination: '终止登记',
+  change_general: '变更登记（一般情形）',
+  correction_general: '更正登记（一般情形）',
 }
 function initByProcess<T>(value: T): ByProcess<T> {
   return PROCESSES.reduce((acc, p) => {
@@ -81,6 +85,10 @@ interface AppState {
   /** 材料片段裁剪开关：按流程保留，关闭时完全沿用原始全文材料逻辑 */
   materialSliceByProcess: ByProcess<boolean>
   setMaterialSlice: (enabled: boolean, process?: ProcessType) => void
+
+  /** 是否启用内置规则：按流程保留，关闭后审核只使用用户规则 */
+  builtinRulesEnabledByProcess: ByProcess<boolean>
+  setBuiltinRulesEnabled: (enabled: boolean, process?: ProcessType) => void
 
   /** 审核结果展示模式：按流程保留，左右面板必须使用同一套问题列表 */
   showDedupedByProcess: ByProcess<boolean>
@@ -252,6 +260,17 @@ export const useStore = create<AppState>((set, get) => ({
     set((s) => ({
       materialSliceByProcess: {
         ...s.materialSliceByProcess,
+        [key]: enabled,
+      },
+    }))
+  },
+
+  builtinRulesEnabledByProcess: initByProcess<boolean>(true),
+  setBuiltinRulesEnabled: (enabled, process) => {
+    const key = process ?? get().process
+    set((s) => ({
+      builtinRulesEnabledByProcess: {
+        ...s.builtinRulesEnabledByProcess,
         [key]: enabled,
       },
     }))

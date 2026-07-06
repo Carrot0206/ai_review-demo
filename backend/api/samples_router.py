@@ -24,10 +24,16 @@ PROCESS_KEYWORDS = {
     "pre_registration_reapply": ["重新申请预登记"],
     "pre_registration": ["预登记", "预登记模板", "预登记申请书"],
     "termination": ["终止登记", "终止登记模板", "终止登记申请书", "清算报告"],
+    "change_general": ["变更登记一般情形", "变更登记（一般情形）"],
+    "correction_general": ["更正登记一般情形", "更正登记（一般情形）"],
 }
 
 
 def _classify_file(name: str) -> Optional[str]:
+    if "更正登记一般情形" in name or "更正登记（一般情形）" in name:
+        return "correction_general"
+    if "变更登记一般情形" in name or "变更登记（一般情形）" in name:
+        return "change_general"
     if "事前报告" in name:
         return "pre_report"
     if "重新申请预登记" in name:
@@ -52,6 +58,8 @@ def list_samples():
         "pre_registration_reapply": [],
         "pre_registration": [],
         "termination": [],
+        "change_general": [],
+        "correction_general": [],
     }
     if not SAMPLES_DIR.exists():
         return groups
@@ -80,6 +88,8 @@ class SampleLoad(BaseModel):
         "pre_registration",
         "pre_registration_reapply",
         "termination",
+        "change_general",
+        "correction_general",
     ]
 
 

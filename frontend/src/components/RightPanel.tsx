@@ -102,7 +102,6 @@ export default function RightPanel() {
   const selectedIssueNonce = useStore((s) => s.selectedIssueNonceByProcess[s.process])
   const setSelectedIssue = useStore((s) => s.setSelectedIssue)
   const clearSelectedIssue = useStore((s) => s.clearSelectedIssue)
-  const setSelectedFieldLocation = useStore((s) => s.setSelectedFieldLocation)
   const showDeduped = useStore((s) => s.showDedupedByProcess[s.process])
   const setShowDeduped = useStore((s) => s.setShowDeduped)
   const issueRefs = useRef(new Map<string, HTMLDivElement>())
@@ -239,10 +238,6 @@ export default function RightPanel() {
 
   function handleSelectIssue(issue: Issue) {
     setSelectedIssue(issue.issue_id, process)
-    const firstTemplateLocation = (issue.issue_location || []).find((loc) =>
-      loc.material_name.includes('模板') || loc.material_name.includes('申报'),
-    ) || issue.issue_location?.[0]
-    setSelectedFieldLocation(firstTemplateLocation?.location || null, process)
   }
 
   const allIssuesByDimension = useMemo(() => {

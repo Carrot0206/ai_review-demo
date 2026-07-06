@@ -444,7 +444,7 @@ def _pre_registration_deterministic_issues(
     has_commitment = _material_present(materials, "合规承诺")
     if not has_application:
         application_rule_ids = (
-            ["REREG-FILE-AI-003", "REREG-FILE-AI-001", "REREG-PREG-ELEMENT-AI-001"]
+            ["REREG-ELEMENT-AI-002", "REREG-FILE-AI-001"]
             if process == "pre_registration_reapply"
             else ["PREG-FILE-AI-001", "PREG-ELEMENT-AI-001"]
         )
@@ -531,17 +531,16 @@ def _pre_registration_skip_rule(
         "PREG-ELEMENT-AI-001",
         "PREG-ELEMENT-AI-003",
         "REREG-FILE-AI-001",
-        "REREG-FILE-AI-003",
-        "REREG-FILE-AI-004",
-        "REREG-PREG-ELEMENT-AI-001",
-        "REREG-PREG-ELEMENT-AI-003",
+        "REREG-FILE-AI-002",
+        "REREG-ELEMENT-AI-002",
+        "REREG-ELEMENT-AI-004",
     }:
         return True
     if not has_commitment and rule.rule_id in {
         "PREG-ELEMENT-AI-002",
         "PREG-ELEMENT-AI-004",
-        "REREG-PREG-ELEMENT-AI-002",
-        "REREG-PREG-ELEMENT-AI-004",
+        "REREG-ELEMENT-AI-003",
+        "REREG-ELEMENT-AI-005",
     }:
         return True
 
@@ -1061,6 +1060,7 @@ async def review(
     rule_id_whitelist: Optional[set] = None,
     on_batch_done: Optional[BatchDoneCallback] = None,
     material_slice_enabled: bool = False,
+    include_builtin_rules: bool = True,
 ) -> ReviewResult:
     """主流程：加载规则→解析材料→分批并发调 LLM→合并结果。
 
@@ -1070,7 +1070,7 @@ async def review(
       extra_rules: 额外混入的规则（例如用户新增规则）
     """
     # 1. 规则
-    all_rules = load_rules(process)
+    all_rules = load_rules(process) if include_builtin_rules else []
     if extra_rules:
         all_rules.extend(extra_rules)
     if rule_id_whitelist:

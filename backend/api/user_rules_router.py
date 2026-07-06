@@ -3,13 +3,16 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, File, HTTPException, UploadFile
 from pydantic import BaseModel
 
+from ..services.rule_importer import import_rules_from_excel
 from ..services.schemas import ProcessType, RiskLevel
 from ..services.user_rules import (
+    add_user_rules_bulk,
     add_user_rule,
     delete_user_rule,
+    delete_user_rules,
     list_user_rules,
     update_user_rule,
 )
@@ -40,6 +43,10 @@ class UserRuleUpdate(BaseModel):
     trigger_condition: Optional[str] = None
 
 
+class UserRuleBatchDelete(BaseModel):
+    rule_ids: list[str]
+
+
 @router.get("")
 def get_user_rules(process: Optional[ProcessType] = None):
     return [r.model_dump() for r in list_user_rules(process)]
@@ -61,6 +68,30 @@ def create_user_rule(payload: UserRuleCreate):
         trigger_condition=payload.trigger_condition,
     )
     return rule.model_dump()
+
+
+@router.post("/import")
+async def import_user_rules(process: ProcessType, file: UploadFile = File(...)):
+    filename = file.filename or ""
+    lower = filename.lower()
+    if not lower.endswith((".xlsx", ".xlsm")):
+        raise HTTPException(status_code=400, detail="仅支持 .xlsx / .xlsm 规则表")
+    content = await file.read()
+    if not content:
+        raise HTTPException(status_code=400, detail="规则表不能为空")
+    try:
+        rules = import_rules_from_excel(content, filename=filename, process=process)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"规则表解析失败：{e}")
+    if not rules:
+        raise HTTPException(status_code=400, detail="未从规则表中识别到可导入规则")
+    saved = add_user_rules_bulk(rules)
+    return {
+        "filename": filename,
+        "process": process,
+        "imported_count": len(saved),
+        "rules": [r.model_dump() for r in saved],
+    }
 
 
 @router.put("/{rule_id}")
@@ -89,3 +120,11 @@ def remove_user_rule(rule_id: str):
     if not ok:
         raise HTTPException(status_code=404, detail=f"规则 {rule_id} 不存在")
     return {"deleted": rule_id}
+
+
+@router.post("/batch-delete")
+def remove_user_rules(payload: UserRuleBatchDelete):
+    if not payload.rule_ids:
+        raise HTTPException(status_code=400, detail="rule_ids 不能为空")
+    deleted = delete_user_rules(payload.rule_ids)
+    return {"deleted_count": deleted, "requested_count": len(payload.rule_ids)}

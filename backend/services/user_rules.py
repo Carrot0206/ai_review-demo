@@ -87,6 +87,16 @@ def add_user_rule(
     return new_rule
 
 
+def add_user_rules_bulk(items: list[UserRule]) -> list[UserRule]:
+    """批量追加用户规则，用于规则表导入。"""
+    if not items:
+        return []
+    rules = _load_all()
+    rules.extend(items)
+    _save_all(rules)
+    return items
+
+
 def delete_user_rule(rule_id: str) -> bool:
     rules = _load_all()
     new = [r for r in rules if r.rule_id != rule_id]
@@ -94,6 +104,19 @@ def delete_user_rule(rule_id: str) -> bool:
         return False
     _save_all(new)
     return True
+
+
+def delete_user_rules(rule_ids: list[str]) -> int:
+    """批量删除用户规则，返回实际删除条数。"""
+    target = set(rule_ids)
+    if not target:
+        return 0
+    rules = _load_all()
+    new = [r for r in rules if r.rule_id not in target]
+    deleted = len(rules) - len(new)
+    if deleted:
+        _save_all(new)
+    return deleted
 
 
 def update_user_rule(

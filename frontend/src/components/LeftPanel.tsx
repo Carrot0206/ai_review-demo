@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
+  Checkbox,
   Collapse,
   Empty,
   Form,
@@ -18,6 +19,7 @@ import {
   DeleteOutlined,
   EditOutlined,
   InboxOutlined,
+  ImportOutlined,
   PlusOutlined,
   RocketOutlined,
   ThunderboltOutlined,
@@ -26,8 +28,10 @@ import {
   createUserRule,
   deleteUpload,
   deleteUserRule,
+  deleteUserRulesBatch,
   getUploadExtracted,
   getRules,
+  importUserRules,
   listUploads,
   loadSamples,
   startReview,
@@ -76,6 +80,28 @@ const TEMPLATE_SECTIONS: Record<ProcessType, string[]> = {
   ],
   pre_report: ['产品基本信息', '关联交易事项'],
   termination: ['产品基本信息', '期限信息', '财务信息', '其他信息'],
+  change_general: [
+    '产品基本信息',
+    '业务分类信息',
+    '产品特征',
+    '互联网贷款信息',
+    '信托费用信息',
+    '初始信托规模',
+    '共同受托人信息',
+    '初始委托人及其财产信息',
+    '初始受益权信息',
+  ],
+  correction_general: [
+    '产品基本信息',
+    '业务分类信息',
+    '产品特征',
+    '互联网贷款信息',
+    '信托费用信息',
+    '初始信托规模',
+    '共同受托人信息',
+    '初始委托人及其财产信息',
+    '初始受益权信息',
+  ],
 }
 
 const PROCESS_LABELS: Record<ProcessType, string> = {
@@ -84,6 +110,8 @@ const PROCESS_LABELS: Record<ProcessType, string> = {
   pre_report: '事前报告',
   initial: '初始登记',
   termination: '终止登记',
+  change_general: '变更登记（一般情形）',
+  correction_general: '更正登记（一般情形）',
 }
 
 const RISK_WEIGHT: Record<RiskLevel, number> = {
@@ -146,8 +174,21 @@ function isBaselineUpload(u: UploadMeta) {
   )
 }
 
+function isPreviousRegistrationUpload(u: UploadMeta) {
+  return u.material_type === '上一次登记申报模板'
+}
+
+function isChangeCurrentMaterial(u: UploadMeta) {
+  return !isPreviousRegistrationUpload(u)
+}
+
+function isFollowupRegistrationProcess(process: ProcessType) {
+  return process === 'change_general' || process === 'correction_general'
+}
+
 function isTemplateUpload(u: UploadMeta) {
   if (isBaselineUpload(u)) return false
+  if (isPreviousRegistrationUpload(u)) return false
   return u.material_type === '申报模板' || u.original_name.includes('模板')
 }
 
@@ -289,6 +330,52 @@ function riskClass(level: RiskLevel | null) {
   return ''
 }
 
+function allSectionFields(section: TemplateSectionData) {
+  return [
+    ...section.fields,
+    ...section.records.flatMap((record) => record.fields),
+  ]
+}
+
+function countSectionIssues(
+  section: TemplateSectionData,
+  issues: Issue[],
+  material: ExtractedMaterial | null,
+  process: ProcessType,
+) {
+  if (!material || issues.length === 0) return 0
+  const sectionNames = TEMPLATE_SECTIONS[process]
+  let markedFields = 0
+  for (const field of allSectionFields(section)) {
+    const fieldMatches = getIssuesForField(field.location, issues, material, sectionNames)
+    if (fieldMatches.length > 0) markedFields += 1
+  }
+  return markedFields
+}
+
+function guessChangeGeneralMaterialType(fileName: string) {
+  if (fileName.includes('申请书')) return '申请书'
+  if (fileName.includes('证明') || fileName.includes('变更事实')) {
+    return '证明发生变更事实的文件'
+  }
+  if (fileName.includes('模板')) return '申报模板'
+  return '其他附件'
+}
+
+function guessCorrectionGeneralMaterialType(fileName: string) {
+  if (fileName.includes('申请书')) return '申请书'
+  if (fileName.includes('证明') || fileName.includes('更正事实')) {
+    return '证明发生需要更正事实的文件'
+  }
+  if (fileName.includes('模板')) return '申报模板'
+  return '其他附件'
+}
+
+function guessFollowupRegistrationMaterialType(process: ProcessType, fileName: string) {
+  if (process === 'correction_general') return guessCorrectionGeneralMaterialType(fileName)
+  return guessChangeGeneralMaterialType(fileName)
+}
+
 export default function LeftPanel() {
   const process = useStore((s) => s.process)
   const rules = useStore((s) => s.rules)
@@ -312,11 +399,14 @@ export default function LeftPanel() {
   const showDeduped = useStore((s) => s.showDedupedByProcess[s.process])
   const materialSliceEnabled = useStore((s) => s.materialSliceByProcess[s.process])
   const setMaterialSlice = useStore((s) => s.setMaterialSlice)
+  const builtinRulesEnabled = useStore((s) => s.builtinRulesEnabledByProcess[s.process])
+  const setBuiltinRulesEnabled = useStore((s) => s.setBuiltinRulesEnabled)
   const filterRisks = useStore((s) => s.filterRisks)
   const setSelectedIssue = useStore((s) => s.setSelectedIssue)
   const selectedFieldLocation = useStore((s) => s.selectedFieldLocationByProcess[s.process])
 
   const [creating, setCreating] = useState(false)
+  const [selectedRuleIds, setSelectedRuleIds] = useState<Set<string>>(new Set())
   const [templateMaterial, setTemplateMaterial] = useState<ExtractedMaterial | null>(null)
   const [templateLoading, setTemplateLoading] = useState(false)
   const fieldRefs = useRef(new Map<string, HTMLDivElement>())
@@ -328,11 +418,24 @@ export default function LeftPanel() {
   useEffect(() => {
     setCreating(false)
     setEditingRuleId(null)
+    setSelectedRuleIds(new Set())
     form.resetFields()
   }, [process, form])
 
+  useEffect(() => {
+    setSelectedRuleIds((prev) => {
+      const available = new Set(userRules.map((r) => r.rule_id))
+      const next = new Set([...prev].filter((id) => available.has(id)))
+      return next.size === prev.size ? prev : next
+    })
+  }, [userRules])
+
   const builtinRules = useMemo(() => rules?.rules || [], [rules])
   const processLabel = PROCESS_LABELS[process]
+  const isFollowupProcess = isFollowupRegistrationProcess(process)
+  const followupShortLabel = process === 'correction_general' ? '更正' : '变更'
+  const followupProcessLabel =
+    process === 'correction_general' ? '更正登记（一般情形）' : '变更登记（一般情形）'
 
   // 适用材料：按流程不同
   const materialOptions = useMemo(() => {
@@ -377,6 +480,28 @@ export default function LeftPanel() {
       return [
         ...commonOptions,
         { value: '清算报告', label: '清算报告' },
+        {
+          value: '法律、行政法规、国家金融监督管理总局要求的其他文件',
+          label: '法律、行政法规、国家金融监督管理总局要求的其他文件',
+        },
+      ]
+    }
+    if (process === 'change_general') {
+      return [
+        { value: '上一次登记申报模板', label: '上一次登记申报模板' },
+        ...commonOptions,
+        { value: '证明发生变更事实的文件', label: '证明发生变更事实的文件' },
+        {
+          value: '法律、行政法规、国家金融监督管理总局要求的其他文件',
+          label: '法律、行政法规、国家金融监督管理总局要求的其他文件',
+        },
+      ]
+    }
+    if (process === 'correction_general') {
+      return [
+        { value: '上一次登记申报模板', label: '上一次登记申报模板' },
+        ...commonOptions,
+        { value: '证明发生需要更正事实的文件', label: '证明发生需要更正事实的文件' },
         {
           value: '法律、行政法规、国家金融监督管理总局要求的其他文件',
           label: '法律、行政法规、国家金融监督管理总局要求的其他文件',
@@ -476,9 +601,9 @@ export default function LeftPanel() {
     setUserRules(r.user_rules || [])
   }
 
-  async function handleUpload(file: File) {
+  async function handleUpload(file: File, materialType?: string) {
     try {
-      await uploadFile(file, { process })
+      await uploadFile(file, { process, material_type: materialType })
       message.success(`${file.name} 上传成功`)
       await refreshUploads()
     } catch (e: any) {
@@ -491,6 +616,10 @@ export default function LeftPanel() {
       }
     }
     return false // 阻止 antd 自带上传
+  }
+
+  function handleFollowupRegistrationCurrentUpload(file: File) {
+    return handleUpload(file, guessFollowupRegistrationMaterialType(process, file.name))
   }
 
   async function handleLoadSamples() {
@@ -588,7 +717,45 @@ export default function LeftPanel() {
 
   async function handleDeleteUserRule(rid: string) {
     await deleteUserRule(rid)
+    setSelectedRuleIds((prev) => {
+      const next = new Set(prev)
+      next.delete(rid)
+      return next
+    })
     await refreshRules()
+  }
+
+  function toggleRuleSelected(ruleId: string, checked: boolean) {
+    setSelectedRuleIds((prev) => {
+      const next = new Set(prev)
+      if (checked) next.add(ruleId)
+      else next.delete(ruleId)
+      return next
+    })
+  }
+
+  function toggleAllRules(checked: boolean) {
+    setSelectedRuleIds(checked ? new Set(userRules.map((r) => r.rule_id)) : new Set())
+  }
+
+  async function handleDeleteSelectedRules() {
+    const ids = [...selectedRuleIds]
+    if (ids.length === 0) return
+    const res = await deleteUserRulesBatch(ids)
+    message.success(`已删除 ${res.deleted_count} 条规则`)
+    setSelectedRuleIds(new Set())
+    await refreshRules()
+  }
+
+  async function handleImportRules(file: File) {
+    try {
+      const res = await importUserRules(process, file)
+      message.success(`已从 ${res.filename} 导入 ${res.imported_count} 条规则`)
+      await refreshRules()
+    } catch (e: any) {
+      message.error('规则表导入失败：' + (e?.response?.data?.detail || e?.message))
+    }
+    return false
   }
 
   async function handleStart() {
@@ -607,6 +774,7 @@ export default function LeftPanel() {
       const { job_id } = await startReview({
         process: reviewProcess,
         file_ids: currentUploads.map((u) => u.file_id),
+        include_builtin_rules: builtinRulesEnabled,
         max_concurrency: 48,
         material_slice_enabled: materialSliceEnabled,
       })
@@ -763,6 +931,17 @@ export default function LeftPanel() {
                   ),
                   children: (
                     <div className="compact-scroll">
+                      <div className="review-option-row compact-rule-option">
+                        <div>
+                          <div className="review-option-title">启用内置规则</div>
+                          <div className="muted">关闭后本次审核只使用用户新增规则</div>
+                        </div>
+                        <Switch
+                          checked={builtinRulesEnabled}
+                          onChange={(checked) => setBuiltinRulesEnabled(checked, process)}
+                          disabled={running}
+                        />
+                      </div>
                       {builtinRules.length === 0 && (
                         <div className="muted" style={{ padding: '4px 0' }}>
                           暂未加载到内置规则
@@ -800,7 +979,7 @@ export default function LeftPanel() {
                   ),
                   children: (
                     <>
-                      <div style={{ marginBottom: 8 }}>
+                      <div className="rule-actions">
                         <Button
                           type="dashed"
                           size="small"
@@ -814,7 +993,48 @@ export default function LeftPanel() {
                         >
                           新增一条规则
                         </Button>
+                        <Upload
+                          beforeUpload={handleImportRules}
+                          showUploadList={false}
+                          accept=".xlsx,.xlsm"
+                        >
+                          <Button
+                            type="dashed"
+                            size="small"
+                            icon={<ImportOutlined />}
+                            block
+                          >
+                            上传规则表
+                          </Button>
+                        </Upload>
                       </div>
+                      {userRules.length > 0 && (
+                        <div className="rule-bulk-bar">
+                          <Checkbox
+                            checked={selectedRuleIds.size === userRules.length}
+                            indeterminate={
+                              selectedRuleIds.size > 0 &&
+                              selectedRuleIds.size < userRules.length
+                            }
+                            onChange={(e) => toggleAllRules(e.target.checked)}
+                          >
+                            全选
+                          </Checkbox>
+                          <Popconfirm
+                            title={`删除选中的 ${selectedRuleIds.size} 条规则？`}
+                            disabled={selectedRuleIds.size === 0}
+                            onConfirm={handleDeleteSelectedRules}
+                          >
+                            <Button
+                              size="small"
+                              danger
+                              disabled={selectedRuleIds.size === 0}
+                            >
+                              删除选中
+                            </Button>
+                          </Popconfirm>
+                        </div>
+                      )}
                       <div className="compact-scroll">
                         {userRules.length === 0 ? (
                           <div className="muted" style={{ padding: '4px 0' }}>
@@ -823,6 +1043,12 @@ export default function LeftPanel() {
                         ) : (
                           userRules.map((r) => (
                             <div key={r.rule_id} className="rule-row">
+                              <Checkbox
+                                checked={selectedRuleIds.has(r.rule_id)}
+                                onChange={(e) =>
+                                  toggleRuleSelected(r.rule_id, e.target.checked)
+                                }
+                              />
                               <span className="rid">{r.rule_id.slice(0, 8)}</span>
                               <span className="txt">
                                 <Tag
@@ -887,28 +1113,85 @@ export default function LeftPanel() {
                 一键载入样例
               </Button>
             </div>
-            <div className={currentUploads.length > 0 ? 'dragger-compact' : ''}>
-              <Dragger
-                multiple
-                beforeUpload={handleUpload}
-                showUploadList={false}
-                accept=".json,.pdf,.docx,.txt,.xlsx,.xlsm"
-              >
-                <p className="ant-upload-drag-icon" style={{ marginBottom: 4 }}>
-                  <InboxOutlined />
-                </p>
-                <p style={{ fontSize: 13, color: 'var(--c-text)', margin: 0 }}>
-                  点击或拖拽上传材料
-                </p>
-                <p style={{ fontSize: 12, color: 'var(--c-text-3)', margin: 0 }}>
-                  支持 JSON / PDF / DOCX / TXT
-                  / XLSX / XLSM
-                </p>
-              </Dragger>
-            </div>
+            {isFollowupProcess ? (
+              <div className="change-upload-grid">
+                <div className="change-upload-section">
+                  <div className="change-upload-title">上一次的初始/变更/更正登记申请模板</div>
+                  <div className={currentUploads.some(isPreviousRegistrationUpload) ? 'dragger-compact' : ''}>
+                    <Dragger
+                      multiple
+                      beforeUpload={(file) => handleUpload(file, '上一次登记申报模板')}
+                      showUploadList={false}
+                      accept=".json,.xlsx,.xlsm"
+                    >
+                      <p className="ant-upload-drag-icon" style={{ marginBottom: 4 }}>
+                        <InboxOutlined />
+                      </p>
+                      <p style={{ fontSize: 13, color: 'var(--c-text)', margin: 0 }}>
+                        上传上一次登记模板
+                      </p>
+                      <p style={{ fontSize: 12, color: 'var(--c-text-3)', margin: 0 }}>
+                        支持 JSON / XLSX / XLSM
+                      </p>
+                    </Dragger>
+                  </div>
+                </div>
+                <div className="change-upload-section">
+                  <div className="change-upload-title">{followupProcessLabel}申请材料</div>
+                  <div className={currentUploads.some(isChangeCurrentMaterial) ? 'dragger-compact' : ''}>
+                    <Dragger
+                      multiple
+                      beforeUpload={handleFollowupRegistrationCurrentUpload}
+                      showUploadList={false}
+                      accept=".json,.pdf,.docx,.txt,.xlsx,.xlsm"
+                    >
+                      <p className="ant-upload-drag-icon" style={{ marginBottom: 4 }}>
+                        <InboxOutlined />
+                      </p>
+                      <p style={{ fontSize: 13, color: 'var(--c-text)', margin: 0 }}>
+                        上传本次{followupShortLabel}材料
+                      </p>
+                      <p style={{ fontSize: 12, color: 'var(--c-text-3)', margin: 0 }}>
+                        模板 / 申请书 / 证明文件
+                      </p>
+                    </Dragger>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className={currentUploads.length > 0 ? 'dragger-compact' : ''}>
+                <Dragger
+                  multiple
+                  beforeUpload={(file) => handleUpload(file)}
+                  showUploadList={false}
+                  accept=".json,.pdf,.docx,.txt,.xlsx,.xlsm"
+                >
+                  <p className="ant-upload-drag-icon" style={{ marginBottom: 4 }}>
+                    <InboxOutlined />
+                  </p>
+                  <p style={{ fontSize: 13, color: 'var(--c-text)', margin: 0 }}>
+                    点击或拖拽上传材料
+                  </p>
+                  <p style={{ fontSize: 12, color: 'var(--c-text-3)', margin: 0 }}>
+                    支持 JSON / PDF / DOCX / TXT
+                    / XLSX / XLSM
+                  </p>
+                </Dragger>
+              </div>
+            )}
             {process === 'pre_registration_reapply' && (
               <div className="muted" style={{ marginTop: 8, fontSize: 12 }}>
                 原预登记材料为可选 baseline；上传后启用差异比对，不上传仍审核当前申报模板和本次材料。
+              </div>
+            )}
+            {process === 'change_general' && (
+              <div className="muted" style={{ marginTop: 8, fontSize: 12 }}>
+                上一次登记模板仅作为历史参考；审核只依据本批规则判断本次变更材料。
+              </div>
+            )}
+            {process === 'correction_general' && (
+              <div className="muted" style={{ marginTop: 8, fontSize: 12 }}>
+                上一次登记模板仅作为历史参考；审核只依据本批规则判断本次更正材料。
               </div>
             )}
             {currentUploads.length > 0 && (
@@ -1004,18 +1287,32 @@ export default function LeftPanel() {
             <Collapse
               className="template-section-collapse"
               defaultActiveKey={[templateSections[0]?.name].filter(Boolean)}
-              items={templateSections.map((section) => ({
-                key: section.name,
-                label: (
-                  <span className="template-section-label">
-                    <span>{section.name}</span>
-                    <span className="muted">
-                      {`${section.fields.length} 个字段`}
+              items={templateSections.map((section) => {
+                const fieldCount = allSectionFields(section).length
+                const issueCount = countSectionIssues(
+                  section,
+                  fieldIssues,
+                  templateMaterial,
+                  process,
+                )
+                return {
+                  key: section.name,
+                  label: (
+                    <span className="template-section-label">
+                      <span>{section.name}</span>
+                      <span className="muted">
+                        {`${fieldCount} 个字段`}
+                      </span>
+                      {issueCount > 0 && (
+                        <span className="template-section-issue-count">
+                          {`AI 标注 ${issueCount} 处异常`}
+                        </span>
+                      )}
                     </span>
-                  </span>
-                ),
-                children: renderTemplateSection(section),
-              }))}
+                  ),
+                  children: renderTemplateSection(section),
+                }
+              })}
             />
           )}
         </div>

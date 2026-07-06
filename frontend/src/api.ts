@@ -47,8 +47,26 @@ export async function createUserRule(payload: {
   return data
 }
 
+export async function importUserRules(
+  process: ProcessType,
+  file: File,
+): Promise<{ filename: string; process: ProcessType; imported_count: number; rules: UserRule[] }> {
+  const form = new FormData()
+  form.append('file', file)
+  const { data } = await http.post('/user-rules/import', form, {
+    params: { process },
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data
+}
+
 export async function deleteUserRule(rule_id: string) {
   const { data } = await http.delete(`/user-rules/${rule_id}`)
+  return data
+}
+
+export async function deleteUserRulesBatch(rule_ids: string[]): Promise<{ deleted_count: number; requested_count: number }> {
+  const { data } = await http.post('/user-rules/batch-delete', { rule_ids })
   return data
 }
 
@@ -114,6 +132,7 @@ export async function startReview(payload: {
   process: ProcessType
   file_ids: string[]
   user_rule_ids?: string[] | null
+  include_builtin_rules?: boolean
   max_concurrency?: number
   material_slice_enabled?: boolean
 }): Promise<{ job_id: string; status: string }> {

@@ -35,9 +35,11 @@ def _build_parser() -> argparse.ArgumentParser:
             "pre_registration",
             "pre_registration_reapply",
             "termination",
+            "change_general",
+            "correction_general",
         ],
         required=True,
-        help="登记流程：pre_report=事前报告 / initial=初始登记 / pre_registration=预登记 / pre_registration_reapply=重新申请预登记 / termination=终止登记",
+        help="登记流程：pre_report=事前报告 / initial=初始登记 / pre_registration=预登记 / pre_registration_reapply=重新申请预登记 / termination=终止登记 / change_general=变更登记（一般情形） / correction_general=更正登记（一般情形）",
     )
     p.add_argument(
         "--materials",
