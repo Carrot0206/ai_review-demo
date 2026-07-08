@@ -1136,7 +1136,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "关联交易性质",
+          "field": "关联交易事项.关联交易性质",
           "op": "equals",
           "value": "重大关联交易"
         },
@@ -1144,12 +1144,11 @@
           "field": "关联交易事项.重大关联交易是否已经董事会批准",
           "op": "required"
         },
-        "raw_spec": "when 关联交易性质选择【重大关联交易】时必填 => 重大关联交易是否已经董事会批准 必填非空",
         "source_check_type": "条件性必填"
       },
       "check_type": "条件必填校验",
       "trigger_condition": "关联交易性质选择【重大关联交易】时必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"关联交易性质\", \"op\": \"equals\", \"value\": \"重大关联交易\"}, \"target\": {\"field\": \"关联交易事项.重大关联交易是否已经董事会批准\", \"op\": \"required\"}, \"raw_spec\": \"when 关联交易性质选择【重大关联交易】时必填 => 重大关联交易是否已经董事会批准 必填非空\", \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"关联交易事项.关联交易性质\",\"op\":\"equals\",\"value\":\"重大关联交易\"},\"target\":{\"field\":\"关联交易事项.重大关联交易是否已经董事会批准\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",

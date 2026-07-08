@@ -931,11 +931,9 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "财产来源",
-          "op": "contains_any",
-          "values": [
-            "财产权"
-          ]
+          "field": "产品基本信息.财产来源",
+          "op": "contains",
+          "value": "财产权"
         },
         "target": {
           "field": "产品基本信息.是否信托受益权转让",
@@ -945,7 +943,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "财产来源选择有【财产权】的，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"财产来源\", \"op\": \"contains_any\", \"values\": [\"财产权\"]}, \"target\": {\"field\": \"产品基本信息.是否信托受益权转让\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"产品基本信息.财产来源\",\"op\":\"contains\",\"value\":\"财产权\"},\"target\":{\"field\":\"产品基本信息.是否信托受益权转让\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -1065,9 +1063,12 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "是否信托受益权转让",
-          "op": "equals",
-          "value": "拆分转让"
+          "field": "产品基本信息.是否信托受益权转让",
+          "op": "contains_any",
+          "values": [
+            "拆分转让",
+            "整体转让"
+          ]
         },
         "target": {
           "field": "产品基本信息.发行、转让场所",
@@ -1077,7 +1078,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "是否信托受益权转让选择【拆分转让】或【整体转让】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"是否信托受益权转让\", \"op\": \"equals\", \"value\": \"拆分转让\"}, \"target\": {\"field\": \"产品基本信息.发行、转让场所\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"产品基本信息.是否信托受益权转让\",\"op\":\"contains_any\",\"values\":[\"拆分转让\",\"整体转让\"]},\"target\":{\"field\":\"产品基本信息.发行、转让场所\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -1152,7 +1153,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "发行、转让场所",
+          "field": "产品基本信息.发行、转让场所",
           "op": "equals",
           "value": "其他"
         },
@@ -1164,7 +1165,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "发行、转让场所选择【其他】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"发行、转让场所\", \"op\": \"equals\", \"value\": \"其他\"}, \"target\": {\"field\": \"产品基本信息.发行、转让场所补充说明\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"产品基本信息.发行、转让场所\",\"op\":\"equals\",\"value\":\"其他\"},\"target\":{\"field\":\"产品基本信息.发行、转让场所补充说明\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -1414,7 +1415,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "开放频度",
+          "field": "产品基本信息.开放频度",
           "op": "equals",
           "value": "其他"
         },
@@ -1426,7 +1427,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "开放频度选择【其他】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"开放频度\", \"op\": \"equals\", \"value\": \"其他\"}, \"target\": {\"field\": \"产品基本信息.开放频度补充说明\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"产品基本信息.开放频度\",\"op\":\"equals\",\"value\":\"其他\"},\"target\":{\"field\":\"产品基本信息.开放频度补充说明\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -1503,7 +1504,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "equals",
           "value": "资产管理信托"
         },
@@ -1515,7 +1516,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【资产管理信托】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"equals\", \"value\": \"资产管理信托\"}, \"target\": {\"field\": \"产品基本信息.是否为结构化信托\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"资产管理信托\"},\"target\":{\"field\":\"产品基本信息.是否为结构化信托\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -1592,7 +1593,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "是否为结构化信托",
+          "field": "产品基本信息.是否为结构化信托",
           "op": "equals",
           "value": "是"
         },
@@ -1604,7 +1605,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "是否为结构化信托选择【是】时，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"是否为结构化信托\", \"op\": \"equals\", \"value\": \"是\"}, \"target\": {\"field\": \"产品基本信息.约定优先劣后受益权比例\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"产品基本信息.是否为结构化信托\",\"op\":\"equals\",\"value\":\"是\"},\"target\":{\"field\":\"产品基本信息.约定优先劣后受益权比例\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -1766,12 +1767,12 @@
           "logic": "AND",
           "conditions": [
             {
-              "field": "信托业务分类",
+              "field": "业务分类信息.信托业务分类",
               "op": "equals",
               "value": "资产管理信托"
             },
             {
-              "field": "项目运作模式",
+              "field": "产品基本信息.项目运作模式",
               "op": "equals",
               "value": "封闭式"
             }
@@ -1785,7 +1786,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【资产管理信托】，且项目运作模式选择【封闭式】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"logic\": \"AND\", \"conditions\": [{\"field\": \"信托业务分类\", \"op\": \"equals\", \"value\": \"资产管理信托\"}, {\"field\": \"项目运作模式\", \"op\": \"equals\", \"value\": \"封闭式\"}]}, \"target\": {\"field\": \"产品基本信息.是否分期募集放款\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"logic\":\"AND\",\"conditions\":[{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"资产管理信托\"},{\"field\":\"产品基本信息.项目运作模式\",\"op\":\"equals\",\"value\":\"封闭式\"}]},\"target\":{\"field\":\"产品基本信息.是否分期募集放款\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -2065,7 +2066,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "equals",
           "value": "资产管理信托"
         },
@@ -2077,7 +2078,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【资产管理信托】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"equals\", \"value\": \"资产管理信托\"}, \"target\": {\"field\": \"业务分类信息.资产管理信托分类\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"资产管理信托\"},\"target\":{\"field\":\"业务分类信息.资产管理信托分类\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -2157,7 +2158,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "equals",
           "value": "资产服务信托"
         },
@@ -2169,7 +2170,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【资产服务信托】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"equals\", \"value\": \"资产服务信托\"}, \"target\": {\"field\": \"业务分类信息.资产服务信托分类1\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"资产服务信托\"},\"target\":{\"field\":\"业务分类信息.资产服务信托分类1\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -2263,7 +2264,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "equals",
           "value": "资产服务信托"
         },
@@ -2275,7 +2276,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【资产服务信托】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"equals\", \"value\": \"资产服务信托\"}, \"target\": {\"field\": \"业务分类信息.资产服务信托分类2\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"资产服务信托\"},\"target\":{\"field\":\"业务分类信息.资产服务信托分类2\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -2352,7 +2353,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "equals",
           "value": "公益慈善信托"
         },
@@ -2364,7 +2365,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【公益慈善信托】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"equals\", \"value\": \"公益慈善信托\"}, \"target\": {\"field\": \"业务分类信息.公益慈善信托分类\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"公益慈善信托\"},\"target\":{\"field\":\"业务分类信息.公益慈善信托分类\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -2441,7 +2442,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "equals",
           "value": "公益慈善信托"
         },
@@ -2453,7 +2454,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【公益慈善信托】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"equals\", \"value\": \"公益慈善信托\"}, \"target\": {\"field\": \"业务分类信息.是否在民政部门备案\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"公益慈善信托\"},\"target\":{\"field\":\"业务分类信息.是否在民政部门备案\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -2528,7 +2529,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "equals",
           "value": "待整改业务"
         },
@@ -2540,7 +2541,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【待整改业务】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"equals\", \"value\": \"待整改业务\"}, \"target\": {\"field\": \"业务分类信息.待整改原因\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"待整改业务\"},\"target\":{\"field\":\"业务分类信息.待整改原因\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -2615,7 +2616,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "equals",
           "value": "待整改业务"
         },
@@ -2627,7 +2628,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【待整改业务】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"equals\", \"value\": \"待整改业务\"}, \"target\": {\"field\": \"业务分类信息.整改计划\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"待整改业务\"},\"target\":{\"field\":\"业务分类信息.整改计划\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -2702,7 +2703,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "equals",
           "value": "待整改业务"
         },
@@ -2714,7 +2715,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【待整改业务】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"equals\", \"value\": \"待整改业务\"}, \"target\": {\"field\": \"业务分类信息.计划完成整改时间\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"待整改业务\"},\"target\":{\"field\":\"业务分类信息.计划完成整改时间\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -2791,7 +2792,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "contains_any",
           "values": [
             "资产管理信托",
@@ -2806,7 +2807,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【资产管理信托或待整改业务】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"contains_any\", \"values\": [\"资产管理信托\", \"待整改业务\"]}, \"target\": {\"field\": \"业务分类信息.是否以管理契约型私募基金形式开展资产管理信托\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"contains_any\",\"values\":[\"资产管理信托\",\"待整改业务\"]},\"target\":{\"field\":\"业务分类信息.是否以管理契约型私募基金形式开展资产管理信托\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -2883,7 +2884,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "contains_any",
           "values": [
             "资产管理信托",
@@ -2899,7 +2900,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【资产管理信托或资产服务信托或待整改业务】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"contains_any\", \"values\": [\"资产管理信托\", \"资产服务信托\", \"待整改业务\"]}, \"target\": {\"field\": \"业务分类信息.是否金融通道业务\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"contains_any\",\"values\":[\"资产管理信托\",\"资产服务信托\",\"待整改业务\"]},\"target\":{\"field\":\"业务分类信息.是否金融通道业务\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -2976,7 +2977,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "contains_any",
           "values": [
             "资产管理信托",
@@ -2992,7 +2993,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【资产管理信托或资产服务信托或待整改业务】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"contains_any\", \"values\": [\"资产管理信托\", \"资产服务信托\", \"待整改业务\"]}, \"target\": {\"field\": \"业务分类信息.是否为融资方服务的私募投行业务\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"contains_any\",\"values\":[\"资产管理信托\",\"资产服务信托\",\"待整改业务\"]},\"target\":{\"field\":\"业务分类信息.是否为融资方服务的私募投行业务\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -3069,7 +3070,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "equals",
           "value": "资产服务信托"
         },
@@ -3081,7 +3082,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【资产服务信托】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"equals\", \"value\": \"资产服务信托\"}, \"target\": {\"field\": \"业务分类信息.是否参与资金募集\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"资产服务信托\"},\"target\":{\"field\":\"业务分类信息.是否参与资金募集\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -3158,7 +3159,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "contains_any",
           "values": [
             "资产管理信托",
@@ -3173,7 +3174,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【资产管理信托或待整改业务】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"contains_any\", \"values\": [\"资产管理信托\", \"待整改业务\"]}, \"target\": {\"field\": \"业务分类信息.是否满足非公开发行要求\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"contains_any\",\"values\":[\"资产管理信托\",\"待整改业务\"]},\"target\":{\"field\":\"业务分类信息.是否满足非公开发行要求\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -3288,7 +3289,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "contains_any",
           "values": [
             "资产管理信托",
@@ -3304,7 +3305,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【资产管理信托或资产服务信托或待整改业务】时，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"contains_any\", \"values\": [\"资产管理信托\", \"资产服务信托\", \"待整改业务\"]}, \"target\": {\"field\": \"产品特征.是否互联网贷款\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"contains_any\",\"values\":[\"资产管理信托\",\"资产服务信托\",\"待整改业务\"]},\"target\":{\"field\":\"产品特征.是否互联网贷款\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -3386,7 +3387,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "是否互联网贷款",
+          "field": "产品特征.是否互联网贷款",
           "op": "equals",
           "value": "是"
         },
@@ -3398,7 +3399,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "是否互联网贷款选择【是】时，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"是否互联网贷款\", \"op\": \"equals\", \"value\": \"是\"}, \"target\": {\"field\": \"产品特征.业务模式\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"产品特征.是否互联网贷款\",\"op\":\"equals\",\"value\":\"是\"},\"target\":{\"field\":\"产品特征.业务模式\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -3475,7 +3476,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "contains_any",
           "values": [
             "资产管理信托",
@@ -3491,7 +3492,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【资产管理信托或资产服务信托或待整改业务】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"contains_any\", \"values\": [\"资产管理信托\", \"资产服务信托\", \"待整改业务\"]}, \"target\": {\"field\": \"产品特征.是否证券投资类信托\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"contains_any\",\"values\":[\"资产管理信托\",\"资产服务信托\",\"待整改业务\"]},\"target\":{\"field\":\"产品特征.是否证券投资类信托\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -3568,7 +3569,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "contains_any",
           "values": [
             "资产管理信托",
@@ -3584,7 +3585,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【资产管理信托或资产服务信托或待整改业务】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"contains_any\", \"values\": [\"资产管理信托\", \"资产服务信托\", \"待整改业务\"]}, \"target\": {\"field\": \"产品特征.是否受托境外理财信托（QDII）\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"contains_any\",\"values\":[\"资产管理信托\",\"资产服务信托\",\"待整改业务\"]},\"target\":{\"field\":\"产品特征.是否受托境外理财信托（QDII）\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -3748,7 +3749,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "是否绿色信托",
+          "field": "产品特征.是否绿色信托",
           "op": "equals",
           "value": "是"
         },
@@ -3760,7 +3761,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "是否绿色信托选择【是】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"是否绿色信托\", \"op\": \"equals\", \"value\": \"是\"}, \"target\": {\"field\": \"产品特征.绿色信托业务模式\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"产品特征.是否绿色信托\",\"op\":\"equals\",\"value\":\"是\"},\"target\":{\"field\":\"产品特征.绿色信托业务模式\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -3838,7 +3839,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "contains_any",
           "values": [
             "资产管理信托",
@@ -3854,7 +3855,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【资产管理信托或资产服务信托或待整改业务】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"contains_any\", \"values\": [\"资产管理信托\", \"资产服务信托\", \"待整改业务\"]}, \"target\": {\"field\": \"产品特征.是否城市更新\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"contains_any\",\"values\":[\"资产管理信托\",\"资产服务信托\",\"待整改业务\"]},\"target\":{\"field\":\"产品特征.是否城市更新\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -4096,7 +4097,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "contains_any",
           "values": [
             "资产管理信托",
@@ -4112,7 +4113,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【资产管理信托或资产服务信托或待整改业务】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"contains_any\", \"values\": [\"资产管理信托\", \"资产服务信托\", \"待整改业务\"]}, \"target\": {\"field\": \"产品特征.是否资产证券双SPV结构下的资产层信托\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"contains_any\",\"values\":[\"资产管理信托\",\"资产服务信托\",\"待整改业务\"]},\"target\":{\"field\":\"产品特征.是否资产证券双SPV结构下的资产层信托\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -5678,7 +5679,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "equals",
           "value": "资产管理信托"
         },
@@ -5690,7 +5691,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【资产管理信托】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"equals\", \"value\": \"资产管理信托\"}, \"target\": {\"field\": \"初始信托规模.募集起始日期\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"资产管理信托\"},\"target\":{\"field\":\"初始信托规模.募集起始日期\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -5765,7 +5766,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "信托业务分类",
+          "field": "业务分类信息.信托业务分类",
           "op": "equals",
           "value": "资产管理信托"
         },
@@ -5777,7 +5778,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "信托业务分类选择【资产管理信托】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"信托业务分类\", \"op\": \"equals\", \"value\": \"资产管理信托\"}, \"target\": {\"field\": \"初始信托规模.募集结束日期\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"资产管理信托\"},\"target\":{\"field\":\"初始信托规模.募集结束日期\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -5854,7 +5855,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "期限类型",
+          "field": "初始信托规模.期限类型",
           "op": "equals",
           "value": "固定期限"
         },
@@ -5866,7 +5867,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "期限类型选择【固定期限】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"期限类型\", \"op\": \"equals\", \"value\": \"固定期限\"}, \"target\": {\"field\": \"初始信托规模.信托产品期限\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"初始信托规模.期限类型\",\"op\":\"equals\",\"value\":\"固定期限\"},\"target\":{\"field\":\"初始信托规模.信托产品期限\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -7027,7 +7028,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "委托人类型",
+          "field": "初始委托人及其财产信息.委托人类型",
           "op": "equals",
           "value": "特定目的载体"
         },
@@ -7039,7 +7040,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "委托人类型选择【特定目的载体】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"委托人类型\", \"op\": \"equals\", \"value\": \"特定目的载体\"}, \"target\": {\"field\": \"初始委托人及其财产信息.管理人名称\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"初始委托人及其财产信息.委托人类型\",\"op\":\"equals\",\"value\":\"特定目的载体\"},\"target\":{\"field\":\"初始委托人及其财产信息.管理人名称\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -7154,7 +7155,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "委托人类型",
+          "field": "初始委托人及其财产信息.委托人类型",
           "op": "equals",
           "value": "特定目的载体"
         },
@@ -7166,7 +7167,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "委托人类型选择【特定目的载体】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"委托人类型\", \"op\": \"equals\", \"value\": \"特定目的载体\"}, \"target\": {\"field\": \"初始委托人及其财产信息.管理人证件类型\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"初始委托人及其财产信息.委托人类型\",\"op\":\"equals\",\"value\":\"特定目的载体\"},\"target\":{\"field\":\"初始委托人及其财产信息.管理人证件类型\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -7241,7 +7242,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "委托人类型",
+          "field": "初始委托人及其财产信息.委托人类型",
           "op": "equals",
           "value": "特定目的载体"
         },
@@ -7253,7 +7254,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "委托人类型选择【特定目的载体】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"委托人类型\", \"op\": \"equals\", \"value\": \"特定目的载体\"}, \"target\": {\"field\": \"初始委托人及其财产信息.管理人证件号码\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"初始委托人及其财产信息.委托人类型\",\"op\":\"equals\",\"value\":\"特定目的载体\"},\"target\":{\"field\":\"初始委托人及其财产信息.管理人证件号码\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -7330,7 +7331,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "委托人类型",
+          "field": "初始委托人及其财产信息.委托人类型",
           "op": "equals",
           "value": "特定目的载体"
         },
@@ -7342,7 +7343,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "委托人类型选择【特定目的载体】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"委托人类型\", \"op\": \"equals\", \"value\": \"特定目的载体\"}, \"target\": {\"field\": \"初始委托人及其财产信息.是否本公司发行产品\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"初始委托人及其财产信息.委托人类型\",\"op\":\"equals\",\"value\":\"特定目的载体\"},\"target\":{\"field\":\"初始委托人及其财产信息.是否本公司发行产品\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -7421,11 +7422,11 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "委托人类型",
+          "field": "初始委托人及其财产信息.委托人类型",
           "op": "contains_any",
           "values": [
             "非金融企业",
-            "金融机构（实体）"
+            "金融机构（实体"
           ]
         },
         "target": {
@@ -7436,7 +7437,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "委托人类型选择【非金融企业或金融机构（实体）】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"委托人类型\", \"op\": \"contains_any\", \"values\": [\"非金融企业\", \"金融机构（实体）\"]}, \"target\": {\"field\": \"初始委托人及其财产信息.委托人是否上市\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"初始委托人及其财产信息.委托人类型\",\"op\":\"contains_any\",\"values\":[\"非金融企业\",\"金融机构（实体\"]},\"target\":{\"field\":\"初始委托人及其财产信息.委托人是否上市\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -7617,11 +7618,9 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "委托资产类型",
-          "op": "contains_any",
-          "values": [
-            "其他"
-          ]
+          "field": "初始委托人及其财产信息.委托资产类型",
+          "op": "contains",
+          "value": "其他"
         },
         "target": {
           "field": "初始委托人及其财产信息.委托资产类型补充说明",
@@ -7631,7 +7630,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "委托资产类型选择有【其他】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"委托资产类型\", \"op\": \"contains_any\", \"values\": [\"其他\"]}, \"target\": {\"field\": \"初始委托人及其财产信息.委托资产类型补充说明\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"初始委托人及其财产信息.委托资产类型\",\"op\":\"contains\",\"value\":\"其他\"},\"target\":{\"field\":\"初始委托人及其财产信息.委托资产类型补充说明\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -8505,7 +8504,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "受益人类型",
+          "field": "初始受益权信息.受益人类型",
           "op": "equals",
           "value": "特定目的载体"
         },
@@ -8517,7 +8516,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "受益人类型选择【特定目的载体】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"受益人类型\", \"op\": \"equals\", \"value\": \"特定目的载体\"}, \"target\": {\"field\": \"初始受益权信息.管理人名称\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"初始受益权信息.受益人类型\",\"op\":\"equals\",\"value\":\"特定目的载体\"},\"target\":{\"field\":\"初始受益权信息.管理人名称\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -8632,7 +8631,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "受益人类型",
+          "field": "初始受益权信息.受益人类型",
           "op": "equals",
           "value": "特定目的载体"
         },
@@ -8644,7 +8643,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "受益人类型选择【特定目的载体】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"受益人类型\", \"op\": \"equals\", \"value\": \"特定目的载体\"}, \"target\": {\"field\": \"初始受益权信息.管理人证件类型\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"初始受益权信息.受益人类型\",\"op\":\"equals\",\"value\":\"特定目的载体\"},\"target\":{\"field\":\"初始受益权信息.管理人证件类型\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -8719,7 +8718,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "受益人类型",
+          "field": "初始受益权信息.受益人类型",
           "op": "equals",
           "value": "特定目的载体"
         },
@@ -8731,7 +8730,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "受益人类型选择【特定目的载体】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"受益人类型\", \"op\": \"equals\", \"value\": \"特定目的载体\"}, \"target\": {\"field\": \"初始受益权信息.管理人证件号码\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"初始受益权信息.受益人类型\",\"op\":\"equals\",\"value\":\"特定目的载体\"},\"target\":{\"field\":\"初始受益权信息.管理人证件号码\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -8808,7 +8807,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "受益人类型",
+          "field": "初始受益权信息.受益人类型",
           "op": "equals",
           "value": "特定目的载体"
         },
@@ -8820,7 +8819,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "受益人类型选择【特定目的载体】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"受益人类型\", \"op\": \"equals\", \"value\": \"特定目的载体\"}, \"target\": {\"field\": \"初始受益权信息.是否本公司发行产品\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"初始受益权信息.受益人类型\",\"op\":\"equals\",\"value\":\"特定目的载体\"},\"target\":{\"field\":\"初始受益权信息.是否本公司发行产品\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -8899,11 +8898,11 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "受益人类型",
+          "field": "初始受益权信息.受益人类型",
           "op": "contains_any",
           "values": [
             "非金融企业",
-            "金融机构（实体）"
+            "金融机构（实体"
           ]
         },
         "target": {
@@ -8914,7 +8913,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "受益人类型选择【非金融企业或金融机构（实体）】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"受益人类型\", \"op\": \"contains_any\", \"values\": [\"非金融企业\", \"金融机构（实体）\"]}, \"target\": {\"field\": \"初始受益权信息.受益人是否上市\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"初始受益权信息.受益人类型\",\"op\":\"contains_any\",\"values\":[\"非金融企业\",\"金融机构（实体\"]},\"target\":{\"field\":\"初始受益权信息.受益人是否上市\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -9110,8 +9109,11 @@
       "script_params": {
         "trigger": {
           "field": "运作模式",
-          "op": "equals",
-          "value": "封闭式净值型"
+          "op": "contains_any",
+          "values": [
+            "封闭式净值型",
+            "开放式净值型"
+          ]
         },
         "target": {
           "field": "初始受益权信息.单位净值",
@@ -9121,7 +9123,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "运作模式选择【封闭式净值型】或【开放式净值型】，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"运作模式\", \"op\": \"equals\", \"value\": \"封闭式净值型\"}, \"target\": {\"field\": \"初始受益权信息.单位净值\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"运作模式\",\"op\":\"contains_any\",\"values\":[\"封闭式净值型\",\"开放式净值型\"]},\"target\":{\"field\":\"初始受益权信息.单位净值\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -9510,7 +9512,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "合同是否记载业绩比较基准",
+          "field": "初始受益权信息.合同是否记载业绩比较基准",
           "op": "equals",
           "value": "是"
         },
@@ -9522,7 +9524,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "合同是否记载业绩比较基准选择【是】时，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"合同是否记载业绩比较基准\", \"op\": \"equals\", \"value\": \"是\"}, \"target\": {\"field\": \"初始受益权信息.业绩比较基准（下限）\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"初始受益权信息.合同是否记载业绩比较基准\",\"op\":\"equals\",\"value\":\"是\"},\"target\":{\"field\":\"初始受益权信息.业绩比较基准（下限）\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -9597,7 +9599,7 @@
       "operator": "conditional_compare",
       "script_params": {
         "trigger": {
-          "field": "合同是否记载业绩比较基准",
+          "field": "初始受益权信息.合同是否记载业绩比较基准",
           "op": "equals",
           "value": "是"
         },
@@ -9609,7 +9611,7 @@
       },
       "check_type": "条件必填校验",
       "trigger_condition": "合同是否记载业绩比较基准选择【是】时，必填",
-      "machine_params": "{\"operator\": \"conditional_compare\", \"params\": {\"trigger\": {\"field\": \"合同是否记载业绩比较基准\", \"op\": \"equals\", \"value\": \"是\"}, \"target\": {\"field\": \"初始受益权信息.业绩比较基准（上限）\", \"op\": \"required\"}, \"source_check_type\": \"条件性必填\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"初始受益权信息.合同是否记载业绩比较基准\",\"op\":\"equals\",\"value\":\"是\"},\"target\":{\"field\":\"初始受益权信息.业绩比较基准（上限）\",\"op\":\"required\"},\"source_check_type\":\"条件性必填\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",

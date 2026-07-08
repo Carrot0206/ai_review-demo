@@ -82,8 +82,47 @@ def _values_for_field(lookup: dict[str, str], field: str) -> list[tuple[str, str
     return out
 
 
+def _strip_array_indexes(value: str) -> str:
+    return re.sub(r"\[\d+\]", "", str(value or "").strip())
+
+
+def _array_scope(path: str) -> tuple[str, str] | None:
+    match = re.match(r"^(.+?)\[(\d+)\]\.", str(path or "").strip())
+    if not match:
+        return None
+    return match.group(1), match.group(2)
+
+
+def _field_section(field: str) -> str:
+    field = _strip_array_indexes(field)
+    return field.rsplit(".", 1)[0] if "." in field else ""
+
+
+def _same_array_section(field: str, target_location: str) -> bool:
+    target_scope = _array_scope(target_location)
+    if not target_scope:
+        return False
+    return _field_section(field) == target_scope[0]
+
+
+def _values_for_field_in_target_row(
+    lookup: dict[str, str],
+    field: str,
+    target_location: str,
+) -> list[tuple[str, str]]:
+    target_scope = _array_scope(target_location)
+    if not target_scope:
+        return _values_for_field(lookup, field)
+    out: list[tuple[str, str]] = []
+    for key, value in lookup.items():
+        if _array_scope(key) == target_scope and _field_matches(key, field):
+            out.append((value, key))
+    return out
+
+
 def _normalize_field_key(value: str) -> str:
     text = str(value or "").strip()
+    text = _strip_array_indexes(text)
     text = re.sub(r"[（(][%％元万元亿元月日]+[）)]", "", text)
     text = text.replace("%", "").replace("％", "")
     text = re.sub(r"\s+", "", text)
@@ -93,7 +132,16 @@ def _normalize_field_key(value: str) -> str:
 def _field_matches(key: str, field: str) -> bool:
     key = str(key or "").strip()
     field = str(field or "").strip()
-    if key == field or key.endswith(f".{field}") or key.endswith(field):
+    key_no_index = _strip_array_indexes(key)
+    field_no_index = _strip_array_indexes(field)
+    if (
+        key == field
+        or key.endswith(f".{field}")
+        or key.endswith(field)
+        or key_no_index == field_no_index
+        or key_no_index.endswith(f".{field_no_index}")
+        or key_no_index.endswith(field_no_index)
+    ):
         return True
     normalized_key = _normalize_field_key(key)
     normalized_field = _normalize_field_key(field)
@@ -135,7 +183,7 @@ def _issue(rule: Rule, *, summary: str, material_name: str, location: str, value
 
 
 def _is_blank(value: str) -> bool:
-    return value is None or str(value).strip() in {"", "无", "否", "null", "None"}
+    return value is None or str(value).strip() in {"", "无", "null", "None"}
 
 
 def _decimal(value: str) -> Optional[Decimal]:
@@ -251,6 +299,33 @@ def _condition_satisfied(cond: dict, lookup: dict[str, str]) -> bool:
     return any(_match_value(value, op, cond.get("value"), cond.get("values")) for value, _ in matches)
 
 
+def _condition_satisfied_for_target_row(
+    cond: dict,
+    lookup: dict[str, str],
+    target_location: str,
+) -> bool:
+    if not cond:
+        return True
+    if "conditions" in cond:
+        logic = str(cond.get("logic") or "AND").upper()
+        checks = [
+            _condition_satisfied_for_target_row(c, lookup, target_location)
+            for c in cond.get("conditions") or []
+            if isinstance(c, dict)
+        ]
+        return any(checks) if logic == "OR" else all(checks)
+
+    field = cond.get("field") or ""
+    if _same_array_section(field, target_location):
+        matches = _values_for_field_in_target_row(lookup, field, target_location)
+    else:
+        matches = _values_for_field(lookup, field)
+    if not matches:
+        return False
+    op = cond.get("op") or "equals"
+    return any(_match_value(value, op, cond.get("value"), cond.get("values")) for value, _ in matches)
+
+
 def _target_issue(
     rule: Rule,
     *,
@@ -270,7 +345,13 @@ def _target_issue(
     )
 
 
-def _run_target_check(rule: Rule, target: dict, lookup: dict[str, str], template_name: str) -> list[Issue]:
+def _run_target_check(
+    rule: Rule,
+    target: dict,
+    lookup: dict[str, str],
+    template_name: str,
+    trigger: dict | None = None,
+) -> list[Issue]:
     field = target.get("field") or rule.field_anchor or rule.field_name
     op = target.get("op") or "required"
     matches = _values_for_field(lookup, field)
@@ -280,6 +361,8 @@ def _run_target_check(rule: Rule, target: dict, lookup: dict[str, str], template
     label = str(field).split(".")[-1]
 
     for value, location in matches:
+        if trigger and not _condition_satisfied_for_target_row(trigger, lookup, location):
+            continue
         if op == "required":
             if _is_blank(value):
                 issues.append(_target_issue(rule, template_name=template_name, location=location, value=value, summary=f"{label}在触发条件下为必填项但未填写", suggestion="请按规则要求补充填写该字段。"))
@@ -290,7 +373,11 @@ def _run_target_check(rule: Rule, target: dict, lookup: dict[str, str], template
                 issues.append(_target_issue(rule, template_name=template_name, location=location, value=value, summary=f"{label}不满足规则要求：{op} {expected}", suggestion="请按规则要求核对字段取值。"))
         elif op in {"lte_field", "gte_field"}:
             other_field = target.get("other_field") or target.get("right_field")
-            other_matches = _values_for_field(lookup, other_field)
+            other_matches = (
+                _values_for_field_in_target_row(lookup, other_field, location)
+                if _same_array_section(other_field, location)
+                else _values_for_field(lookup, other_field)
+            )
             if not other_matches:
                 continue
             left = _decimal(value)
@@ -387,13 +474,11 @@ def run_script_rules(rules: list[Rule], materials: list[ExtractedMaterial]) -> t
         if op == "conditional_compare":
             trigger = params.get("trigger") if isinstance(params.get("trigger"), dict) else {}
             target = params.get("target") if isinstance(params.get("target"), dict) else {}
-            if trigger and not _condition_satisfied(trigger, lookup):
-                continue
             if not target:
                 logs.append(f"跳过脚本规则 {rule.rule_id}：缺少target")
                 fallback_rule_ids.append(rule.rule_id)
                 continue
-            issues.extend(_run_target_check(rule, target, lookup, template_name))
+            issues.extend(_run_target_check(rule, target, lookup, template_name, trigger=trigger))
             continue
 
         if op == "required":

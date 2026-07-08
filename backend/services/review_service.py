@@ -317,13 +317,30 @@ def _defect_pairs(issue: Issue) -> frozenset:
         if value.startswith("缺失:") or value.startswith("缺失："):
             # 取冒号后的目标
             target = value.split(":", 1)[-1] if ":" in value else value.split("：", 1)[-1]
-            target = target.strip()
+            target = _normalize_missing_target(target)
             if target:
                 pairs.add(("__MISSING__", target))
                 continue
         pairs.add(((loc.material_name or "").strip(), _leaf_field(loc)))
     # 丢掉 leaf 抽不出的（避免空 leaf 误聚）
     return frozenset(p for p in pairs if p[1])
+
+
+def _normalize_missing_target(target: str) -> str:
+    """归一材料缺失目标，避免内置材料规则和上传脚本材料规则重复报同一事实。"""
+    import re
+
+    text = re.sub(r"[（(][^）)]*[）)]", "", str(target or "")).strip()
+    text = text.replace("信托产品", "").strip()
+    if "重新申请预登记申请书" in text:
+        return "重新申请预登记申请书"
+    if "补充预登记申请书" in text:
+        return "补充预登记申请书"
+    if "预登记申请书" in text or text == "申请书":
+        return "预登记申请书"
+    if "合规承诺" in text:
+        return "合规承诺书"
+    return text
 
 
 # 通用的"缺失/未填写"占位符。仍保留——_location_fingerprint / 其它老路径可能用到。

@@ -1240,13 +1240,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "产品基本信息.是否信托受益权转让",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -1268,13 +1268,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "产品基本信息.财产来源",
+          "op": "contains",
+          "value": "财产权"
+        },
+        "target": {
+          "field": "产品基本信息.是否信托受益权转让",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"产品基本信息.财产来源\",\"op\":\"contains\",\"value\":\"财产权\"},\"target\":{\"field\":\"产品基本信息.是否信托受益权转让\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -1437,13 +1446,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "产品基本信息.发行、转让场所",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -1465,13 +1474,25 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "产品基本信息.是否信托受益权转让",
+          "op": "contains_any",
+          "values": [
+            "拆分转让",
+            "整体转让"
+          ]
+        },
+        "target": {
+          "field": "产品基本信息.发行、转让场所",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"产品基本信息.是否信托受益权转让\",\"op\":\"contains_any\",\"values\":[\"拆分转让\",\"整体转让\"]},\"target\":{\"field\":\"产品基本信息.发行、转让场所\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -1595,13 +1616,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "产品基本信息.发行、转让场所补充说明",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -1623,13 +1644,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "产品基本信息.发行、转让场所",
+          "op": "equals",
+          "value": "其他"
+        },
+        "target": {
+          "field": "产品基本信息.发行、转让场所补充说明",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"产品基本信息.发行、转让场所\",\"op\":\"equals\",\"value\":\"其他\"},\"target\":{\"field\":\"产品基本信息.发行、转让场所补充说明\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -1833,13 +1863,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "产品基本信息.是否为结构化信托",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -1861,13 +1891,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "业务分类信息.信托业务分类",
+          "op": "equals",
+          "value": "资产管理信托"
+        },
+        "target": {
+          "field": "产品基本信息.是否为结构化信托",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"资产管理信托\"},\"target\":{\"field\":\"产品基本信息.是否为结构化信托\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -2032,13 +2071,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "产品基本信息.是否分期募集放款",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -2060,13 +2099,32 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "logic": "AND",
+          "conditions": [
+            {
+              "field": "业务分类信息.信托业务分类",
+              "op": "equals",
+              "value": "资产管理信托"
+            },
+            {
+              "field": "产品基本信息.项目运作模式",
+              "op": "equals",
+              "value": "封闭式"
+            }
+          ]
+        },
+        "target": {
+          "field": "产品基本信息.是否分期募集放款",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"logic\":\"AND\",\"conditions\":[{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"资产管理信托\"},{\"field\":\"产品基本信息.项目运作模式\",\"op\":\"equals\",\"value\":\"封闭式\"}]},\"target\":{\"field\":\"产品基本信息.是否分期募集放款\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -2665,13 +2723,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "业务分类信息.资产管理信托分类",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -2693,13 +2751,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "业务分类信息.信托业务分类",
+          "op": "equals",
+          "value": "资产管理信托"
+        },
+        "target": {
+          "field": "业务分类信息.资产管理信托分类",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"资产管理信托\"},\"target\":{\"field\":\"业务分类信息.资产管理信托分类\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -2823,13 +2890,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "业务分类信息.资产服务信托分类1",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -2851,13 +2918,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "业务分类信息.信托业务分类",
+          "op": "equals",
+          "value": "资产服务信托"
+        },
+        "target": {
+          "field": "业务分类信息.资产服务信托分类1",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"资产服务信托\"},\"target\":{\"field\":\"业务分类信息.资产服务信托分类1\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -2981,13 +3057,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "业务分类信息.资产服务信托分类2",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -3009,13 +3085,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "业务分类信息.信托业务分类",
+          "op": "equals",
+          "value": "资产服务信托"
+        },
+        "target": {
+          "field": "业务分类信息.资产服务信托分类2",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"资产服务信托\"},\"target\":{\"field\":\"业务分类信息.资产服务信托分类2\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -3139,13 +3224,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "业务分类信息.公益慈善信托分类",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -3167,13 +3252,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "业务分类信息.信托业务分类",
+          "op": "equals",
+          "value": "公益慈善信托"
+        },
+        "target": {
+          "field": "业务分类信息.公益慈善信托分类",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"公益慈善信托\"},\"target\":{\"field\":\"业务分类信息.公益慈善信托分类\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -3298,13 +3392,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "业务分类信息.是否参与资金募集",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -3326,13 +3420,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "业务分类信息.信托业务分类",
+          "op": "equals",
+          "value": "资产服务信托"
+        },
+        "target": {
+          "field": "业务分类信息.是否参与资金募集",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"资产服务信托\"},\"target\":{\"field\":\"业务分类信息.是否参与资金募集\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -3497,13 +3600,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "业务分类信息.是否互联网贷款",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -3525,13 +3628,25 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "业务分类信息.信托业务分类",
+          "op": "contains_any",
+          "values": [
+            "资产管理信托",
+            "资产服务信托"
+          ]
+        },
+        "target": {
+          "field": "业务分类信息.是否互联网贷款",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"contains_any\",\"values\":[\"资产管理信托\",\"资产服务信托\"]},\"target\":{\"field\":\"业务分类信息.是否互联网贷款\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -3656,13 +3771,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "业务分类信息.业务模式",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -3684,13 +3799,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "业务分类信息.是否互联网贷款",
+          "op": "equals",
+          "value": "是"
+        },
+        "target": {
+          "field": "业务分类信息.业务模式",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.是否互联网贷款\",\"op\":\"equals\",\"value\":\"是\"},\"target\":{\"field\":\"业务分类信息.业务模式\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -3815,13 +3939,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "业务分类信息.是否证券投资类信托",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -3843,13 +3967,25 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "业务分类信息.信托业务分类",
+          "op": "contains_any",
+          "values": [
+            "资产管理信托",
+            "资产服务信托"
+          ]
+        },
+        "target": {
+          "field": "业务分类信息.是否证券投资类信托",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"contains_any\",\"values\":[\"资产管理信托\",\"资产服务信托\"]},\"target\":{\"field\":\"业务分类信息.是否证券投资类信托\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -3975,13 +4111,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "业务分类信息.是否受托境外理财信托（QDII）",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -4003,13 +4139,25 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "业务分类信息.信托业务分类",
+          "op": "contains_any",
+          "values": [
+            "资产管理信托",
+            "资产服务信托"
+          ]
+        },
+        "target": {
+          "field": "业务分类信息.是否受托境外理财信托（QDII）",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"contains_any\",\"values\":[\"资产管理信托\",\"资产服务信托\"]},\"target\":{\"field\":\"业务分类信息.是否受托境外理财信托（QDII）\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -4291,13 +4439,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "交易结构.发行规模",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -4319,13 +4467,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "发行规模类型",
+          "op": "equals",
+          "value": "固定规模"
+        },
+        "target": {
+          "field": "交易结构.发行规模",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"发行规模类型\",\"op\":\"equals\",\"value\":\"固定规模\"},\"target\":{\"field\":\"交易结构.发行规模\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -4683,13 +4840,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "交易结构.信托产品期限",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -4711,13 +4868,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "交易结构.期限类型",
+          "op": "equals",
+          "value": "固定期限"
+        },
+        "target": {
+          "field": "交易结构.信托产品期限",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"交易结构.期限类型\",\"op\":\"equals\",\"value\":\"固定期限\"},\"target\":{\"field\":\"交易结构.信托产品期限\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -4957,13 +5123,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "交易结构.期次编号",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -4985,13 +5151,32 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "logic": "AND",
+          "conditions": [
+            {
+              "field": "产品基本信息.登记类型",
+              "op": "equals",
+              "value": "补充预登记"
+            },
+            {
+              "field": "产品基本信息.是否分期募集放款",
+              "op": "equals",
+              "value": "是"
+            }
+          ]
+        },
+        "target": {
+          "field": "交易结构.期次编号",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"logic\":\"AND\",\"conditions\":[{\"field\":\"产品基本信息.登记类型\",\"op\":\"equals\",\"value\":\"补充预登记\"},{\"field\":\"产品基本信息.是否分期募集放款\",\"op\":\"equals\",\"value\":\"是\"}]},\"target\":{\"field\":\"交易结构.期次编号\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -5666,13 +5851,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "底层资产及交易对手.底层资产（三类）",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -5694,13 +5879,25 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "底层资产及交易对手.底层资产（二类）",
+          "op": "contains_any",
+          "values": [
+            "其他非标准化债权资产",
+            "其他非标准化金融产品"
+          ]
+        },
+        "target": {
+          "field": "底层资产及交易对手.底层资产（三类）",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"底层资产及交易对手.底层资产（二类）\",\"op\":\"contains_any\",\"values\":[\"其他非标准化债权资产\",\"其他非标准化金融产品\"]},\"target\":{\"field\":\"底层资产及交易对手.底层资产（三类）\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -6066,13 +6263,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "底层资产及交易对手.收（受）益权标的资产",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -6094,13 +6291,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "底层资产及交易对手.底层资产（二类）",
+          "op": "equals",
+          "value": "特定资产收（受）益权"
+        },
+        "target": {
+          "field": "底层资产及交易对手.收（受）益权标的资产",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"底层资产及交易对手.底层资产（二类）\",\"op\":\"equals\",\"value\":\"特定资产收（受）益权\"},\"target\":{\"field\":\"底层资产及交易对手.收（受）益权标的资产\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -6225,13 +6431,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "底层资产及交易对手.是否附回购",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -6253,13 +6459,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "底层资产及交易对手.资产取得方式",
+          "op": "equals",
+          "value": "资金投向"
+        },
+        "target": {
+          "field": "底层资产及交易对手.是否附回购",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"底层资产及交易对手.资产取得方式\",\"op\":\"equals\",\"value\":\"资金投向\"},\"target\":{\"field\":\"底层资产及交易对手.是否附回购\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -6384,13 +6599,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "底层资产及交易对手.贷款产品类别",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -6412,13 +6627,32 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "logic": "AND",
+          "conditions": [
+            {
+              "field": "底层资产及交易对手.底层资产（二类）",
+              "op": "equals",
+              "value": "贷款"
+            },
+            {
+              "field": "底层资产及交易对手.资产取得方式",
+              "op": "equals",
+              "value": "资金投向"
+            }
+          ]
+        },
+        "target": {
+          "field": "底层资产及交易对手.贷款产品类别",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"logic\":\"AND\",\"conditions\":[{\"field\":\"底层资产及交易对手.底层资产（二类）\",\"op\":\"equals\",\"value\":\"贷款\"},{\"field\":\"底层资产及交易对手.资产取得方式\",\"op\":\"equals\",\"value\":\"资金投向\"}]},\"target\":{\"field\":\"底层资产及交易对手.贷款产品类别\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -6543,13 +6777,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "底层资产及交易对手.是否参照委托贷款管理",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -6571,13 +6805,37 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "logic": "AND",
+          "conditions": [
+            {
+              "field": "业务分类信息.信托业务分类",
+              "op": "equals",
+              "value": "资产服务信托"
+            },
+            {
+              "field": "底层资产及交易对手.底层资产（二类）",
+              "op": "equals",
+              "value": "贷款"
+            },
+            {
+              "field": "底层资产及交易对手.资产取得方式",
+              "op": "equals",
+              "value": "资金投向"
+            }
+          ]
+        },
+        "target": {
+          "field": "底层资产及交易对手.是否参照委托贷款管理",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"logic\":\"AND\",\"conditions\":[{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"资产服务信托\"},{\"field\":\"底层资产及交易对手.底层资产（二类）\",\"op\":\"equals\",\"value\":\"贷款\"},{\"field\":\"底层资产及交易对手.资产取得方式\",\"op\":\"equals\",\"value\":\"资金投向\"}]},\"target\":{\"field\":\"底层资产及交易对手.是否参照委托贷款管理\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -6859,13 +7117,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "底层资产及交易对手.合伙企业投向",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -6887,13 +7145,35 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "logic": "AND",
+          "conditions": [
+            {
+              "field": "底层资产及交易对手.底层资产（二类）",
+              "op": "contains_any",
+              "values": [
+                "普通合伙企业份额",
+                "有限合伙企业份额"
+              ]
+            },
+            {
+              "field": "底层资产及交易对手.资产取得方式",
+              "op": "equals",
+              "value": "资金投向"
+            }
+          ]
+        },
+        "target": {
+          "field": "底层资产及交易对手.合伙企业投向",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"logic\":\"AND\",\"conditions\":[{\"field\":\"底层资产及交易对手.底层资产（二类）\",\"op\":\"contains_any\",\"values\":[\"普通合伙企业份额\",\"有限合伙企业份额\"]},{\"field\":\"底层资产及交易对手.资产取得方式\",\"op\":\"equals\",\"value\":\"资金投向\"}]},\"target\":{\"field\":\"底层资产及交易对手.合伙企业投向\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -7017,13 +7297,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "底层资产及交易对手.合伙企业投向详情",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -7045,13 +7325,35 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "logic": "AND",
+          "conditions": [
+            {
+              "field": "底层资产及交易对手.底层资产（二类）",
+              "op": "contains_any",
+              "values": [
+                "普通合伙企业份额",
+                "有限合伙企业份额"
+              ]
+            },
+            {
+              "field": "底层资产及交易对手.资产取得方式",
+              "op": "equals",
+              "value": "资金投向"
+            }
+          ]
+        },
+        "target": {
+          "field": "底层资产及交易对手.合伙企业投向详情",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"logic\":\"AND\",\"conditions\":[{\"field\":\"底层资产及交易对手.底层资产（二类）\",\"op\":\"contains_any\",\"values\":[\"普通合伙企业份额\",\"有限合伙企业份额\"]},{\"field\":\"底层资产及交易对手.资产取得方式\",\"op\":\"equals\",\"value\":\"资金投向\"}]},\"target\":{\"field\":\"底层资产及交易对手.合伙企业投向详情\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -7410,13 +7712,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "底层资产及交易对手.投向行业大类",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -7438,13 +7740,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "底层资产及交易对手.资产取得方式",
+          "op": "equals",
+          "value": "资金投向"
+        },
+        "target": {
+          "field": "底层资产及交易对手.投向行业大类",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"底层资产及交易对手.资产取得方式\",\"op\":\"equals\",\"value\":\"资金投向\"},\"target\":{\"field\":\"底层资产及交易对手.投向行业大类\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -8045,13 +8356,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "托管信息.保（托）管人名称",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -8073,13 +8384,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "托管信息.是否聘请保（托）管人",
+          "op": "equals",
+          "value": "是"
+        },
+        "target": {
+          "field": "托管信息.保（托）管人名称",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"托管信息.是否聘请保（托）管人\",\"op\":\"equals\",\"value\":\"是\"},\"target\":{\"field\":\"托管信息.保（托）管人名称\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -8162,13 +8482,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "托管信息.保障信托财产安全的措施和纠纷解决机制",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -8190,13 +8510,32 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "logic": "AND",
+          "conditions": [
+            {
+              "field": "托管信息.是否聘请保（托）管人",
+              "op": "equals",
+              "value": "否"
+            },
+            {
+              "field": "业务分类信息.信托业务分类",
+              "op": "equals",
+              "value": "资产管理信托"
+            }
+          ]
+        },
+        "target": {
+          "field": "托管信息.保障信托财产安全的措施和纠纷解决机制",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"logic\":\"AND\",\"conditions\":[{\"field\":\"托管信息.是否聘请保（托）管人\",\"op\":\"equals\",\"value\":\"否\"},{\"field\":\"业务分类信息.信托业务分类\",\"op\":\"equals\",\"value\":\"资产管理信托\"}]},\"target\":{\"field\":\"托管信息.保障信托财产安全的措施和纠纷解决机制\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -8399,13 +8738,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "风险控制信息.担保人信息描述",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -8427,13 +8766,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "担保类型仅",
+          "op": "equals",
+          "value": "信用"
+        },
+        "target": {
+          "field": "风险控制信息.担保人信息描述",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"担保类型仅\",\"op\":\"equals\",\"value\":\"信用\"},\"target\":{\"field\":\"风险控制信息.担保人信息描述\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -8516,13 +8864,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "风险控制信息.抵质押物信息描述",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -8544,13 +8892,25 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "风险控制信息.担保类型",
+          "op": "contains_any",
+          "values": [
+            "抵押",
+            "质押"
+          ]
+        },
+        "target": {
+          "field": "风险控制信息.抵质押物信息描述",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"风险控制信息.担保类型\",\"op\":\"contains_any\",\"values\":[\"抵押\",\"质押\"]},\"target\":{\"field\":\"风险控制信息.抵质押物信息描述\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -8633,13 +8993,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "风险控制信息.保证类型信息描述",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -8661,13 +9021,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "风险控制信息.担保类型",
+          "op": "equals",
+          "value": "保证"
+        },
+        "target": {
+          "field": "风险控制信息.保证类型信息描述",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"风险控制信息.担保类型\",\"op\":\"equals\",\"value\":\"保证\"},\"target\":{\"field\":\"风险控制信息.保证类型信息描述\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -8750,13 +9119,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "风险控制信息.其他风控信息描述",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -8778,13 +9147,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "风险控制信息.担保类型",
+          "op": "equals",
+          "value": "其他"
+        },
+        "target": {
+          "field": "风险控制信息.其他风控信息描述",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"风险控制信息.担保类型\",\"op\":\"equals\",\"value\":\"其他\"},\"target\":{\"field\":\"风险控制信息.其他风控信息描述\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -9504,13 +9882,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "房地产项目信息.国有土地使用证号",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -9532,13 +9910,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "房地产项目信息.是否办理国有土地使用证",
+          "op": "equals",
+          "value": "是"
+        },
+        "target": {
+          "field": "房地产项目信息.国有土地使用证号",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"房地产项目信息.是否办理国有土地使用证\",\"op\":\"equals\",\"value\":\"是\"},\"target\":{\"field\":\"房地产项目信息.国有土地使用证号\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -9743,13 +10130,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "房地产项目信息.建设用地规划许可证号",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -9771,13 +10158,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "房地产项目信息.是否办理建设用地规划许可证",
+          "op": "equals",
+          "value": "是"
+        },
+        "target": {
+          "field": "房地产项目信息.建设用地规划许可证号",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"房地产项目信息.是否办理建设用地规划许可证\",\"op\":\"equals\",\"value\":\"是\"},\"target\":{\"field\":\"房地产项目信息.建设用地规划许可证号\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -9982,13 +10378,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "房地产项目信息.建设工程规划许可证号",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -10010,13 +10406,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "房地产项目信息.是否办理建设工程规划许可证",
+          "op": "equals",
+          "value": "是"
+        },
+        "target": {
+          "field": "房地产项目信息.建设工程规划许可证号",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"房地产项目信息.是否办理建设工程规划许可证\",\"op\":\"equals\",\"value\":\"是\"},\"target\":{\"field\":\"房地产项目信息.建设工程规划许可证号\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -10221,13 +10626,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "房地产项目信息.建筑工程施工许可证号",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -10249,13 +10654,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "房地产项目信息.是否办理建筑工程施工许可证",
+          "op": "equals",
+          "value": "是"
+        },
+        "target": {
+          "field": "房地产项目信息.建筑工程施工许可证号",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"房地产项目信息.是否办理建筑工程施工许可证\",\"op\":\"equals\",\"value\":\"是\"},\"target\":{\"field\":\"房地产项目信息.建筑工程施工许可证号\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
@@ -11604,13 +12018,13 @@
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
-      "rule_role": "uploaded_script",
+      "rule_role": "disabled_duplicate_conditional_required",
       "severity_type": "issue",
       "issue_type": "字段",
       "field_anchor": "关联交易事项.重大关联交易是否已经董事会批准",
       "skip_when": "",
-      "enabled": true,
-      "demo_enabled": true,
+      "enabled": false,
+      "demo_enabled": false,
       "needs_human": false
     },
     {
@@ -11632,13 +12046,22 @@
       ],
       "review_method": "script",
       "rule_object": "字段",
-      "operator": "required",
+      "operator": "conditional_compare",
       "script_params": {
+        "trigger": {
+          "field": "关联交易事项.关联交易性质",
+          "op": "equals",
+          "value": "重大关联交易"
+        },
+        "target": {
+          "field": "关联交易事项.重大关联交易是否已经董事会批准",
+          "op": "required"
+        },
         "source_check_type": "必填非空"
       },
-      "check_type": "非空校验 + 条件逻辑判断",
+      "check_type": "条件必填校验",
       "trigger_condition": "",
-      "machine_params": "{\"operator\": \"required\", \"params\": {\"source_check_type\": \"必填非空\"}}",
+      "machine_params": "{\"operator\":\"conditional_compare\",\"params\":{\"trigger\":{\"field\":\"关联交易事项.关联交易性质\",\"op\":\"equals\",\"value\":\"重大关联交易\"},\"target\":{\"field\":\"关联交易事项.重大关联交易是否已经董事会批准\",\"op\":\"required\"},\"source_check_type\":\"必填非空\"}}",
       "risk_level": "中风险",
       "ai_check_focus": [],
       "evidence_requirement": "请指出涉及的材料、表名、字段、页码或文本片段。",
