@@ -7,6 +7,7 @@ import type {
   ProcessType,
   RiskLevel,
   RuleListResponse,
+  RuleSetMeta,
   SampleListResponse,
   UploadMeta,
   UserRule,
@@ -57,6 +58,40 @@ export async function importUserRules(
     params: { process },
     headers: { 'Content-Type': 'multipart/form-data' },
   })
+  return data
+}
+
+export async function listRuleSets(process: ProcessType): Promise<RuleSetMeta[]> {
+  const { data } = await http.get('/rule-sets', { params: { process } })
+  return data.rule_sets || []
+}
+
+export async function importRuleSet(
+  process: ProcessType,
+  file: File,
+): Promise<RuleSetMeta> {
+  const form = new FormData()
+  form.append('file', file)
+  const { data } = await http.post('/rule-sets/import', form, {
+    params: { process },
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data
+}
+
+export async function activateRuleSet(rule_set_id: string): Promise<RuleSetMeta> {
+  const { data } = await http.post(`/rule-sets/${rule_set_id}/activate`)
+  return data
+}
+
+export async function deleteRuleSet(rule_set_id: string): Promise<{
+  deleted: boolean
+  rule_set_id: string
+  filename: string
+  process: ProcessType
+  was_active: boolean
+}> {
+  const { data } = await http.delete(`/rule-sets/${rule_set_id}`)
   return data
 }
 
@@ -131,7 +166,7 @@ export async function loadSamples(process: ProcessType): Promise<{ process: Proc
 export async function startReview(payload: {
   process: ProcessType
   file_ids: string[]
-  user_rule_ids?: string[] | null
+  rule_set_id?: string | null
   include_builtin_rules?: boolean
   max_concurrency?: number
   material_slice_enabled?: boolean
@@ -145,12 +180,18 @@ export async function getReview(job_id: string): Promise<JobInfo> {
   return data
 }
 
+export async function cancelReview(job_id: string): Promise<{ job_id: string; status: string; cancelled: boolean }> {
+  const { data } = await http.post(`/review/${job_id}/cancel`)
+  return data
+}
+
 /** SSE 订阅。返回 close 函数。 */
 export function subscribeReviewStream(
   job_id: string,
   onMsg: (msg: string) => void,
   onDone: () => void,
   onFailed: (err: string) => void,
+  onCancelled: () => void,
   onBatchDone?: (payload: { batch: BatchLog; issues: Issue[] }) => void,
 ): () => void {
   const url = `/api/review/${job_id}/stream`
@@ -183,6 +224,10 @@ export function subscribeReviewStream(
     } catch {
       onFailed('failed')
     }
+    es.close()
+  })
+  es.addEventListener('cancelled', () => {
+    onCancelled()
     es.close()
   })
   es.onerror = () => {

@@ -1,14 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
-  Checkbox,
   Collapse,
   Empty,
-  Form,
-  Input,
-  Modal,
   Popconfirm,
-  Select,
   Switch,
   Tag,
   Tooltip,
@@ -16,27 +11,28 @@ import {
   message,
 } from 'antd'
 import {
+  CheckCircleOutlined,
+  CloseCircleOutlined,
   DeleteOutlined,
-  EditOutlined,
   InboxOutlined,
   ImportOutlined,
-  PlusOutlined,
   RocketOutlined,
   ThunderboltOutlined,
 } from '@ant-design/icons'
 import {
-  createUserRule,
+  activateRuleSet,
+  cancelReview,
+  deleteRuleSet,
   deleteUpload,
-  deleteUserRule,
-  deleteUserRulesBatch,
+  getReview,
   getUploadExtracted,
   getRules,
-  importUserRules,
+  importRuleSet,
+  listRuleSets,
   listUploads,
   loadSamples,
   startReview,
   subscribeReviewStream,
-  updateUserRule,
   uploadFile,
 } from '../api'
 import { useStore } from '../store'
@@ -148,27 +144,6 @@ interface TemplateSectionData {
   fields: TemplateField[]
   records: TemplateRecord[]
 }
-
-const REVIEW_DIMENSION_OPTIONS = [
-  { value: '用户新增规则', label: '用户新增规则' },
-  { value: '登记必填要素规则库', label: '登记必填要素规则库' },
-  { value: '格式模板规则库', label: '格式模板规则库' },
-  { value: '跨材料数据逻辑校验库', label: '跨材料数据逻辑校验库' },
-  { value: '监管合规红线规则库', label: '监管合规红线规则库' },
-  { value: '业务退回/整改案例库', label: '业务退回/整改案例库' },
-  { value: '审查风险分级规则库', label: '审查风险分级规则库' },
-]
-
-const CHECK_TYPE_OPTIONS = [
-  { value: '语义条件判断', label: '语义条件判断' },
-  { value: '条件性必填', label: '条件性必填' },
-  { value: '跨材料一致性', label: '跨材料一致性' },
-  { value: '监管口径符合性', label: '监管口径符合性' },
-  { value: '字段类型格式', label: '字段类型格式' },
-  { value: '签字盖章存在性', label: '签字盖章存在性' },
-  { value: '风险分级', label: '风险分级' },
-  { value: '其他', label: '其他' },
-]
 
 function fmtSize(b: number) {
   if (b < 1024) return b + ' B'
@@ -391,10 +366,10 @@ function guessFollowupRegistrationMaterialType(process: ProcessType, fileName: s
 export default function LeftPanel() {
   const process = useStore((s) => s.process)
   const rules = useStore((s) => s.rules)
-  const userRules = useStore((s) => s.userRules)
+  const ruleSets = useStore((s) => s.ruleSets)
   const uploads = useStore((s) => s.uploads)
   const setUploads = useStore((s) => s.setUploads)
-  const setUserRules = useStore((s) => s.setUserRules)
+  const setRuleSets = useStore((s) => s.setRuleSets)
   const setRules = useStore((s) => s.setRules)
 
   const setJobId = useStore((s) => s.setJobId)
@@ -416,128 +391,20 @@ export default function LeftPanel() {
   const filterRisks = useStore((s) => s.filterRisks)
   const setSelectedIssue = useStore((s) => s.setSelectedIssue)
   const selectedFieldLocation = useStore((s) => s.selectedFieldLocationByProcess[s.process])
+  const jobId = useStore((s) => s.jobIdByProcess[s.process])
 
-  const [creating, setCreating] = useState(false)
-  const [selectedRuleIds, setSelectedRuleIds] = useState<Set<string>>(new Set())
   const [templateMaterial, setTemplateMaterial] = useState<ExtractedMaterial | null>(null)
   const [templateLoading, setTemplateLoading] = useState(false)
   const fieldRefs = useRef(new Map<string, HTMLDivElement>())
-  // 正在编辑的规则 id；为 null 表示新增模式
-  const [editingRuleId, setEditingRuleId] = useState<string | null>(null)
-  const [form] = Form.useForm()
-
-  // 切换流程时：关闭 Modal、重置表单内容
-  useEffect(() => {
-    setCreating(false)
-    setEditingRuleId(null)
-    setSelectedRuleIds(new Set())
-    form.resetFields()
-  }, [process, form])
-
-  useEffect(() => {
-    setSelectedRuleIds((prev) => {
-      const available = new Set(userRules.map((r) => r.rule_id))
-      const next = new Set([...prev].filter((id) => available.has(id)))
-      return next.size === prev.size ? prev : next
-    })
-  }, [userRules])
+  const reviewStreamCloseRef = useRef<(() => void) | null>(null)
 
   const builtinRules = useMemo(() => rules?.rules || [], [rules])
+  const activeRuleSet = useMemo(() => ruleSets.find((item) => item.active), [ruleSets])
   const processLabel = PROCESS_LABELS[process]
   const isFollowupProcess = isFollowupRegistrationProcess(process)
   const followupShortLabel = process === 'correction_general' ? '更正' : '变更'
   const followupProcessLabel =
     process === 'correction_general' ? '更正登记（一般情形）' : '变更登记（一般情形）'
-
-  // 适用材料：按流程不同
-  const materialOptions = useMemo(() => {
-    if (process === 'pre_report') {
-      return [
-        { value: '申报模板', label: '申报模板' },
-        { value: '申请书', label: '申请书' },
-        {
-          value: '法律、行政法规、国家金融监督管理总局要求的其他文件',
-          label: '法律、行政法规、国家金融监督管理总局要求的其他文件',
-        },
-      ]
-    }
-    const commonOptions = [
-      { value: '申报模板', label: '申报模板' },
-      { value: '申请书', label: '申请书' },
-    ]
-    if (process === 'pre_registration') {
-      return [
-        ...commonOptions,
-        { value: '合规承诺书', label: '合规承诺书' },
-        {
-          value: '法律、行政法规、国家金融监督管理总局要求的其他文件',
-          label: '法律、行政法规、国家金融监督管理总局要求的其他文件',
-        },
-      ]
-    }
-    if (process === 'pre_registration_reapply') {
-      return [
-        ...commonOptions,
-        { value: '原预登记申报模板JSON', label: '原预登记申报模板JSON' },
-        { value: '原预登记系统记录', label: '原预登记系统记录' },
-        { value: '政信类证明材料', label: '政信类证明材料' },
-        { value: '新型资产服务信托情况说明', label: '新型资产服务信托情况说明' },
-        {
-          value: '法律、行政法规、国家金融监督管理总局要求的其他文件',
-          label: '法律、行政法规、国家金融监督管理总局要求的其他文件',
-        },
-      ]
-    }
-    if (process === 'pre_registration_supplement') {
-      return [
-        { value: '申报模板', label: '申报模板' },
-        { value: '申请书', label: '申请书' },
-        { value: '信托预登记要素报告表', label: '信托预登记要素报告表' },
-        { value: '补充说明材料', label: '补充说明材料' },
-        { value: '其他附件', label: '其他附件' },
-      ]
-    }
-    if (process === 'termination') {
-      return [
-        ...commonOptions,
-        { value: '清算报告', label: '清算报告' },
-        {
-          value: '法律、行政法规、国家金融监督管理总局要求的其他文件',
-          label: '法律、行政法规、国家金融监督管理总局要求的其他文件',
-        },
-      ]
-    }
-    if (process === 'change_general') {
-      return [
-        { value: '上一次登记申报模板', label: '上一次登记申报模板' },
-        ...commonOptions,
-        { value: '证明发生变更事实的文件', label: '证明发生变更事实的文件' },
-        {
-          value: '法律、行政法规、国家金融监督管理总局要求的其他文件',
-          label: '法律、行政法规、国家金融监督管理总局要求的其他文件',
-        },
-      ]
-    }
-    if (process === 'correction_general') {
-      return [
-        { value: '上一次登记申报模板', label: '上一次登记申报模板' },
-        ...commonOptions,
-        { value: '证明发生需要更正事实的文件', label: '证明发生需要更正事实的文件' },
-        {
-          value: '法律、行政法规、国家金融监督管理总局要求的其他文件',
-          label: '法律、行政法规、国家金融监督管理总局要求的其他文件',
-        },
-      ]
-    }
-    return [
-      ...commonOptions,
-      { value: '信托文件样本', label: '信托文件样本' },
-      {
-        value: '法律、行政法规、国家金融监督管理总局要求的其他文件',
-        label: '法律、行政法规、国家金融监督管理总局要求的其他文件',
-      },
-    ]
-  }, [process])
 
   // 当前流程下的上传文件（演示版：全部都展示）
   const currentUploads = uploads
@@ -618,7 +485,8 @@ export default function LeftPanel() {
   async function refreshRules() {
     const r = await getRules(process)
     setRules(r)
-    setUserRules(r.user_rules || [])
+    const versions = await listRuleSets(process)
+    setRuleSets(versions)
   }
 
   async function handleUpload(file: File, materialType?: string) {
@@ -669,113 +537,36 @@ export default function LeftPanel() {
     await refreshUploads()
   }
 
-  async function handleCreateRule() {
-    try {
-      const vals = await form.validateFields()
-      if (editingRuleId) {
-        await updateUserRule(editingRuleId, {
-          applicable_materials: vals.applicable_materials || [],
-          rule_text: vals.rule_text,
-          risk_level: vals.risk_level as RiskLevel,
-          review_dimension: vals.review_dimension || '用户新增规则',
-          check_type: vals.check_type || '语义条件判断',
-          table_name: vals.table_name || '',
-          field_name: vals.field_name || '',
-          trigger_condition: vals.trigger_condition || '',
-        })
-        message.success('已保存修改')
-      } else {
-        await createUserRule({
-          process,
-          applicable_materials: vals.applicable_materials || [],
-          rule_text: vals.rule_text,
-          risk_level: vals.risk_level as RiskLevel,
-          review_dimension: vals.review_dimension || '用户新增规则',
-          check_type: vals.check_type || '语义条件判断',
-          table_name: vals.table_name || '',
-          field_name: vals.field_name || '',
-          trigger_condition: vals.trigger_condition || '',
-        })
-        message.success('已新增规则')
-      }
-      setCreating(false)
-      setEditingRuleId(null)
-      form.resetFields()
-      await refreshRules()
-    } catch {
-      /* validation */
-    }
-  }
-
-  function handleOpenEdit(rule: {
-    rule_id: string
-    rule_text: string
-    risk_level: RiskLevel
-    applicable_materials?: string[]
-    review_dimension?: string
-    check_type?: string
-    table_name?: string
-    field_name?: string
-    trigger_condition?: string
-  }) {
-    setEditingRuleId(rule.rule_id)
-    setCreating(true)
-    // setFieldsValue 在 Modal forceRender 之后会立刻生效
-    setTimeout(() => {
-      form.setFieldsValue({
-        rule_text: rule.rule_text,
-        risk_level: rule.risk_level,
-        applicable_materials: rule.applicable_materials || [],
-        review_dimension: rule.review_dimension || '用户新增规则',
-        check_type: rule.check_type || '语义条件判断',
-        table_name: rule.table_name || '',
-        field_name: rule.field_name || '',
-        trigger_condition: rule.trigger_condition || '',
-      })
-    }, 0)
-  }
-
-  async function handleDeleteUserRule(rid: string) {
-    await deleteUserRule(rid)
-    setSelectedRuleIds((prev) => {
-      const next = new Set(prev)
-      next.delete(rid)
-      return next
-    })
-    await refreshRules()
-  }
-
-  function toggleRuleSelected(ruleId: string, checked: boolean) {
-    setSelectedRuleIds((prev) => {
-      const next = new Set(prev)
-      if (checked) next.add(ruleId)
-      else next.delete(ruleId)
-      return next
-    })
-  }
-
-  function toggleAllRules(checked: boolean) {
-    setSelectedRuleIds(checked ? new Set(userRules.map((r) => r.rule_id)) : new Set())
-  }
-
-  async function handleDeleteSelectedRules() {
-    const ids = [...selectedRuleIds]
-    if (ids.length === 0) return
-    const res = await deleteUserRulesBatch(ids)
-    message.success(`已删除 ${res.deleted_count} 条规则`)
-    setSelectedRuleIds(new Set())
-    await refreshRules()
-  }
-
   async function handleImportRules(file: File) {
     try {
-      const res = await importUserRules(process, file)
-      message.success(`已从 ${res.filename} 导入 ${res.imported_count} 条规则`)
+      const res = await importRuleSet(process, file)
+      await activateRuleSet(res.rule_set_id)
+      message.success(`已导入并启用 ${res.filename}：脚本 ${res.script_count} 条，AI ${res.ai_count} 条`)
       await refreshRules()
     } catch (e: any) {
       message.error('规则表导入失败：' + (e?.response?.data?.detail || e?.message))
     }
     return false
+  }
+
+  async function handleActivateRuleSet(ruleSetId: string) {
+    try {
+      await activateRuleSet(ruleSetId)
+      message.success('已启用规则版本')
+      await refreshRules()
+    } catch (e: any) {
+      message.error('启用失败：' + (e?.response?.data?.detail || e?.message))
+    }
+  }
+
+  async function handleDeleteRuleSet(ruleSetId: string) {
+    try {
+      const res = await deleteRuleSet(ruleSetId)
+      message.success(`已删除规则版本：${res.filename}`)
+      await refreshRules()
+    } catch (e: any) {
+      message.error('删除规则版本失败：' + (e?.response?.data?.detail || e?.message))
+    }
   }
 
   async function handleStart() {
@@ -785,9 +576,9 @@ export default function LeftPanel() {
     }
     const availableRuleCount =
       (builtinRulesEnabled ? builtinRules.length : 0) +
-      userRules.filter((rule) => rule.enabled).length
+      (activeRuleSet ? activeRuleSet.total_rules : 0)
     if (availableRuleCount === 0) {
-      message.warning('当前流程没有可用审核规则，请先生成内置规则或新增用户规则')
+      message.warning('当前流程没有可用审核规则，请启用内置规则或上传规则版本')
       return
     }
     // 锁定本次审核所属流程,避免审核过程中用户切流程时回调写到错误流程
@@ -795,12 +586,16 @@ export default function LeftPanel() {
     resetProgress(reviewProcess)
     resetBatchProgress(reviewProcess)
     setResult(null, reviewProcess)
+    setJobId(null, reviewProcess)
     setStage('parse', reviewProcess)
     setJobStatus('pending', reviewProcess)
+    reviewStreamCloseRef.current?.()
+    reviewStreamCloseRef.current = null
     try {
       const { job_id } = await startReview({
         process: reviewProcess,
         file_ids: currentUploads.map((u) => u.file_id),
+        rule_set_id: activeRuleSet?.rule_set_id || null,
         include_builtin_rules: builtinRulesEnabled,
         max_concurrency: 48,
         material_slice_enabled: materialSliceEnabled,
@@ -809,7 +604,7 @@ export default function LeftPanel() {
       setJobStatus('running', reviewProcess)
       setStage('batch', reviewProcess)
 
-      subscribeReviewStream(
+      reviewStreamCloseRef.current = subscribeReviewStream(
         job_id,
         (msg) => {
           appendProgress(msg, reviewProcess)
@@ -822,17 +617,29 @@ export default function LeftPanel() {
           }
         },
         async () => {
+          reviewStreamCloseRef.current = null
           setStage('done', reviewProcess)
           setJobStatus('done', reviewProcess)
           // 拉取最终结果（覆盖累积区为合并后的最终版）
-          const { getReview } = await import('../api')
           const job = await getReview(job_id)
           setResult(job.result || null, reviewProcess)
+          setJobId(null, reviewProcess)
         },
         (err) => {
+          reviewStreamCloseRef.current = null
           setStage('failed', reviewProcess)
           setJobStatus('failed', reviewProcess)
+          setJobId(null, reviewProcess)
           message.error('审核失败：' + err)
+        },
+        () => {
+          reviewStreamCloseRef.current = null
+          setStage('cancelled', reviewProcess)
+          setJobStatus('cancelled', reviewProcess)
+          setJobId(null, reviewProcess)
+          setResult(null, reviewProcess)
+          appendProgress('审核已取消', reviewProcess)
+          message.info('已取消审核')
         },
         (payload) => {
           // O6：批次完成事件 → 累积到 store，触发 RightPanel 重渲染
@@ -847,6 +654,27 @@ export default function LeftPanel() {
   }
 
   const running = jobStatus === 'pending' || jobStatus === 'running'
+
+  async function handleCancelReview() {
+    if (!jobId || !running) return
+    const reviewProcess = process
+    reviewStreamCloseRef.current?.()
+    reviewStreamCloseRef.current = null
+    setStage('cancelled', reviewProcess)
+    setJobStatus('cancelled', reviewProcess)
+    setResult(null, reviewProcess)
+    appendProgress('正在取消审核…', reviewProcess)
+    try {
+      await cancelReview(jobId)
+      appendProgress('审核已取消', reviewProcess)
+      setJobId(null, reviewProcess)
+      message.info('已取消审核')
+    } catch (e: any) {
+      setStage('failed', reviewProcess)
+      setJobStatus('failed', reviewProcess)
+      message.error('取消审核失败：' + (e?.response?.data?.detail || e?.message))
+    }
+  }
 
   function renderIssueBadge(issues: Issue[]) {
     const risk = topRisk(issues)
@@ -936,7 +764,9 @@ export default function LeftPanel() {
           <h3>审核工作台 · {processLabel}</h3>
           <div className="right">
             <Tag color="processing">内置规则 {builtinRules.length}</Tag>
-            <Tag color="purple">用户规则 {userRules.length}</Tag>
+            <Tag color={activeRuleSet ? 'purple' : 'default'}>
+              规则版本 {ruleSets.length}
+            </Tag>
             <Tag color={currentUploads.length > 0 ? 'success' : 'default'}>
               材料 {currentUploads.length}
             </Tag>
@@ -961,7 +791,7 @@ export default function LeftPanel() {
                       <div className="review-option-row compact-rule-option">
                         <div>
                           <div className="review-option-title">启用内置规则</div>
-                          <div className="muted">关闭后本次审核只使用用户新增规则</div>
+                          <div className="muted">关闭后本次审核只使用已启用的上传规则版本</div>
                         </div>
                         <Switch
                           checked={builtinRulesEnabled}
@@ -1001,25 +831,12 @@ export default function LeftPanel() {
                   key: 'user',
                   label: (
                     <span style={{ fontSize: 13, fontWeight: 600 }}>
-                      用户新增规则（{userRules.length}）
+                      上传规则版本（{ruleSets.length}）
                     </span>
                   ),
                   children: (
                     <>
                       <div className="rule-actions">
-                        <Button
-                          type="dashed"
-                          size="small"
-                          icon={<PlusOutlined />}
-                          onClick={() => {
-                            setEditingRuleId(null)
-                            form.resetFields()
-                            setCreating(true)
-                          }}
-                          block
-                        >
-                          新增一条规则
-                        </Button>
                         <Upload
                           beforeUpload={handleImportRules}
                           showUploadList={false}
@@ -1031,92 +848,59 @@ export default function LeftPanel() {
                             icon={<ImportOutlined />}
                             block
                           >
-                            上传规则表
+                            上传规则 Excel
                           </Button>
                         </Upload>
                       </div>
-                      {userRules.length > 0 && (
-                        <div className="rule-bulk-bar">
-                          <Checkbox
-                            checked={selectedRuleIds.size === userRules.length}
-                            indeterminate={
-                              selectedRuleIds.size > 0 &&
-                              selectedRuleIds.size < userRules.length
-                            }
-                            onChange={(e) => toggleAllRules(e.target.checked)}
-                          >
-                            全选
-                          </Checkbox>
-                          <Popconfirm
-                            title={`删除选中的 ${selectedRuleIds.size} 条规则？`}
-                            disabled={selectedRuleIds.size === 0}
-                            onConfirm={handleDeleteSelectedRules}
-                          >
-                            <Button
-                              size="small"
-                              danger
-                              disabled={selectedRuleIds.size === 0}
-                            >
-                              删除选中
-                            </Button>
-                          </Popconfirm>
-                        </div>
-                      )}
                       <div className="compact-scroll">
-                        {userRules.length === 0 ? (
+                        {ruleSets.length === 0 ? (
                           <div className="muted" style={{ padding: '4px 0' }}>
-                            暂无用户规则
+                            暂无上传规则版本
                           </div>
                         ) : (
-                          userRules.map((r) => (
-                            <div key={r.rule_id} className="rule-row">
-                              <Checkbox
-                                checked={selectedRuleIds.has(r.rule_id)}
-                                onChange={(e) =>
-                                  toggleRuleSelected(r.rule_id, e.target.checked)
-                                }
-                              />
-                              <span className="rid">{r.rule_id.slice(0, 8)}</span>
+                          ruleSets.map((r) => (
+                            <div key={r.rule_set_id} className="rule-row">
+                              <span className="rid">{r.active ? <CheckCircleOutlined /> : r.rule_set_id.slice(-6)}</span>
                               <span className="txt">
                                 <Tag
-                                  color={
-                                    r.risk_level === '高风险'
-                                      ? 'error'
-                                      : r.risk_level === '中风险'
-                                      ? 'warning'
-                                      : 'success'
-                                  }
+                                  color={r.active ? 'success' : 'default'}
                                   style={{ marginRight: 6 }}
                                 >
-                                  {r.risk_level}
+                                  {r.active ? '当前启用' : '未启用'}
                                 </Tag>
-                                {r.rule_text}
+                                {r.filename}
                                 <div className="muted" style={{ marginTop: 2 }}>
-                                  {r.review_dimension || '用户新增规则'}
-                                  {r.check_type ? ` · ${r.check_type}` : ''}
-                                  {r.table_name || r.field_name
-                                    ? ` · ${[r.table_name, r.field_name].filter(Boolean).join('.')}`
-                                    : ''}
+                                  脚本 {r.script_count} · AI {r.ai_count}
+                                  {r.unsupported_count ? ` · 待结构化 ${r.unsupported_count}` : ''}
+                                  {r.warning_count ? ` · 警告 ${r.warning_count}` : ''}
                                 </div>
                               </span>
-                              <Tooltip title="编辑">
+                              <Tooltip title="启用该版本">
                                 <Button
                                   type="text"
                                   size="small"
-                                  icon={<EditOutlined />}
-                                  onClick={() => handleOpenEdit(r)}
+                                  icon={<CheckCircleOutlined />}
+                                  disabled={r.active || running}
+                                  onClick={() => handleActivateRuleSet(r.rule_set_id)}
                                 />
                               </Tooltip>
                               <Popconfirm
-                                title="删除该规则？"
-                                onConfirm={() => handleDeleteUserRule(r.rule_id)}
+                                title="删除该规则版本？"
+                                description="会同时删除原始 Excel 和解析后的规则，删除后不可恢复。"
+                                okText="删除"
+                                cancelText="取消"
+                                okButtonProps={{ danger: true }}
+                                onConfirm={() => handleDeleteRuleSet(r.rule_set_id)}
                               >
-                                <Button
-                                  type="text"
-                                  size="small"
-                                  icon={<DeleteOutlined />}
-                                  danger
-                                />
+                                <Tooltip title="删除该版本">
+                                  <Button
+                                    type="text"
+                                    size="small"
+                                    danger
+                                    icon={<DeleteOutlined />}
+                                    disabled={running}
+                                  />
+                                </Tooltip>
                               </Popconfirm>
                             </div>
                           ))
@@ -1275,17 +1059,30 @@ export default function LeftPanel() {
                 disabled={running}
               />
             </div>
-            <Button
-              type="primary"
-              block
-              size="large"
-              icon={<RocketOutlined />}
-              onClick={handleStart}
-              loading={running}
-              style={{ marginTop: 12, fontWeight: 600 }}
-            >
-              {running ? 'AI 审核中…' : '开始 AI 审核'}
-            </Button>
+            {running ? (
+              <Button
+                danger
+                block
+                size="large"
+                icon={<CloseCircleOutlined />}
+                onClick={handleCancelReview}
+                disabled={!jobId}
+                style={{ marginTop: 12, fontWeight: 600 }}
+              >
+                取消审核
+              </Button>
+            ) : (
+              <Button
+                type="primary"
+                block
+                size="large"
+                icon={<RocketOutlined />}
+                onClick={handleStart}
+                style={{ marginTop: 12, fontWeight: 600 }}
+              >
+                开始 AI 审核
+              </Button>
+            )}
             <div className="start-note">
               当前预览模板：
               <strong>{templateUpload?.original_name || '未上传申报模板'}</strong>
@@ -1350,102 +1147,6 @@ export default function LeftPanel() {
         </div>
       </div>
 
-      {/* 新增规则 Modal */}
-      <Modal
-        key={process /* 切流程时强制重建并清空 */}
-        title={`${editingRuleId ? '编辑' : '新增'}用户规则 · ${processLabel}`}
-        open={creating}
-        onCancel={() => {
-          setCreating(false)
-          setEditingRuleId(null)
-          form.resetFields()
-        }}
-        afterClose={() => form.resetFields()}
-        onOk={handleCreateRule}
-        okText="保存"
-        cancelText="取消"
-        width={560}
-        forceRender
-        destroyOnHidden
-      >
-        <Form
-          layout="vertical"
-          form={form}
-          initialValues={{
-            risk_level: '中风险',
-            review_dimension: '用户新增规则',
-            check_type: '语义条件判断',
-          }}
-          preserve={false}
-        >
-          <Form.Item
-            label="规则内容"
-            name="rule_text"
-            rules={[{ required: true, message: '请输入规则内容' }]}
-          >
-            <Input.TextArea
-              rows={3}
-              placeholder="例：信托产品名称中不得出现'保本'、'保收益'等表述"
-            />
-          </Form.Item>
-          <Form.Item label="风险等级" name="risk_level">
-            <Select
-              options={[
-                { value: '高风险', label: '高风险' },
-                { value: '中风险', label: '中风险' },
-                { value: '低风险', label: '低风险' },
-              ]}
-            />
-          </Form.Item>
-          <Form.Item label="适用材料" name="applicable_materials">
-            <Select
-              mode="multiple"
-              allowClear
-              placeholder="选择一个或多个材料类型（可不填，默认全部适用）"
-              options={materialOptions}
-              optionLabelProp="label"
-              maxTagCount="responsive"
-              dropdownStyle={{ maxWidth: 'unset' }}
-            />
-          </Form.Item>
-          <Collapse
-            size="small"
-            ghost
-            items={[
-              {
-                key: 'advanced',
-                label: (
-                  <span style={{ fontSize: 13, fontWeight: 600 }}>
-                    高级定位信息（可选）
-                  </span>
-                ),
-                children: (
-                  <>
-                    <div className="muted" style={{ marginBottom: 10 }}>
-                      用于提升材料裁剪和 AI 定位准确性；不填写时会按规则文本弱检索，命中不足自动回退全文。
-                    </div>
-                    <Form.Item label="审核维度" name="review_dimension">
-                      <Select options={REVIEW_DIMENSION_OPTIONS} />
-                    </Form.Item>
-                    <Form.Item label="校验类型" name="check_type">
-                      <Select options={CHECK_TYPE_OPTIONS} />
-                    </Form.Item>
-                    <Form.Item label="表名" name="table_name">
-                      <Input placeholder="例：产品特征" allowClear />
-                    </Form.Item>
-                    <Form.Item label="字段名" name="field_name">
-                      <Input placeholder="例：约定优先劣后受益权比例" allowClear />
-                    </Form.Item>
-                    <Form.Item label="触发条件" name="trigger_condition">
-                      <Input placeholder="例：是否结构化信托=是" allowClear />
-                    </Form.Item>
-                  </>
-                ),
-              },
-            ]}
-          />
-        </Form>
-      </Modal>
     </>
   )
 }

@@ -6,12 +6,12 @@ import type {
   ProcessType,
   ReviewResult,
   RuleListResponse,
+  RuleSetMeta,
   UploadMeta,
-  UserRule,
 } from './types'
 
 type JobStatus = JobInfo['status'] | 'idle'
-type Stage = 'idle' | 'parse' | 'batch' | 'merge' | 'done' | 'failed'
+type Stage = 'idle' | 'parse' | 'batch' | 'merge' | 'done' | 'failed' | 'cancelled'
 
 type ByProcess<T> = Record<ProcessType, T>
 
@@ -49,8 +49,8 @@ interface AppState {
   rules: RuleListResponse | null
   setRules: (r: RuleListResponse | null) => void
 
-  userRules: UserRule[]
-  setUserRules: (rs: UserRule[]) => void
+  ruleSets: RuleSetMeta[]
+  setRuleSets: (rs: RuleSetMeta[]) => void
 
   uploads: UploadMeta[]
   setUploads: (us: UploadMeta[]) => void
@@ -88,7 +88,7 @@ interface AppState {
   materialSliceByProcess: ByProcess<boolean>
   setMaterialSlice: (enabled: boolean, process?: ProcessType) => void
 
-  /** 是否启用内置规则：按流程保留，关闭后审核只使用用户规则 */
+  /** 是否启用内置规则：按流程保留，关闭后审核只使用上传规则版本 */
   builtinRulesEnabledByProcess: ByProcess<boolean>
   setBuiltinRulesEnabled: (enabled: boolean, process?: ProcessType) => void
 
@@ -120,8 +120,8 @@ export const useStore = create<AppState>((set, get) => ({
   rules: null,
   setRules: (r) => set({ rules: r }),
 
-  userRules: [],
-  setUserRules: (rs) => set({ userRules: rs }),
+  ruleSets: [],
+  setRuleSets: (rs) => set({ ruleSets: rs }),
 
   uploads: [],
   setUploads: (us) => set({ uploads: us }),

@@ -1,0 +1,53 @@
+{
+  "total_rules": 80,
+  "script_count": 54,
+  "ai_count": 26,
+  "unsupported_count": 7,
+  "error_count": 0,
+  "warning_count": 7,
+  "errors": [],
+  "warnings": [
+    {
+      "sheet": "脚本审核规则",
+      "row": 8,
+      "rule_id": "TERM-ELEMENT-SCRIPT-007",
+      "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+    },
+    {
+      "sheet": "脚本审核规则",
+      "row": 13,
+      "rule_id": "TERM-ELEMENT-SCRIPT-012",
+      "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+    },
+    {
+      "sheet": "脚本审核规则",
+      "row": 16,
+      "rule_id": "TERM-ELEMENT-SCRIPT-015",
+      "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+    },
+    {
+      "sheet": "脚本审核规则",
+      "row": 48,
+      "rule_id": "TERM-ELEMENT-SCRIPT-047",
+      "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+    },
+    {
+      "sheet": "脚本审核规则",
+      "row": 51,
+      "rule_id": "TERM-ELEMENT-SCRIPT-050",
+      "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+    },
+    {
+      "sheet": "脚本审核规则",
+      "row": 53,
+      "rule_id": "TERM-ELEMENT-SCRIPT-052",
+      "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+    },
+    {
+      "sheet": "脚本审核规则",
+      "row": 55,
+      "rule_id": "TERM-ELEMENT-SCRIPT-054",
+      "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+    }
+  ]
+}

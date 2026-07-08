@@ -4,8 +4,8 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Query
 
 from ..services.rule_loader import load_rules, split_for_ai_and_human
+from ..services.rule_sets import list_rule_sets
 from ..services.schemas import ProcessType
-from ..services.user_rules import list_user_rules
 
 router = APIRouter(prefix="/api/rules", tags=["rules"])
 
@@ -34,11 +34,13 @@ def get_rules(process: ProcessType = Query(...)):
             "issue_type": r.issue_type,
         }
 
+    rule_sets = list_rule_sets(process)
     return {
         "process": process,
         "total": len(rules),
         "ai_count": len(ai_rules),
         "human_count": len(human_rules),
         "rules": [to_card(r) for r in rules],
-        "user_rules": [r.model_dump() for r in list_user_rules(process)],
+        "user_rules": [],
+        "rule_sets": [r.model_dump() for r in rule_sets],
     }

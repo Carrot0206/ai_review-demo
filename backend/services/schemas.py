@@ -47,6 +47,9 @@ class Rule(BaseModel):
     field_name: str = ""
     applicable_materials: list[str] = Field(default_factory=list)
     review_method: str = "ai"
+    rule_object: str = ""
+    operator: str = ""
+    script_params: dict = Field(default_factory=dict)
     check_type: str = ""
     trigger_condition: str = ""
     machine_params: str = ""

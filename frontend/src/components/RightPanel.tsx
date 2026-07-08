@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Collapse, Empty, Popconfirm, Space, Switch, Tag, message } from 'antd'
 import {
   CheckCircleOutlined,
+  CloseCircleOutlined,
   DeleteOutlined,
   DownloadOutlined,
   FilterOutlined,
@@ -50,9 +51,28 @@ function escapeHtml(raw: string | number | null | undefined) {
     .replace(/'/g, '&#39;')
 }
 
+const REVIEW_METHOD_MARK_PREFIX = '__review_method__:'
+
+function basisTextWithoutMethod(text: string) {
+  if (!text.startsWith(REVIEW_METHOD_MARK_PREFIX)) return text
+  const index = text.indexOf('\n')
+  return index >= 0 ? text.slice(index + 1) : ''
+}
+
+function issueMethodLabel(issue: Issue) {
+  const bases = issue.rule_bases?.length ? issue.rule_bases : [issue.rule_basis]
+  const marker = bases
+    .map((basis) => (basis?.rule_text || '').trim())
+    .find((text) => text.startsWith(REVIEW_METHOD_MARK_PREFIX))
+  if (!marker) return 'AI'
+  return marker.slice(REVIEW_METHOD_MARK_PREFIX.length).split('\n')[0].trim() === '脚本'
+    ? '脚本'
+    : 'AI'
+}
+
 function plainBasisText(b: RuleBasis) {
   const file = (b.basis_file || '').trim()
-  const text = (b.rule_text || '').trim()
+  const text = basisTextWithoutMethod((b.rule_text || '').trim())
   const isUser = b.basis_type === '用户新增规则' || file === '用户新增规则' || !file
   return isUser ? text : `《${file}》：${text}`
 }
@@ -274,7 +294,7 @@ export default function RightPanel() {
     })
   }
 
-  function buildIssueCardHtml(issue: Issue, index: number) {
+function buildIssueCardHtml(issue: Issue, index: number) {
     const locations = issue.issue_location || []
     const allBases = issue.rule_bases?.length ? issue.rule_bases : [issue.rule_basis]
     const allSummaries = [issue.issue_summary, ...(issue.alt_summaries || [])].filter(Boolean)
@@ -283,6 +303,7 @@ export default function RightPanel() {
     const dim = normalizeDimension(
       issue.review_dimension || ruleDimensionMap.get(issue.rule_id),
     )
+    const method = issueMethodLabel(issue)
 
     const locationsHtml =
       locations.length === 0
@@ -331,7 +352,10 @@ export default function RightPanel() {
             <span class="issue-no">#${index + 1}</span>
             <span class="issue-title">${escapeHtml(issue.issue_summary)}</span>
           </div>
-          <span class="risk">${escapeHtml(isRiskHint(issue) ? '风险提示' : issue.risk_level)}</span>
+          <div class="tags">
+            <span class="method ${method === '脚本' ? 'script' : 'ai'}">${escapeHtml(method)}</span>
+            <span class="risk">${escapeHtml(isRiskHint(issue) ? '风险提示' : issue.risk_level)}</span>
+          </div>
         </div>
         <div class="meta">
           审核类别：${escapeHtml(displayDimension(dim))}　
@@ -454,6 +478,19 @@ export default function RightPanel() {
               font-weight: 600;
               background: #fff;
             }
+            .tags {
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              flex: 0 0 auto;
+            }
+            .method {
+              border-radius: 999px;
+              padding: 1px 8px;
+              font-weight: 700;
+            }
+            .method.ai { color: #4A54A8; background: #EEF2FF; }
+            .method.script { color: #047857; background: #DFF8EA; }
             .meta, .muted { color: #6b7280; }
             .location-block, .basis-item, .suggestion, .human-item {
               border: 1px solid #e5e7eb;
@@ -549,6 +586,21 @@ export default function RightPanel() {
           <div className="sub">
             请先在左侧上传材料或一键载入样例，然后点击「开始 AI 审核」
           </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (jobStatus === 'cancelled' && !result) {
+    return (
+      <div className="panel" style={{ flex: 1 }}>
+        <div className="panel-header">
+          <h3><ThunderboltOutlined style={{ color: 'var(--c-primary)' }} /> AI 审查结果</h3>
+        </div>
+        <div className="empty-state">
+          <div className="ico"><CloseCircleOutlined /></div>
+          <div className="ttl">审核已取消</div>
+          <div className="sub">本次审核已停止，可以重新点击「开始 AI 审核」发起新任务。</div>
         </div>
       </div>
     )

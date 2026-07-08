@@ -16,6 +16,8 @@ from .rule_loader import (
     load_rules,
     split_for_ai_and_human,
 )
+from .rule_set_importer import script_rule_needs_configuration
+from .script_rule_engine import run_script_rules
 from .schemas import (
     BatchLog,
     ExtractedMaterial,
@@ -69,6 +71,47 @@ def _display_location(raw: str) -> str:
     return re.sub(r"\[(\d+)\]", repl, str(raw or ""))
 
 
+def _basis_type_for_rule(rule: Rule) -> str:
+    if rule.rule_source == "上传规则":
+        return "内置规则"
+    return "用户新增规则" if rule.rule_id.startswith("USER-") else "内置规则"
+
+
+REVIEW_METHOD_MARK_PREFIX = "__review_method__:"
+
+
+def _basis_with_review_method(basis: RuleBasis, method: str) -> RuleBasis:
+    text = basis.rule_text or ""
+    if text.startswith(REVIEW_METHOD_MARK_PREFIX):
+        _, _, rest = text.partition("\n")
+        text = rest
+    return RuleBasis(
+        basis_type=basis.basis_type,
+        basis_file=basis.basis_file,
+        rule_text=f"{REVIEW_METHOD_MARK_PREFIX}{method}\n{text}",
+    )
+
+
+def _mark_review_method(issue: Issue, method: str) -> Issue:
+    issue.rule_basis = _basis_with_review_method(issue.rule_basis, method)
+    if issue.rule_bases:
+        issue.rule_bases = [_basis_with_review_method(basis, method) for basis in issue.rule_bases]
+    return issue
+
+
+def _script_rule_to_ai_fallback(rule: Rule) -> Rule:
+    data = rule.model_dump()
+    data["review_method"] = "ai"
+    data["operator"] = ""
+    data["rule_role"] = "script_ai_fallback"
+    data["check_type"] = rule.check_type or "脚本规则AI兜底"
+    data["ai_check_focus"] = [
+        "该规则原本属于脚本审核规则，但缺少可执行结构化参数或依赖外部数据源。",
+        "请严格依据规则文本，在当前上传材料范围内判断是否存在明确问题；材料中没有足够依据时不要输出问题。",
+    ]
+    return Rule.model_validate(data)
+
+
 def _build_issue_from_model(raw: dict, rules_by_id: dict, ) -> Optional[Issue]:
     """把模型返回的一个 issue 字典套用本地规则回填 → Issue。"""
     rule_id = (raw.get("rule_id") or "").strip()
@@ -90,14 +133,14 @@ def _build_issue_from_model(raw: dict, rules_by_id: dict, ) -> Optional[Issue]:
             )
         )
 
-    return Issue(
+    issue = Issue(
         issue_id="",  # 在合并阶段统一编号
         rule_id=rule_id,
         review_dimension=rule.review_dimension,
         issue_summary=str(raw.get("issue_summary", "") or "").strip(),
         risk_level=rule.risk_level,  # 后端回填
         rule_basis=RuleBasis(
-            basis_type="用户新增规则" if rule_id.startswith("USER-") else "内置规则",
+            basis_type=_basis_type_for_rule(rule),
             basis_file=rule.basis_file or "",
             rule_text=rule.rule_text or "",
         ),
@@ -106,6 +149,7 @@ def _build_issue_from_model(raw: dict, rules_by_id: dict, ) -> Optional[Issue]:
         severity_type=rule.severity_type,
         issue_type=rule.issue_type,
     )
+    return _mark_review_method(issue, "AI")
 
 
 async def _run_batch(
@@ -404,7 +448,7 @@ def _issue_from_rule(
             continue
         bases.append(
             RuleBasis(
-                basis_type="用户新增规则" if rid.startswith("USER-") else "内置规则",
+                basis_type=_basis_type_for_rule(r),
                 basis_file=r.basis_file or "",
                 rule_text=r.rule_text or "",
             )
@@ -1067,7 +1111,7 @@ async def review(
     参数：
       material_paths: 需要在此函数内现解析的材料路径
       materials_preloaded: 已解析的 ExtractedMaterial 列表（直接复用，例如上传缓存）
-      extra_rules: 额外混入的规则（例如用户新增规则）
+      extra_rules: 额外混入的规则（例如上传规则版本）
     """
     # 1. 规则
     all_rules = load_rules(process) if include_builtin_rules else []
@@ -1075,10 +1119,12 @@ async def review(
         all_rules.extend(extra_rules)
     if rule_id_whitelist:
         all_rules = [r for r in all_rules if r.rule_id in rule_id_whitelist]
-    ai_rules, human_rules = split_for_ai_and_human(all_rules)
+    script_rules = [r for r in all_rules if r.review_method == "script" and r.enabled and r.demo_enabled]
+    non_script_rules = [r for r in all_rules if r.review_method != "script"]
+    ai_rules, human_rules = split_for_ai_and_human(non_script_rules)
     await _emit(
         progress_cb,
-        f"加载规则完成：AI 审核 {len(ai_rules)} 条，需人工复核 {len(human_rules)} 条",
+        f"加载规则完成：脚本审核 {len(script_rules)} 条，AI 审核 {len(ai_rules)} 条，需人工复核 {len(human_rules)} 条",
     )
 
     # 2. 材料
@@ -1096,20 +1142,41 @@ async def review(
         await _emit(progress_cb, f"已解析材料：{m.material_name}（{len(m.segments)} 个片段）")
 
     deterministic_issues: list[Issue] = []
+    if script_rules:
+        script_issues, script_logs, script_fallback_ids = run_script_rules(script_rules, materials)
+        for issue in script_issues:
+            _mark_review_method(issue, "脚本")
+        deterministic_issues.extend(script_issues)
+        await _emit(progress_cb, f"脚本审核完成：{len(script_rules)} 条规则，发现 {len(script_issues)} 个问题")
+        for msg in script_logs[:20]:
+            await _emit(progress_cb, msg)
+        if len(script_logs) > 20:
+            await _emit(progress_cb, f"脚本审核另有 {len(script_logs) - 20} 条跳过/提示日志")
+        fallback_rules = [
+            _script_rule_to_ai_fallback(rule)
+            for rule in script_rules
+            if rule.rule_id in set(script_fallback_ids) or script_rule_needs_configuration(rule)
+        ]
+        if fallback_rules:
+            ai_rules.extend(fallback_rules)
+            await _emit(progress_cb, f"脚本规则AI兜底：{len(fallback_rules)} 条不可执行脚本规则已转入 AI 审核")
     if process in {
         "pre_registration",
         "pre_registration_reapply",
         "pre_registration_supplement",
     }:
-        ai_rules, deterministic_issues, skipped_count = _preprocess_pre_registration_rules(
+        ai_rules, pre_registration_issues, skipped_count = _preprocess_pre_registration_rules(
             ai_rules,
             materials,
             process=process,
         )
+        deterministic_issues.extend(pre_registration_issues)
+        for issue in pre_registration_issues:
+            _mark_review_method(issue, "脚本")
         process_label = PROCESS_LABEL.get(process, process)
         await _emit(
             progress_cb,
-            f"{process_label}前置判断完成：确定性问题 {len(deterministic_issues)} 个，跳过未触发规则 {skipped_count} 条，进入 AI 规则 {len(ai_rules)} 条",
+            f"{process_label}前置判断完成：确定性问题 {len(pre_registration_issues)} 个，跳过未触发规则 {skipped_count} 条，进入 AI 规则 {len(ai_rules)} 条",
         )
 
     if not ai_rules:

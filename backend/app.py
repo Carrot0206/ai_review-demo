@@ -11,10 +11,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .api.review_router import router as review_router
+from .api.rule_sets_router import router as rule_sets_router
 from .api.rules_router import router as rules_router
 from .api.samples_router import router as samples_router
 from .api.upload_router import router as upload_router
-from .api.user_rules_router import router as user_rules_router
 
 app = FastAPI(
     title="信托登记 AI 辅助审核 Demo",
@@ -38,7 +38,7 @@ def health():
 
 
 app.include_router(rules_router)
-app.include_router(user_rules_router)
+app.include_router(rule_sets_router)
 app.include_router(upload_router)
 app.include_router(review_router)
 app.include_router(samples_router)

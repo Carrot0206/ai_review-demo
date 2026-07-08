@@ -1,0 +1,59 @@
+{
+  "total_rules": 369,
+  "script_count": 299,
+  "ai_count": 70,
+  "unsupported_count": 8,
+  "error_count": 0,
+  "warning_count": 8,
+  "errors": [],
+  "warnings": [
+    {
+      "sheet": "脚本审核规则",
+      "row": 4,
+      "rule_id": "PREG-SCRIPT-003",
+      "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
+    },
+    {
+      "sheet": "脚本审核规则",
+      "row": 62,
+      "rule_id": "PREG-SCRIPT-061",
+      "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
+    },
+    {
+      "sheet": "脚本审核规则",
+      "row": 109,
+      "rule_id": "PREG-SCRIPT-108",
+      "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
+    },
+    {
+      "sheet": "脚本审核规则",
+      "row": 119,
+      "rule_id": "PREG-SCRIPT-118",
+      "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
+    },
+    {
+      "sheet": "脚本审核规则",
+      "row": 122,
+      "rule_id": "PREG-SCRIPT-121",
+      "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
+    },
+    {
+      "sheet": "脚本审核规则",
+      "row": 126,
+      "rule_id": "PREG-SCRIPT-125",
+      "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
+    },
+    {
+      "sheet": "脚本审核规则",
+      "row": 136,
+      "rule_id": "PREG-SCRIPT-135",
+      "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
+    },
+    {
+      "sheet": "脚本审核规则",
+      "row": 266,
+      "rule_id": "PREG-SCRIPT-265",
+      "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
+    }
+  ]
+}

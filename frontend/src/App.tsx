@@ -5,12 +5,12 @@ import ProcessBar from './components/ProcessBar'
 import LeftPanel from './components/LeftPanel'
 import RightPanel from './components/RightPanel'
 import { useStore } from './store'
-import { getRules, listUploads } from './api'
+import { getRules, listRuleSets, listUploads } from './api'
 
 function App() {
   const process = useStore((s) => s.process)
   const setRules = useStore((s) => s.setRules)
-  const setUserRules = useStore((s) => s.setUserRules)
+  const setRuleSets = useStore((s) => s.setRuleSets)
   const setUploads = useStore((s) => s.setUploads)
 
   // 切流程刷新当前流程的规则集和上传列表;
@@ -19,11 +19,12 @@ function App() {
     getRules(process)
       .then((r) => {
         setRules(r)
-        setUserRules(r.user_rules || [])
+        setRuleSets(r.rule_sets || [])
       })
       .catch(() => {})
+    listRuleSets(process).then(setRuleSets).catch(() => {})
     listUploads(process).then(setUploads).catch(() => {})
-  }, [process, setRules, setUserRules, setUploads])
+  }, [process, setRules, setRuleSets, setUploads])
 
   return (
     <>

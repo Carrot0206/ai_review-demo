@@ -8,10 +8,29 @@ function riskClass(level: string) {
   return 'low'
 }
 
+const REVIEW_METHOD_MARK_PREFIX = '__review_method__:'
+
+function basisTextWithoutMethod(text: string) {
+  if (!text.startsWith(REVIEW_METHOD_MARK_PREFIX)) return text
+  const index = text.indexOf('\n')
+  return index >= 0 ? text.slice(index + 1) : ''
+}
+
+function methodLabel(issue: Issue) {
+  const bases = issue.rule_bases?.length ? issue.rule_bases : [issue.rule_basis]
+  const marker = bases
+    .map((basis) => (basis?.rule_text || '').trim())
+    .find((text) => text.startsWith(REVIEW_METHOD_MARK_PREFIX))
+  if (!marker) return 'AI'
+  return marker.slice(REVIEW_METHOD_MARK_PREFIX.length).split('\n')[0].trim() === '脚本'
+    ? '脚本'
+    : 'AI'
+}
+
 /** 根据 basis 渲染：《文件》：规则内容；用户新增/无文件时只显示 rule_text。 */
 function renderBasisLine(b: RuleBasis) {
   const file = (b.basis_file || '').trim()
-  const text = (b.rule_text || '').trim()
+  const text = basisTextWithoutMethod((b.rule_text || '').trim())
   const isUser = b.basis_type === '用户新增规则' || file === '用户新增规则' || !file
   if (isUser || !file) {
     return <span>{text}</span>
@@ -76,6 +95,9 @@ const IssueCard = forwardRef<HTMLDivElement, Props>(function IssueCard(
       >
         <span className="title" title={issue.issue_summary}>
           {issue.issue_summary}
+        </span>
+        <span className={`method-tag ${methodLabel(issue) === '脚本' ? 'script' : 'ai'}`}>
+          {methodLabel(issue)}
         </span>
         <span className={`risk-tag ${cls}`}>
           {isRiskHint ? '风险提示' : issue.risk_level}

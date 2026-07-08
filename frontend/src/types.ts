@@ -41,6 +41,25 @@ export interface RuleListResponse {
   human_count: number
   rules: Rule[]
   user_rules: UserRule[]
+  rule_sets?: RuleSetMeta[]
+}
+
+export interface RuleSetMeta {
+  rule_set_id: string
+  process: ProcessType
+  filename: string
+  created_at: number
+  active: boolean
+  total_rules: number
+  script_count: number
+  ai_count: number
+  unsupported_count: number
+  error_count: number
+  warning_count: number
+  report?: {
+    errors?: { sheet?: string; row?: number; rule_id?: string; message: string }[]
+    warnings?: { sheet?: string; row?: number; rule_id?: string; message: string }[]
+  }
 }
 
 export interface UserRule {
@@ -156,7 +175,7 @@ export interface ReviewResult {
 export interface JobInfo {
   job_id: string
   process: ProcessType
-  status: 'pending' | 'running' | 'done' | 'failed'
+  status: 'pending' | 'running' | 'done' | 'failed' | 'cancelled'
   started_at: number
   finished_at?: number | null
   error?: string | null

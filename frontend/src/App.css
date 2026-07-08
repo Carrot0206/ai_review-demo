@@ -432,6 +432,29 @@
 .risk-tag.mid  { color: var(--c-risk-mid);  background: var(--c-risk-mid-bg); }
 .risk-tag.low  { color: var(--c-risk-low);  background: var(--c-risk-low-bg); }
 
+.method-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-width: 30px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+.method-tag.ai {
+  color: #4A54A8;
+  background: #EEF2FF;
+}
+.method-tag.script {
+  color: #047857;
+  background: #DFF8EA;
+}
+
 /* ===== 问题卡片 ===== */
 .issue-card {
   background: #fff;
@@ -455,7 +478,7 @@
 .issue-head {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: 7px;
   padding: 10px 12px;
   cursor: pointer;
   user-select: none;
@@ -471,7 +494,6 @@
   word-break: break-word;
 }
 .issue-head .risk-tag {
-  margin-left: auto;
   flex-shrink: 0;
 }
 .issue-head .chev {
