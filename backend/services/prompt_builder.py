@@ -441,6 +441,78 @@ PROCESS_SYSTEM_PROMPTS = {
     "correction_general": CORRECTION_GENERAL_SYSTEM_PROMPT,
 }
 
+INITIAL_RULE_TYPE_PROMPTS = {
+    "material_required": """本批规则类型：material_required（材料提交/材料质量）。
+执行口径：
+1. 只检查材料是否提交、是否可读、是否满足规则要求的文件或佐证材料；不得检查申报模板字段实质内容。
+2. 材料缺失时，issue_location 使用 material_name=\"材料清单\"，location 写缺失材料名，value 写 \"缺失:<材料名>\"。
+3. 材料质量问题必须定位到具体材料和页/段，value 写明 \"不可读\"、\"不清晰\"、\"不完整\" 等真实事实。
+4. 若材料是否应提交取决于业务条件，必须先确认触发条件；触发条件不明确时不要输出问题。""",
+    "cross_material_consistency": """本批规则类型：cross_material_consistency（跨材料一致性）。
+执行口径：
+1. 专门检查申报模板与申请书、信托文件样本、其他附件之间的一致性。
+2. 一个不一致字段输出一条 issue，不要把多个字段合并成一个大问题。
+3. issue_location 至少包含两端位置；value 统一写成 \"申报模板:<值>；对照材料:<值>\"。
+4. 只找到一端值、另一端材料没有明确记载时，不得直接判定不一致；仅在规则要求佐证材料且确实缺失时输出佐证材料缺失问题。""",
+    "array_unique": """本批规则类型：array_unique（主键/唯一性）。
+执行口径：
+1. 只检查主键、唯一性、联合主键约束。
+2. 每组重复值输出一条 issue，issue_location 列出重复记录位置。
+3. value 写成 \"重复主键:<字段或联合字段>=<值>\"。
+4. 不得把字段为空当作唯一性重复；字段为空应交给必填类规则。""",
+    "numeric_relation": """本批规则类型：numeric_relation（数值/金额/规模关系）。
+执行口径：
+1. 检查金额、规模、上下限、比例、加总、字段间数值关系。
+2. 每个失败关系输出一条 issue。
+3. value 写明公式/约束和实际值，例如 \"要求:集合资金=0；实际:1000000\"。
+4. 数组记录路径必须保留原始 0 基下标，展示层会转换为业务可读的 1 基下标。""",
+    "business_mapping": """本批规则类型：business_mapping（业务分类/监管口径/字段联动）。
+执行口径：
+1. 检查业务分类、监管口径、字段联动、条件映射。
+2. 必须先确认触发条件，再判断目标字段是否符合规则；不满足触发条件时不得输出问题。
+3. value 写成 \"条件:<触发字段=值>；当前:<目标字段=值>；要求:<规则要求>\"。
+4. 不得把定义说明直接扩展成业务违规。""",
+    "form_scope": """本批规则类型：form_scope（填表范围/适用条件）。
+执行口径：
+1. 检查表或字段是否适用、是否应填、是否不应填。
+2. 必须先判断适用条件；空表本身不等于问题。
+3. value 写成 \"适用条件:<条件>；当前材料:<事实>\"。
+4. 对 \"非必填\"、\"选填\"、\"仅当...填报\" 规则，未触发时输出空 issues。""",
+    "general_explanation": """本批规则类型：general_explanation（定义/填报说明/解释性口径）。
+执行口径：
+1. 只有材料中已有填写值且明显违反定义或填报口径时才输出问题。
+2. 禁止因为规则只是定义说明，就推断字段缺失或业务违规。
+3. 对 \"可\"、\"可以\"、\"非必填\"、\"选填\"、\"示例\" 类规则默认不输出问题。
+4. 若规则没有明确强约束，且材料事实不能证明违反规则，输出空 issues。""",
+    "script_ai_fallback": """本批规则类型：script_ai_fallback（脚本规则 AI 兜底）。
+执行口径：
+1. 该规则原本应由脚本执行；严格按 operator、script_params、machine_params 和 rule_text 判断。
+2. 不得把\"脚本不可执行\"解释为申请材料有问题。
+3. 只有材料事实和规则参数足够明确时才输出问题；参数不足、外部系统状态不可得、工作日计算不可验证、外部数据源缺失时输出空 issues。
+4. 输出仍使用统一 issue schema，rule_id 必须来自本批规则。""",
+}
+
+INITIAL_PROMPT_PROFILE_DEFAULT = "general_explanation"
+
+
+def _prompt_profile_for_rules(process: str, rules: list[Rule]) -> str:
+    if process != "initial" or not rules:
+        return ""
+    profiles = {r.rule_type or INITIAL_PROMPT_PROFILE_DEFAULT for r in rules}
+    if len(profiles) == 1:
+        return next(iter(profiles))
+    return INITIAL_PROMPT_PROFILE_DEFAULT
+
+
+def _system_prompt_for_rules(process: str, rules: list[Rule]) -> tuple[str, str]:
+    system_prompt = PROCESS_SYSTEM_PROMPTS.get(process)
+    if system_prompt is None:
+        raise ValueError(f"未配置流程 system prompt: {process}")
+    profile = _prompt_profile_for_rules(process, rules)
+    if process == "initial" and profile:
+        system_prompt = f"{system_prompt}\n\n{INITIAL_RULE_TYPE_PROMPTS.get(profile, INITIAL_RULE_TYPE_PROMPTS[INITIAL_PROMPT_PROFILE_DEFAULT])}"
+    return system_prompt, profile
+
 
 def _rule_to_prompt_obj(rule: Rule) -> dict[str, Any]:
     """精简规则字段送进 prompt，避免 token 浪费。"""
@@ -449,7 +521,10 @@ def _rule_to_prompt_obj(rule: Rule) -> dict[str, Any]:
         "rule_name": rule.rule_name,
         "rule_text": rule.rule_text,
         "review_dimension": rule.review_dimension,
+        "rule_type": rule.rule_type,
         "applicable_materials": rule.applicable_materials,
+        "operator": rule.operator,
+        "script_params": rule.script_params,
         "check_type": rule.check_type,
         "table_name": rule.table_name,
         "field_name": rule.field_name,
@@ -487,9 +562,7 @@ def build_messages(
     material_filter：限定本次只送入哪些 material_type 的材料；为 None 表示全发。
     若过滤后为空，仍保留 1 行占位提示，使模型可以走"未发现问题"分支。
     """
-    system_prompt = PROCESS_SYSTEM_PROMPTS.get(process)
-    if system_prompt is None:
-        raise ValueError(f"未配置流程 system prompt: {process}")
+    system_prompt, prompt_profile = _system_prompt_for_rules(process, rules)
 
     process_label = PROCESS_LABEL.get(process, process)
     rule_list = [_rule_to_prompt_obj(r) for r in rules]
@@ -508,6 +581,7 @@ def build_messages(
 {process_label}
 
 ## 本次需要审查的规则（共 {len(rules)} 条，请逐条独立判断）
+Prompt Profile：{prompt_profile or "default"}
 ```json
 {json.dumps(rule_list, ensure_ascii=False, indent=2)}
 ```

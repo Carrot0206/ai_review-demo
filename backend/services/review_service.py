@@ -12,6 +12,7 @@ from .material_slicer import slice_materials_for_group
 from .prompt_builder import build_messages
 from .rule_loader import (
     describe_group,
+    group_initial_by_rule_type,
     group_by_dimension,
     load_rules,
     split_for_ai_and_human,
@@ -102,14 +103,21 @@ def _mark_review_method(issue: Issue, method: str) -> Issue:
 def _script_rule_to_ai_fallback(rule: Rule) -> Rule:
     data = rule.model_dump()
     data["review_method"] = "ai"
-    data["operator"] = ""
+    data["rule_type"] = "script_ai_fallback"
     data["rule_role"] = "script_ai_fallback"
     data["check_type"] = rule.check_type or "脚本规则AI兜底"
     data["ai_check_focus"] = [
         "该规则原本属于脚本审核规则，但缺少可执行结构化参数或依赖外部数据源。",
-        "请严格依据规则文本，在当前上传材料范围内判断是否存在明确问题；材料中没有足够依据时不要输出问题。",
+        "只有材料事实和参数足够明确时才输出问题；参数不足或外部数据缺失时输出空 issues。",
+        "不得把脚本不可执行解释为申请材料有问题。",
     ]
     return Rule.model_validate(data)
+
+
+def _prompt_profile_for_group(process: ProcessType, group: list[Rule]) -> str:
+    if process == "initial" and group:
+        return group[0].rule_type or "general_explanation"
+    return ""
 
 
 def _build_issue_from_model(raw: dict, rules_by_id: dict, ) -> Optional[Issue]:
@@ -164,6 +172,7 @@ async def _run_batch(
 ):
     start = time.perf_counter()
     label = describe_group(group)
+    prompt_profile = _prompt_profile_for_group(process, group)
     await _emit(progress_cb, f"[{batch_id}] 开始审核 {label}")
     try:
         # O1：按本批规则的 applicable_materials 裁剪材料
@@ -191,6 +200,8 @@ async def _run_batch(
         log = BatchLog(
             batch_id=batch_id,
             review_dimension=label,
+            rule_type=prompt_profile,
+            prompt_profile=prompt_profile,
             rule_count=len(group),
             status="success",
             issues_found=len(issues),
@@ -216,6 +227,8 @@ async def _run_batch(
         log = BatchLog(
             batch_id=batch_id,
             review_dimension=label,
+            rule_type=prompt_profile,
+            prompt_profile=prompt_profile,
             rule_count=len(group),
             status="failed",
             duration_seconds=round(duration, 2),
@@ -1222,7 +1235,7 @@ async def review(
         )
 
     # 3. 分组 & 并发
-    groups = group_by_dimension(ai_rules)
+    groups = group_initial_by_rule_type(ai_rules) if process == "initial" else group_by_dimension(ai_rules)
     rules_by_id = {r.rule_id: r for r in ai_rules}
     await _emit(progress_cb, f"分组完成：共 {len(groups)} 批")
 

@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Iterable
 
 from .material_filter import is_explicit_cross_document_rule
+from .rule_set_importer import infer_rule_type
 from .schemas import ProcessType, Rule
 
 RULES_DIR = Path(__file__).resolve().parent.parent / "data" / "rules"
@@ -43,6 +44,8 @@ def _normalize_dimension(raw: str) -> str:
 
 
 def _is_human_review(rule: Rule) -> bool:
+    if rule.rule_type == "human_layout":
+        return True
     check_type = (rule.check_type or "").strip()
     if check_type in HUMAN_REVIEW_CHECK_TYPES:
         return True
@@ -74,6 +77,10 @@ def split_for_ai_and_human(rules: Iterable[Rule]) -> tuple[list[Rule], list[Rule
     ai_rules: list[Rule] = []
     human_rules: list[Rule] = []
     for r in rules:
+        if not r.rule_type:
+            r.rule_type = infer_rule_type(r)
+        if r.rule_type == "human_layout":
+            r.needs_human = True
         (human_rules if r.needs_human else ai_rules).append(r)
     return ai_rules, human_rules
 
@@ -98,9 +105,34 @@ def group_by_dimension(rules: list[Rule], max_group_size: int = MAX_GROUP_SIZE) 
     return groups
 
 
+def group_initial_by_rule_type(rules: list[Rule], max_group_size: int = MAX_GROUP_SIZE) -> list[list[Rule]]:
+    """Initial registration groups by prompt profile before dimension.
+
+    This keeps prompts task-specific while preserving the existing dimension and
+    material-scope isolation used to avoid noisy cross-document batches.
+    """
+    bucket: dict[tuple[str, str, str, str], list[Rule]] = {}
+    for r in rules:
+        if not r.rule_type:
+            r.rule_type = infer_rule_type(r)
+        rule_type = r.rule_type or "general_explanation"
+        dim = _normalize_dimension(r.review_dimension)
+        scope = "cross_document" if is_explicit_cross_document_rule(r) else "template_or_internal"
+        source_sheet = getattr(r, "source_sheet", "") or ""
+        key = (rule_type, dim, scope, source_sheet)
+        bucket.setdefault(key, []).append(r)
+
+    groups: list[list[Rule]] = []
+    for _, items in bucket.items():
+        for i in range(0, len(items), max_group_size):
+            groups.append(items[i : i + max_group_size])
+    return groups
+
+
 def describe_group(group: list[Rule]) -> str:
     """给一组规则起一个用于日志/批次标识的描述。"""
     if not group:
         return "empty"
     dim = _normalize_dimension(group[0].review_dimension)
-    return f"{dim}({len(group)}条)"
+    rule_type = group[0].rule_type or "general"
+    return f"{dim}/{rule_type}({len(group)}条)"

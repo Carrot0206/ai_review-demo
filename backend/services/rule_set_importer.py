@@ -93,6 +93,42 @@ def _normalize_dimension(value: str) -> str:
     return mapping.get(value, value or "其他")
 
 
+def infer_rule_type(rule: Rule) -> str:
+    """Infer a conservative prompt profile for older rule workbooks."""
+    if rule.rule_type:
+        return rule.rule_type
+    text = " ".join(
+        str(value or "")
+        for value in [
+            rule.check_type,
+            rule.operator,
+            rule.rule_text,
+            rule.rule_name,
+            rule.review_dimension,
+            " ".join(rule.ai_check_focus or []),
+        ]
+    )
+    if "版式" in text or "显著位置" in text:
+        return "human_layout"
+    if rule.rule_role == "script_ai_fallback":
+        return "script_ai_fallback"
+    if rule.review_method == "script":
+        return ""
+    if "跨材料一致性" in text or "保持一致" in text or "与信托文件" in text or "与申请书" in text:
+        return "cross_material_consistency"
+    if "主键" in text or "唯一性" in text or "唯一约束" in text:
+        return "array_unique"
+    if any(keyword in text for keyword in ("规模", "金额", "上限", "下限", "比例", "加总", "应为0", "不小于", "不大于")):
+        return "numeric_relation"
+    if any(keyword in text for keyword in ("分类", "监管口径", "字段联动", "系统提示分类错误", "不得分类为")):
+        return "business_mapping"
+    if any(keyword in text for keyword in ("填表范围", "非必填", "仅要求", "仅当", "选填")):
+        return "form_scope"
+    if any(keyword in text for keyword in ("须提交", "应提交", "上传", "材料", "清晰", "可阅读", "佐证")):
+        return "material_required"
+    return "general_explanation"
+
+
 def _script_rule_needs_configuration(rule: Rule) -> bool:
     if rule.review_method != "script":
         return False
@@ -170,6 +206,7 @@ def _rule_common(
         basis_file=_cell(row, mapping, "审查依据") or filename,
         basis_text=_cell(row, mapping, "审查依据"),
         review_dimension=_normalize_dimension(_cell(row, mapping, "审查维度")),
+        rule_type=_cell(row, mapping, "规则类型"),
         table_name=section,
         field_name=field_name,
         applicable_materials=_split(_cell(row, mapping, "适用材料")),
@@ -190,6 +227,9 @@ def _rule_common(
         enabled=_cell(row, mapping, "启用状态") not in {"否", "false", "False", "0"},
         demo_enabled=True,
     )
+    if not rule.rule_type:
+        rule.rule_type = infer_rule_type(rule)
+    return rule
 
 
 def import_rule_set_from_excel(content: bytes, *, filename: str, process: ProcessType) -> tuple[list[Rule], dict]:

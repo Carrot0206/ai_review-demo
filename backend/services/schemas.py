@@ -43,6 +43,7 @@ class Rule(BaseModel):
     basis_file: str = ""
     basis_text: str = ""
     review_dimension: str = ""
+    rule_type: str = ""
     table_name: str = ""
     field_name: str = ""
     applicable_materials: list[str] = Field(default_factory=list)
@@ -137,6 +138,8 @@ class BatchLog(BaseModel):
 
     batch_id: str
     review_dimension: str
+    rule_type: str = ""
+    prompt_profile: str = ""
     rule_count: int
     status: Literal["success", "failed"]
     issues_found: int = 0
