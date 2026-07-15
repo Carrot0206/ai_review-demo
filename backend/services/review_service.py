@@ -14,11 +14,15 @@ from .rule_loader import (
     describe_group,
     group_initial_by_rule_type,
     group_by_dimension,
+    group_pre_registration_by_rule_type,
+    group_pre_report_by_rule_type,
+    group_termination_by_rule_type,
     load_rules,
     split_for_ai_and_human,
 )
 from .rule_set_importer import script_rule_needs_configuration
 from .script_rule_engine import run_script_rules
+from .table_scope_engine import apply_scope_decisions, resolve_scope_decisions
 from .schemas import (
     BatchLog,
     ExtractedMaterial,
@@ -31,6 +35,8 @@ from .schemas import (
     ReviewSummary,
     Rule,
     RuleBasis,
+    ScopeDecision,
+    TableScopeRule,
 )
 
 
@@ -115,7 +121,7 @@ def _script_rule_to_ai_fallback(rule: Rule) -> Rule:
 
 
 def _prompt_profile_for_group(process: ProcessType, group: list[Rule]) -> str:
-    if process == "initial" and group:
+    if process in {"initial", "pre_registration", "pre_report", "termination"} and group:
         return group[0].rule_type or "general_explanation"
     return ""
 
@@ -458,6 +464,57 @@ def _get_rule(rules_by_id: dict[str, Rule], rule_id: str) -> Optional[Rule]:
     return rules_by_id.get(rule_id)
 
 
+def _rule_text_contains(rule: Rule, *keywords: str) -> bool:
+    text = " ".join(
+        str(item or "")
+        for item in (
+            rule.rule_id,
+            rule.rule_name,
+            rule.rule_text,
+            rule.check_type,
+            rule.evidence_requirement,
+            " ".join(rule.ai_check_focus or []),
+        )
+    )
+    return all(keyword in text for keyword in keywords)
+
+
+def _first_rule_by_ids_or_text(
+    rules_by_id: dict[str, Rule],
+    rule_ids: list[str],
+    *keywords: str,
+    rule_type: str = "",
+) -> Optional[Rule]:
+    for rid in rule_ids:
+        rule = rules_by_id.get(rid)
+        if rule and (not rule_type or rule.rule_type == rule_type) and (not keywords or _rule_text_contains(rule, *keywords)):
+            return rule
+    return next(
+        (
+            rule
+            for rule in rules_by_id.values()
+            if rule.review_method == "ai"
+            and (not rule_type or rule.rule_type == rule_type)
+            and _rule_text_contains(rule, *keywords)
+        ),
+        None,
+    )
+
+
+def _existing_rule_ids_by_text(
+    rules_by_id: dict[str, Rule],
+    *keywords: str,
+    rule_type: str = "",
+) -> list[str]:
+    return [
+        rule.rule_id
+        for rule in rules_by_id.values()
+        if rule.review_method == "ai"
+        and (not rule_type or rule.rule_type == rule_type)
+        and _rule_text_contains(rule, *keywords)
+    ]
+
+
 def _issue_from_rule(
     rule: Rule,
     *,
@@ -520,9 +577,13 @@ def _pre_registration_deterministic_issues(
         application_rule_ids = (
             ["REREG-ELEMENT-AI-002", "REREG-FILE-AI-001"]
             if process == "pre_registration_reapply"
-            else ["PREG-FILE-AI-001", "PREG-ELEMENT-AI-001"]
+            else ["PREG-AI-001", "PREG-FILE-SCRIPT-001", "PREG-ELEMENT-AI-001", "PREG-FILE-AI-001"]
         )
-        rule = next((_get_rule(rules_by_id, rid) for rid in application_rule_ids if _get_rule(rules_by_id, rid)), None)
+        rule = (
+            next((_get_rule(rules_by_id, rid) for rid in application_rule_ids if _get_rule(rules_by_id, rid)), None)
+            if process == "pre_registration_reapply"
+            else _first_rule_by_ids_or_text(rules_by_id, application_rule_ids, "申请书", rule_type="material_required")
+        )
         if rule:
             issues.append(
                 _issue_from_rule(
@@ -537,7 +598,7 @@ def _pre_registration_deterministic_issues(
                         for rid in (
                             application_rule_ids
                             if process == "pre_registration_reapply"
-                            else ["PREG-FILE-AI-001", "PREG-FILE-AI-002", "PREG-ELEMENT-AI-001"]
+                            else _existing_rule_ids_by_text(rules_by_id, "申请书", rule_type="material_required")
                         )
                         if rid in rules_by_id
                     ],
@@ -545,7 +606,8 @@ def _pre_registration_deterministic_issues(
                 )
             )
     if process == "pre_registration" and not has_commitment:
-        rule = _get_rule(rules_by_id, "PREG-ELEMENT-AI-002")
+        commitment_rule_ids = ["PREG-AI-002", "PREG-ELEMENT-AI-002"]
+        rule = _first_rule_by_ids_or_text(rules_by_id, commitment_rule_ids, "合规承诺", rule_type="material_required")
         if rule:
             issues.append(
                 _issue_from_rule(
@@ -555,7 +617,7 @@ def _pre_registration_deterministic_issues(
                     location="合规承诺书",
                     value="缺失:合规承诺书",
                     suggestion="请补充提交合规承诺书，并按要求签字盖章。",
-                    rule_ids=[rid for rid in ["PREG-ELEMENT-AI-002"] if rid in rules_by_id],
+                    rule_ids=_existing_rule_ids_by_text(rules_by_id, "合规承诺", rule_type="material_required"),
                     rules_by_id=rules_by_id,
                 )
             )
@@ -602,6 +664,8 @@ def _pre_registration_skip_rule(
         "PREG-FILE-AI-001",
         "PREG-FILE-AI-002",
         "PREG-FILE-AI-003",
+        "PREG-AI-001",
+        "PREG-AI-003",
         "PREG-ELEMENT-AI-001",
         "PREG-ELEMENT-AI-003",
         "REREG-FILE-AI-001",
@@ -611,6 +675,8 @@ def _pre_registration_skip_rule(
     }:
         return True
     if not has_commitment and rule.rule_id in {
+        "PREG-AI-002",
+        "PREG-AI-004",
         "PREG-ELEMENT-AI-002",
         "PREG-ELEMENT-AI-004",
         "REREG-ELEMENT-AI-003",
@@ -1128,6 +1194,7 @@ async def review(
     *,
     materials_preloaded: Optional[list] = None,
     extra_rules: Optional[list] = None,
+    table_scope_rules: Optional[list[TableScopeRule]] = None,
     client: Optional[DeepSeekClient] = None,
     max_concurrency: int = 48,
     progress_cb: Optional[ProgressCallback] = None,
@@ -1142,6 +1209,7 @@ async def review(
       material_paths: 需要在此函数内现解析的材料路径
       materials_preloaded: 已解析的 ExtractedMaterial 列表（直接复用，例如上传缓存）
       extra_rules: 额外混入的规则（例如上传规则版本）
+      table_scope_rules: 当前上传规则版本包含的表级报送范围规则
     """
     # 1. 规则
     all_rules = load_rules(process) if include_builtin_rules else []
@@ -1149,14 +1217,6 @@ async def review(
         all_rules.extend(extra_rules)
     if rule_id_whitelist:
         all_rules = [r for r in all_rules if r.rule_id in rule_id_whitelist]
-    script_rules = [r for r in all_rules if r.review_method == "script" and r.enabled and r.demo_enabled]
-    non_script_rules = [r for r in all_rules if r.review_method != "script"]
-    ai_rules, human_rules = split_for_ai_and_human(non_script_rules)
-    await _emit(
-        progress_cb,
-        f"加载规则完成：脚本审核 {len(script_rules)} 条，AI 审核 {len(ai_rules)} 条，需人工复核 {len(human_rules)} 条",
-    )
-
     # 2. 材料
     materials: list[ExtractedMaterial] = []
     if materials_preloaded:
@@ -1171,7 +1231,50 @@ async def review(
         materials.append(m)
         await _emit(progress_cb, f"已解析材料：{m.material_name}（{len(m.segments)} 个片段）")
 
+    scope_decisions: list[ScopeDecision] = []
+    scope_human_items: list[HumanReviewItem] = []
     deterministic_issues: list[Issue] = []
+    if table_scope_rules:
+        scope_client = client
+        if scope_client is None and any(
+            scope.enabled and scope.unknown_policy == "ai_review"
+            for scope in table_scope_rules
+        ):
+            try:
+                scope_client = DeepSeekClient()
+            except RuntimeError:
+                scope_client = None
+        scope_decisions = await resolve_scope_decisions(
+            table_scope_rules,
+            materials,
+            client=scope_client,
+        )
+        all_rules, scope_issues, scope_human_items, scope_skipped = apply_scope_decisions(
+            all_rules,
+            table_scope_rules,
+            scope_decisions,
+        )
+        for issue in scope_issues:
+            _mark_review_method(issue, "脚本")
+        deterministic_issues.extend(scope_issues)
+        client = scope_client or client
+        decision_summary = "、".join(
+            f"{decision.table_name}={decision.status}"
+            for decision in scope_decisions
+        )
+        await _emit(
+            progress_cb,
+            f"表级报送范围判断完成：{decision_summary}；跳过字段规则 {scope_skipped} 条",
+        )
+
+    script_rules = [r for r in all_rules if r.review_method == "script" and r.enabled and r.demo_enabled]
+    non_script_rules = [r for r in all_rules if r.review_method != "script"]
+    ai_rules, human_rules = split_for_ai_and_human(non_script_rules)
+    await _emit(
+        progress_cb,
+        f"加载规则完成：脚本审核 {len(script_rules)} 条，AI 审核 {len(ai_rules)} 条，需人工复核 {len(human_rules)} 条",
+    )
+
     if script_rules:
         script_issues, script_logs, script_fallback_ids = run_script_rules(script_rules, materials)
         for issue in script_issues:
@@ -1222,7 +1325,7 @@ async def review(
             issues=deterministic_issues,
             deduped_summary=_summarize(process, deduped),
             deduped_issues=deduped,
-            human_review_items=[
+            human_review_items=scope_human_items + [
                 HumanReviewItem(
                     rule_id=r.rule_id,
                     rule_name=r.rule_name,
@@ -1232,10 +1335,20 @@ async def review(
                 for r in human_rules
             ],
             batch_logs=[],
+            scope_decisions=scope_decisions,
         )
 
     # 3. 分组 & 并发
-    groups = group_initial_by_rule_type(ai_rules) if process == "initial" else group_by_dimension(ai_rules)
+    if process == "initial":
+        groups = group_initial_by_rule_type(ai_rules)
+    elif process == "pre_registration":
+        groups = group_pre_registration_by_rule_type(ai_rules)
+    elif process == "pre_report":
+        groups = group_pre_report_by_rule_type(ai_rules)
+    elif process == "termination":
+        groups = group_termination_by_rule_type(ai_rules)
+    else:
+        groups = group_by_dimension(ai_rules)
     rules_by_id = {r.rule_id: r for r in ai_rules}
     await _emit(progress_cb, f"分组完成：共 {len(groups)} 批")
 
@@ -1288,7 +1401,7 @@ async def review(
     for i, it in enumerate(deduped_issues, start=1):
         it.issue_id = f"DEDUPED-ISSUE-{i:03d}"
 
-    human_items = [
+    human_items = scope_human_items + [
         HumanReviewItem(
             rule_id=r.rule_id,
             rule_name=r.rule_name,
@@ -1305,4 +1418,5 @@ async def review(
         deduped_issues=deduped_issues,
         human_review_items=human_items,
         batch_logs=batch_logs,
+        scope_decisions=scope_decisions,
     )

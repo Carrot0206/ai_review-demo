@@ -1,0 +1,258 @@
+{
+  "scopes": [
+    {
+      "scope_id": "INITIAL-SCOPE-001",
+      "registration_type": "初始登记",
+      "source_file": "初始登记审查规则_导入版.xlsx",
+      "source_sheet": "表级报送范围",
+      "source_row": 2,
+      "table_name": "产品基本信息",
+      "scope_type": "always_required",
+      "applicability_condition": {},
+      "exemption_condition": {},
+      "ai_materials": [
+        "申报模板"
+      ],
+      "ai_check_focus": "",
+      "effective_from": "",
+      "effective_to": "",
+      "outside_effect": "unknown",
+      "unknown_policy": "human_review",
+      "rule_text": "本表要求全部信托项目填报。",
+      "basis_text": "附件2-2《初始登记要素表及填表说明》— 数据结构",
+      "risk_level": "高风险",
+      "enabled": true
+    },
+    {
+      "scope_id": "INITIAL-SCOPE-002",
+      "registration_type": "初始登记",
+      "source_file": "初始登记审查规则_导入版.xlsx",
+      "source_sheet": "表级报送范围",
+      "source_row": 3,
+      "table_name": "业务分类信息",
+      "scope_type": "always_required",
+      "applicability_condition": {},
+      "exemption_condition": {},
+      "ai_materials": [
+        "申报模板"
+      ],
+      "ai_check_focus": "",
+      "effective_from": "",
+      "effective_to": "",
+      "outside_effect": "unknown",
+      "unknown_policy": "human_review",
+      "rule_text": "本表要求全部信托项目填报。",
+      "basis_text": "附件2-2《初始登记要素表及填表说明》— 数据结构",
+      "risk_level": "高风险",
+      "enabled": true
+    },
+    {
+      "scope_id": "INITIAL-SCOPE-003",
+      "registration_type": "初始登记",
+      "source_file": "初始登记审查规则_导入版.xlsx",
+      "source_sheet": "表级报送范围",
+      "source_row": 4,
+      "table_name": "产品特征",
+      "scope_type": "always_required",
+      "applicability_condition": {},
+      "exemption_condition": {},
+      "ai_materials": [
+        "申报模板"
+      ],
+      "ai_check_focus": "",
+      "effective_from": "",
+      "effective_to": "",
+      "outside_effect": "unknown",
+      "unknown_policy": "human_review",
+      "rule_text": "本表要求全部信托项目填报。",
+      "basis_text": "附件2-2《初始登记要素表及填表说明》— 数据结构",
+      "risk_level": "高风险",
+      "enabled": true
+    },
+    {
+      "scope_id": "INITIAL-SCOPE-004",
+      "registration_type": "初始登记",
+      "source_file": "初始登记审查规则_导入版.xlsx",
+      "source_sheet": "表级报送范围",
+      "source_row": 5,
+      "table_name": "互联网贷款信息",
+      "scope_type": "conditional",
+      "applicability_condition": {
+        "op": "table_has_content",
+        "table": "互联网贷款信息"
+      },
+      "exemption_condition": {
+        "field": "产品特征.是否互联网贷款",
+        "op": "equals",
+        "value": "否"
+      },
+      "ai_materials": [
+        "申报模板",
+        "申请书",
+        "信托文件样本"
+      ],
+      "ai_check_focus": "先确认是否属于互联网贷款业务，再判断是否具有合作机构；重点检查产品特征、合作机构安排、信托文件和申请书。仅在具有合作机构时要求填报本表。",
+      "effective_from": "",
+      "effective_to": "",
+      "outside_effect": "unknown",
+      "unknown_policy": "ai_review",
+      "rule_text": "本表仅要求具有合作机构的互联网贷款业务填报。",
+      "basis_text": "附件2-2《初始登记要素表及填表说明》— 数据结构",
+      "risk_level": "高风险",
+      "enabled": true
+    },
+    {
+      "scope_id": "INITIAL-SCOPE-005",
+      "registration_type": "初始登记",
+      "source_file": "初始登记审查规则_导入版.xlsx",
+      "source_sheet": "表级报送范围",
+      "source_row": 6,
+      "table_name": "信托费用信息",
+      "scope_type": "conditional",
+      "applicability_condition": {
+        "op": "table_has_content",
+        "table": "信托费用信息"
+      },
+      "exemption_condition": {},
+      "ai_materials": [
+        "申报模板",
+        "申请书",
+        "信托文件样本"
+      ],
+      "ai_check_focus": "判断信托合同或申请材料是否约定收取受托人报酬、托管费、投资管理费、销售服务费或其他信托费用；仅约定费用承担但未实际收取的，不直接认定为应填报。",
+      "effective_from": "",
+      "effective_to": "",
+      "outside_effect": "unknown",
+      "unknown_policy": "ai_review",
+      "rule_text": "本表要求收取信托费用的信托项目填报。",
+      "basis_text": "附件2-2《初始登记要素表及填表说明》— 数据结构",
+      "risk_level": "高风险",
+      "enabled": true
+    },
+    {
+      "scope_id": "INITIAL-SCOPE-006",
+      "registration_type": "初始登记",
+      "source_file": "初始登记审查规则_导入版.xlsx",
+      "source_sheet": "表级报送范围",
+      "source_row": 7,
+      "table_name": "初始信托规模",
+      "scope_type": "always_required",
+      "applicability_condition": {},
+      "exemption_condition": {},
+      "ai_materials": [
+        "申报模板"
+      ],
+      "ai_check_focus": "",
+      "effective_from": "",
+      "effective_to": "",
+      "outside_effect": "unknown",
+      "unknown_policy": "human_review",
+      "rule_text": "本表要求全部信托项目填报。",
+      "basis_text": "附件2-2《初始登记要素表及填表说明》— 数据结构",
+      "risk_level": "高风险",
+      "enabled": true
+    },
+    {
+      "scope_id": "INITIAL-SCOPE-007",
+      "registration_type": "初始登记",
+      "source_file": "初始登记审查规则_导入版.xlsx",
+      "source_sheet": "表级报送范围",
+      "source_row": 8,
+      "table_name": "共同受托人信息",
+      "scope_type": "conditional",
+      "applicability_condition": {
+        "op": "table_has_content",
+        "table": "共同受托人信息"
+      },
+      "exemption_condition": {},
+      "ai_materials": [
+        "申报模板",
+        "申请书",
+        "信托文件样本"
+      ],
+      "ai_check_focus": "判断信托文件或申请书是否约定两个以上受托人，或明确存在共同受托安排；重点检查受托人主体、共同处理信托事务等约定。",
+      "effective_from": "",
+      "effective_to": "",
+      "outside_effect": "unknown",
+      "unknown_policy": "ai_review",
+      "rule_text": "本表仅要求具有共同受托人的信托项目填报。",
+      "basis_text": "附件2-2《初始登记要素表及填表说明》— 数据结构",
+      "risk_level": "高风险",
+      "enabled": true
+    },
+    {
+      "scope_id": "INITIAL-SCOPE-008",
+      "registration_type": "初始登记",
+      "source_file": "初始登记审查规则_导入版.xlsx",
+      "source_sheet": "表级报送范围",
+      "source_row": 9,
+      "table_name": "初始委托人及其财产信息",
+      "scope_type": "always_required",
+      "applicability_condition": {},
+      "exemption_condition": {},
+      "ai_materials": [
+        "申报模板"
+      ],
+      "ai_check_focus": "",
+      "effective_from": "",
+      "effective_to": "",
+      "outside_effect": "unknown",
+      "unknown_policy": "human_review",
+      "rule_text": "本表要求全部信托项目填报，填报内容仅限于成立当天的初始委托人及其财产信息。",
+      "basis_text": "附件2-2《初始登记要素表及填表说明》— 数据结构",
+      "risk_level": "高风险",
+      "enabled": true
+    },
+    {
+      "scope_id": "INITIAL-SCOPE-009",
+      "registration_type": "初始登记",
+      "source_file": "初始登记审查规则_导入版.xlsx",
+      "source_sheet": "表级报送范围",
+      "source_row": 10,
+      "table_name": "初始受益权信息",
+      "scope_type": "conditional",
+      "applicability_condition": {
+        "logic": "OR",
+        "conditions": [
+          {
+            "field": "业务分类信息.信托业务分类",
+            "op": "equals",
+            "value": "资产管理信托"
+          },
+          {
+            "field": "业务分类信息.资产服务信托分类1",
+            "op": "equals",
+            "value": "财富管理服务信托"
+          }
+        ]
+      },
+      "exemption_condition": {
+        "logic": "AND",
+        "conditions": [
+          {
+            "field": "业务分类信息.信托业务分类",
+            "op": "not_equals",
+            "value": "资产管理信托"
+          },
+          {
+            "field": "业务分类信息.资产服务信托分类1",
+            "op": "not_equals",
+            "value": "财富管理服务信托"
+          }
+        ]
+      },
+      "ai_materials": [
+        "申报模板"
+      ],
+      "ai_check_focus": "",
+      "effective_from": "",
+      "effective_to": "",
+      "outside_effect": "unknown",
+      "unknown_policy": "human_review",
+      "rule_text": "本表要求资产管理信托、财富管理服务信托填报，填报内容仅限于成立当天的初始受益权信息。",
+      "basis_text": "附件2-2《初始登记要素表及填表说明》— 数据结构",
+      "risk_level": "高风险",
+      "enabled": true
+    }
+  ]
+}

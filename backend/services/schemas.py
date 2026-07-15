@@ -6,6 +6,7 @@ from typing import Literal, Optional
 from pydantic import BaseModel, Field
 
 RiskLevel = Literal["高风险", "中风险", "低风险"]
+ScopeStatus = Literal["required", "not_required", "prohibited", "unknown", "conflict"]
 ProcessType = Literal[
     "pre_report",
     "initial",
@@ -68,6 +69,30 @@ class Rule(BaseModel):
     needs_human: bool = False
 
 
+class TableScopeRule(BaseModel):
+    """A table-level applicability rule imported with a rule set."""
+
+    scope_id: str
+    registration_type: str
+    source_file: str = ""
+    source_sheet: str = "表级报送范围"
+    source_row: int = 0
+    table_name: str
+    scope_type: Literal["always_required", "conditional", "prohibited"] = "conditional"
+    applicability_condition: dict = Field(default_factory=dict)
+    exemption_condition: dict = Field(default_factory=dict)
+    ai_materials: list[str] = Field(default_factory=list)
+    ai_check_focus: str = ""
+    effective_from: str = ""
+    effective_to: str = ""
+    outside_effect: Literal["not_required", "prohibited", "unknown"] = "unknown"
+    unknown_policy: Literal["ai_review", "human_review"] = "ai_review"
+    rule_text: str
+    basis_text: str = ""
+    risk_level: RiskLevel = "中风险"
+    enabled: bool = True
+
+
 class MaterialSegment(BaseModel):
     """材料的一个文本片段，统一位置坐标供模型引用。"""
 
@@ -88,6 +113,16 @@ class IssueLocation(BaseModel):
     material_name: str
     location: str
     value: str = ""
+
+
+class ScopeDecision(BaseModel):
+    scope_id: str
+    table_name: str
+    status: ScopeStatus
+    reason: str = ""
+    source: Literal["script", "ai", "script+ai"] = "script"
+    table_present: bool = False
+    evidence: list[IssueLocation] = Field(default_factory=list)
 
 
 class RuleBasis(BaseModel):
@@ -163,3 +198,4 @@ class ReviewResult(BaseModel):
     deduped_issues: list[Issue] = Field(default_factory=list)
     human_review_items: list[HumanReviewItem] = Field(default_factory=list)
     batch_logs: list[BatchLog] = Field(default_factory=list)
+    scope_decisions: list[ScopeDecision] = Field(default_factory=list)

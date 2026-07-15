@@ -6,6 +6,11 @@ import type {
   JobInfo,
   ProcessType,
   RiskLevel,
+  RuleLibraryImportPreview,
+  RuleLibraryProcess,
+  RuleLibraryResponse,
+  RuleLibraryRule,
+  RuleLibraryRuleInput,
   RuleListResponse,
   RuleSetMeta,
   SampleListResponse,
@@ -183,6 +188,94 @@ export async function getReview(job_id: string): Promise<JobInfo> {
 export async function cancelReview(job_id: string): Promise<{ job_id: string; status: string; cancelled: boolean }> {
   const { data } = await http.post(`/review/${job_id}/cancel`)
   return data
+}
+
+export async function getRuleLibraryRules(
+  process: RuleLibraryProcess,
+): Promise<RuleLibraryResponse> {
+  const { data } = await http.get('/rule-library/rules', { params: { process } })
+  return data
+}
+
+export async function createRuleLibraryRule(
+  payload: RuleLibraryRuleInput,
+): Promise<RuleLibraryRule> {
+  const { data } = await http.post('/rule-library/rules', payload)
+  return data
+}
+
+export async function updateRuleLibraryRule(
+  ruleId: string,
+  payload: RuleLibraryRuleInput,
+): Promise<RuleLibraryRule> {
+  const { data } = await http.put(`/rule-library/rules/${ruleId}`, payload)
+  return data
+}
+
+export async function copyRuleLibraryRule(ruleId: string): Promise<RuleLibraryRule> {
+  const { data } = await http.post(`/rule-library/rules/${ruleId}/copy`)
+  return data
+}
+
+export async function setRuleLibraryRuleEnabled(
+  ruleId: string,
+  enabled: boolean,
+): Promise<RuleLibraryRule> {
+  const { data } = await http.patch(`/rule-library/rules/${ruleId}/enabled`, { enabled })
+  return data
+}
+
+export async function deleteRuleLibraryRule(ruleId: string) {
+  const { data } = await http.delete(`/rule-library/rules/${ruleId}`)
+  return data
+}
+
+export async function deleteRuleLibraryRules(ruleIds: string[]) {
+  const { data } = await http.post('/rule-library/rules/batch-delete', {
+    rule_ids: ruleIds,
+  })
+  return data as { deleted_count: number; requested_count: number }
+}
+
+export async function previewRuleLibraryImport(
+  process: RuleLibraryProcess,
+  file: File,
+): Promise<RuleLibraryImportPreview> {
+  const form = new FormData()
+  form.append('file', file)
+  const { data } = await http.post('/rule-library/import/preview', form, {
+    params: { process },
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data
+}
+
+export async function commitRuleLibraryImport(
+  process: RuleLibraryProcess,
+  file: File,
+): Promise<{ imported_count: number; script_count: number; ai_count: number }> {
+  const form = new FormData()
+  form.append('file', file)
+  const { data } = await http.post('/rule-library/import/commit', form, {
+    params: { process },
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data
+}
+
+export async function downloadRuleLibraryTemplate(process: RuleLibraryProcess) {
+  const { data } = await http.get('/rule-library/template', {
+    params: { process },
+    responseType: 'blob',
+  })
+  const url = URL.createObjectURL(data)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `${process}_rule_library_template.xlsx`
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
 }
 
 /** SSE 订阅。返回 close 函数。 */

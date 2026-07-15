@@ -105,8 +105,8 @@ def group_by_dimension(rules: list[Rule], max_group_size: int = MAX_GROUP_SIZE) 
     return groups
 
 
-def group_initial_by_rule_type(rules: list[Rule], max_group_size: int = MAX_GROUP_SIZE) -> list[list[Rule]]:
-    """Initial registration groups by prompt profile before dimension.
+def group_by_rule_type(rules: list[Rule], max_group_size: int = MAX_GROUP_SIZE) -> list[list[Rule]]:
+    """Group by prompt profile before dimension.
 
     This keeps prompts task-specific while preserving the existing dimension and
     material-scope isolation used to avoid noisy cross-document batches.
@@ -127,6 +127,22 @@ def group_initial_by_rule_type(rules: list[Rule], max_group_size: int = MAX_GROU
         for i in range(0, len(items), max_group_size):
             groups.append(items[i : i + max_group_size])
     return groups
+
+
+def group_initial_by_rule_type(rules: list[Rule], max_group_size: int = MAX_GROUP_SIZE) -> list[list[Rule]]:
+    return group_by_rule_type(rules, max_group_size=max_group_size)
+
+
+def group_pre_registration_by_rule_type(rules: list[Rule], max_group_size: int = MAX_GROUP_SIZE) -> list[list[Rule]]:
+    return group_by_rule_type(rules, max_group_size=max_group_size)
+
+
+def group_pre_report_by_rule_type(rules: list[Rule], max_group_size: int = MAX_GROUP_SIZE) -> list[list[Rule]]:
+    return group_by_rule_type(rules, max_group_size=max_group_size)
+
+
+def group_termination_by_rule_type(rules: list[Rule], max_group_size: int = MAX_GROUP_SIZE) -> list[list[Rule]]:
+    return group_by_rule_type(rules, max_group_size=max_group_size)
 
 
 def describe_group(group: list[Rule]) -> str:

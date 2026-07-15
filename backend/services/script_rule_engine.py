@@ -11,6 +11,7 @@ from .schemas import ExtractedMaterial, Issue, IssueLocation, Rule, RuleBasis
 
 SUPPORTED_OPERATORS = {
     "enum",
+    "dependent_enum",
     "required",
     "max_length",
     "number_precision",
@@ -64,7 +65,9 @@ def _value_for_rule(lookup: dict[str, str], rule: Rule) -> tuple[str, str]:
     for candidate in candidates:
         if candidate in lookup:
             return lookup[candidate], candidate
-        matches = [key for key in lookup if key.endswith(f".{candidate}") or key.endswith(f".{rule.field_name}")]
+        matches = [key for key in lookup if _field_matches(key, candidate)]
+        if not matches and rule.field_name:
+            matches = [key for key in lookup if _field_matches(key, rule.field_name)]
         if matches:
             key = sorted(matches, key=len)[0]
             return lookup[key], key
@@ -80,6 +83,46 @@ def _values_for_field(lookup: dict[str, str], field: str) -> list[tuple[str, str
         if _field_matches(key, field):
             out.append((value, key))
     return out
+
+
+def _required_table_name(rule: Rule) -> str:
+    table = str(rule.table_name or "").strip()
+    field = str(rule.field_name or "").strip()
+    anchor = str(rule.field_anchor or "").strip()
+    if not table:
+        return ""
+    if str(rule.rule_object or "").strip() == "表":
+        return table
+    if field and field == table:
+        return table
+    if anchor and _strip_array_indexes(anchor) == table:
+        return table
+    return ""
+
+
+def _location_in_table(location: str, table_name: str) -> bool:
+    location = str(location or "").strip()
+    table_name = str(table_name or "").strip()
+    if not location or not table_name:
+        return False
+    # 支持 "表名.字段"、"表名[0].字段"，以及外层模板名前缀后的
+    # "申报模板.表名.字段" / "申报模板.表名[0].字段"。
+    pattern = rf"(^|\.){re.escape(table_name)}(?:\[\d+\])?\."
+    return re.search(pattern, location) is not None
+
+
+def _is_table_business_value(location: str, value: str) -> bool:
+    if str(value or "").strip() in {"", "无", "null", "None", "[]", "{}", "-"}:
+        return False
+    field_name = str(location or "").rsplit(".", 1)[-1]
+    return _strip_array_indexes(field_name) != "序号"
+
+
+def _table_has_content(lookup: dict[str, str], table_name: str) -> bool:
+    return any(
+        _location_in_table(location, table_name) and _is_table_business_value(location, value)
+        for location, value in lookup.items()
+    )
 
 
 def _strip_array_indexes(value: str) -> str:
@@ -186,6 +229,15 @@ def _is_blank(value: str) -> bool:
     return value is None or str(value).strip() in {"", "无", "null", "None"}
 
 
+def _normalize_material_label(value: str) -> str:
+    text = str(value or "").strip()
+    text = re.sub(r"[（(][^）)]*[）)]", "", text)
+    text = re.sub(r"附件\s*\d+(?:-\d+)*", "", text)
+    text = text.replace("信托产品", "")
+    text = re.sub(r"[\s_《》【】\[\]（）()、,，;；/\\.-]+", "", text)
+    return text
+
+
 def _decimal(value: str) -> Optional[Decimal]:
     text = str(value or "").replace(",", "").strip()
     if not text:
@@ -206,7 +258,24 @@ def _material_matches(material: ExtractedMaterial, label: str) -> bool:
     parts = [p for p in re.split(r"[、,，;；/\s]+", label or "") if p]
     if not parts:
         return False
-    return any(part in haystack for part in parts)
+    if any(part in haystack for part in parts):
+        return True
+    if "模板" in label and material.material_type == "申报模板":
+        return True
+    if "申请书" in label and material.material_type == "申请书":
+        return True
+    if ("信托文件" in label or "信托合同" in label) and material.material_type == "信托文件样本":
+        return True
+    if "清算报告" in label and material.material_type == "其他附件":
+        return True
+
+    normalized_label = _normalize_material_label(label)
+    normalized_haystack = _normalize_material_label(haystack)
+    if normalized_label and normalized_label in normalized_haystack:
+        return True
+
+    normalized_parts = [_normalize_material_label(part) for part in parts]
+    return any(part and part in normalized_haystack for part in normalized_parts)
 
 
 def _has_material(materials: list[ExtractedMaterial], label: str, exts: list[str] | None = None) -> bool:
@@ -282,6 +351,16 @@ def _split_multi_select_value(value: str) -> list[str]:
         for item in re.split(r"[、,，;；/\n]+", str(value or ""))
         if item.strip()
     ]
+
+
+def _allowed_enum_values(values) -> list[str]:
+    out: list[str] = []
+    for value in values or []:
+        for item in re.split(r"[、,，;；\n]+", str(value or "")):
+            item = item.strip()
+            if item and item not in out:
+                out.append(item)
+    return out
 
 
 def _condition_satisfied(cond: dict, lookup: dict[str, str]) -> bool:
@@ -470,7 +549,6 @@ def run_script_rules(rules: list[Rule], materials: list[ExtractedMaterial]) -> t
                 )
             continue
 
-        value, location = _value_for_rule(lookup, rule)
         if op == "conditional_compare":
             trigger = params.get("trigger") if isinstance(params.get("trigger"), dict) else {}
             target = params.get("target") if isinstance(params.get("target"), dict) else {}
@@ -481,7 +559,53 @@ def run_script_rules(rules: list[Rule], materials: list[ExtractedMaterial]) -> t
             issues.extend(_run_target_check(rule, target, lookup, template_name, trigger=trigger))
             continue
 
+        if op == "dependent_enum":
+            parent_field = str(params.get("parent_field") or "").strip()
+            child_field = str(params.get("child_field") or "").strip()
+            mapping = params.get("mapping")
+            if not parent_field or not child_field or not isinstance(mapping, dict) or not mapping:
+                logs.append(f"跳过脚本规则 {rule.rule_id}：dependent_enum 参数不完整")
+                continue
+            child_matches = _values_for_field(lookup, child_field)
+            for child_value, child_location in child_matches:
+                if _is_blank(child_value):
+                    continue
+                parent_matches = _values_for_field_in_target_row(lookup, parent_field, child_location)
+                if not parent_matches:
+                    continue
+                parent_value, parent_location = parent_matches[0]
+                allowed = _allowed_enum_values(mapping.get(str(parent_value).strip()) or [])
+                if not allowed or str(child_value).strip() in allowed:
+                    continue
+                issues.append(
+                    _issue(
+                        rule,
+                        summary=f"{child_field}与{parent_field}的地区映射不一致",
+                        material_name=template_name,
+                        location=f"{parent_location}; {child_location}",
+                        value=f"{parent_field}:{parent_value}; {child_field}:{child_value}",
+                        suggestion=f"请将{child_field}修改为{parent_field}对应的有效地区。",
+                    )
+                )
+            continue
+
         if op == "required":
+            table_name = _required_table_name(rule)
+            if table_name:
+                if not _table_has_content(lookup, table_name):
+                    issues.append(
+                        _issue(
+                            rule,
+                            summary=f"{table_name}表未填写",
+                            material_name=template_name,
+                            location=table_name,
+                            value=f"空表:{table_name}",
+                            suggestion=f"请补充填写{table_name}表。",
+                        )
+                    )
+                continue
+
+            value, location = _value_for_rule(lookup, rule)
             if _is_blank(value):
                 issues.append(
                     _issue(
@@ -495,11 +619,15 @@ def run_script_rules(rules: list[Rule], materials: list[ExtractedMaterial]) -> t
                 )
             continue
 
+        value, location = _value_for_rule(lookup, rule)
         if _is_blank(value):
             continue
 
         if op == "enum":
-            allowed = [str(item).strip() for item in (params.get("values") or []) if str(item).strip()]
+            allowed = _allowed_enum_values(params.get("values") or [])
+            if not allowed:
+                logs.append(f"跳过脚本规则 {rule.rule_id}：enum 缺少非空 values")
+                continue
             if allowed and _is_multi_select_enum(rule, params):
                 selected = _split_multi_select_value(value)
                 invalid_values = [item for item in selected if item not in allowed]
@@ -584,16 +712,7 @@ def run_script_rules(rules: list[Rule], materials: list[ExtractedMaterial]) -> t
             try:
                 actual = datetime.strptime(value, "%Y-%m-%d").date()
             except ValueError:
-                issues.append(
-                    _issue(
-                        rule,
-                        summary=f"{rule.field_name or rule.rule_name}日期格式不是YYYY-MM-DD",
-                        material_name=template_name,
-                        location=location,
-                        value=value,
-                        suggestion="请按YYYY-MM-DD格式填写有效日期。",
-                    )
-                )
+                logs.append(f"跳过脚本规则 {rule.rule_id}：日期格式不符合YYYY-MM-DD，交由date_format规则处理")
                 continue
             today = datetime.now().date()
             if params.get("min") == "today" and actual < today:

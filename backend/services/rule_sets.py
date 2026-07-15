@@ -10,8 +10,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from .rule_set_importer import import_rule_set_from_excel
-from .schemas import ProcessType, Rule
+from .rule_set_importer import import_rule_package_from_excel
+from .schemas import ProcessType, Rule, TableScopeRule
 
 RULE_SETS_DIR = Path(__file__).resolve().parent.parent / "data" / "rule_sets"
 RULE_SETS_DIR.mkdir(parents=True, exist_ok=True)
@@ -30,6 +30,7 @@ class RuleSetMeta(BaseModel):
     unsupported_count: int = 0
     error_count: int = 0
     warning_count: int = 0
+    scope_count: int = 0
     report: dict = Field(default_factory=dict)
 
 
@@ -80,8 +81,16 @@ def load_rule_set_rules(rule_set_id: str) -> list[Rule]:
     return [Rule.model_validate(item) for item in raw.get("rules", [])]
 
 
+def load_rule_set_scopes(rule_set_id: str) -> list[TableScopeRule]:
+    path = _rule_set_dir(rule_set_id) / "table_scopes.json"
+    if not path.exists():
+        return []
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    return [TableScopeRule.model_validate(item) for item in raw.get("scopes", [])]
+
+
 def create_rule_set(*, process: ProcessType, filename: str, content: bytes) -> RuleSetMeta:
-    rules, report = import_rule_set_from_excel(content, filename=filename, process=process)
+    rules, scopes, report = import_rule_package_from_excel(content, filename=filename, process=process)
     now = int(time.time())
     rule_set_id = f"{process}_{now}_{uuid.uuid4().hex[:6]}"
     target = _rule_set_dir(rule_set_id)
@@ -89,6 +98,10 @@ def create_rule_set(*, process: ProcessType, filename: str, content: bytes) -> R
     (target / "source.xlsx").write_bytes(content)
     (target / "rules.json").write_text(
         json.dumps({"rules": [r.model_dump() for r in rules]}, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    (target / "table_scopes.json").write_text(
+        json.dumps({"scopes": [scope.model_dump() for scope in scopes]}, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
     (target / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -105,6 +118,7 @@ def create_rule_set(*, process: ProcessType, filename: str, content: bytes) -> R
         unsupported_count=report["unsupported_count"],
         error_count=report["error_count"],
         warning_count=report["warning_count"],
+        scope_count=report.get("scope_count", 0),
         report=report,
     )
     items = _load_index()

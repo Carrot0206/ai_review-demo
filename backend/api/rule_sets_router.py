@@ -11,6 +11,7 @@ from ..services.rule_sets import (
     delete_rule_set,
     list_rule_sets,
     load_rule_set_rules,
+    load_rule_set_scopes,
 )
 from ..services.schemas import ProcessType
 
@@ -48,7 +49,14 @@ def activate(rule_set_id: str):
 @router.get("/{rule_set_id}/rules")
 def get_rule_set_rules(rule_set_id: str):
     rules = load_rule_set_rules(rule_set_id)
-    return {"rule_set_id": rule_set_id, "total": len(rules), "rules": [r.model_dump() for r in rules]}
+    scopes = load_rule_set_scopes(rule_set_id)
+    return {
+        "rule_set_id": rule_set_id,
+        "total": len(rules),
+        "scope_count": len(scopes),
+        "rules": [r.model_dump() for r in rules],
+        "table_scopes": [scope.model_dump() for scope in scopes],
+    }
 
 
 @router.delete("/{rule_set_id}")

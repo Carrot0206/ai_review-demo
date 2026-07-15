@@ -11,7 +11,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from ..services.review_service import review
-from ..services.rule_sets import load_rule_set_rules, resolve_rule_set_id
+from ..services.rule_sets import load_rule_set_rules, load_rule_set_scopes, resolve_rule_set_id
 from ..services.schemas import BatchLog, Issue, ProcessType
 from ..services.upload_store import load_extracted, load_meta
 from .jobs import ReviewJob, attach_task, cancel_job, create_job, get_job, push_event, push_progress
@@ -23,7 +23,7 @@ class ReviewStart(BaseModel):
     process: ProcessType
     file_ids: list[str]
     rule_set_id: Optional[str] = None
-    include_builtin_rules: bool = True
+    include_builtin_rules: bool = False
     max_concurrency: int = 48
     material_slice_enabled: bool = False
 
@@ -49,13 +49,17 @@ async def _run_review_job(job: ReviewJob, payload: ReviewStart):
         if payload.rule_set_id and resolved_rule_set_id is None:
             raise RuntimeError(f"规则版本 {payload.rule_set_id} 不存在或不适用于当前流程")
         extra_rules = load_rule_set_rules(resolved_rule_set_id) if resolved_rule_set_id else []
+        table_scope_rules = load_rule_set_scopes(resolved_rule_set_id) if resolved_rule_set_id else []
 
         # 3. 进度回调
         async def cb(msg: str):
             await push_progress(job, msg)
 
         if resolved_rule_set_id:
-            await push_progress(job, f"已加载上传规则版本：{resolved_rule_set_id}（{len(extra_rules)} 条）")
+            await push_progress(
+                job,
+                f"已加载上传规则版本：{resolved_rule_set_id}（审核规则 {len(extra_rules)} 条，范围规则 {len(table_scope_rules)} 条）",
+            )
         else:
             await push_progress(job, "未启用上传规则版本，仅使用内置规则")
 
@@ -75,6 +79,7 @@ async def _run_review_job(job: ReviewJob, payload: ReviewStart):
             process=payload.process,
             materials_preloaded=materials,
             extra_rules=extra_rules,
+            table_scope_rules=table_scope_rules,
             max_concurrency=payload.max_concurrency,
             progress_cb=cb,
             on_batch_done=batch_cb,

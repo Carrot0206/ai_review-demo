@@ -1,126 +1,6 @@
 {
   "rule_sets": [
     {
-      "rule_set_id": "pre_report_1783391995_a86ed9",
-      "process": "pre_report",
-      "filename": "事前报告审查规则_导入版.xlsx",
-      "created_at": 1783391995,
-      "active": true,
-      "total_rules": 46,
-      "script_count": 31,
-      "ai_count": 15,
-      "unsupported_count": 5,
-      "error_count": 0,
-      "warning_count": 5,
-      "report": {
-        "total_rules": 46,
-        "script_count": 31,
-        "ai_count": 15,
-        "unsupported_count": 5,
-        "error_count": 0,
-        "warning_count": 5,
-        "errors": [],
-        "warnings": [
-          {
-            "sheet": "脚本审核规则",
-            "row": 4,
-            "rule_id": "PRE-REPORT-FILE-SCRIPT-003",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 5,
-            "rule_id": "PRE-REPORT-FILE-SCRIPT-004",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 16,
-            "rule_id": "PRE-REPORT-ELEMENT-SCRIPT-011",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 19,
-            "rule_id": "PRE-REPORT-ELEMENT-SCRIPT-014",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 21,
-            "rule_id": "PRE-REPORT-ELEMENT-SCRIPT-016",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          }
-        ]
-      }
-    },
-    {
-      "rule_set_id": "termination_1783395827_7caf68",
-      "process": "termination",
-      "filename": "终止登记审查规则_导入版.xlsx",
-      "created_at": 1783395827,
-      "active": true,
-      "total_rules": 80,
-      "script_count": 54,
-      "ai_count": 26,
-      "unsupported_count": 7,
-      "error_count": 0,
-      "warning_count": 7,
-      "report": {
-        "total_rules": 80,
-        "script_count": 54,
-        "ai_count": 26,
-        "unsupported_count": 7,
-        "error_count": 0,
-        "warning_count": 7,
-        "errors": [],
-        "warnings": [
-          {
-            "sheet": "脚本审核规则",
-            "row": 8,
-            "rule_id": "TERM-ELEMENT-SCRIPT-007",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 13,
-            "rule_id": "TERM-ELEMENT-SCRIPT-012",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 16,
-            "rule_id": "TERM-ELEMENT-SCRIPT-015",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 48,
-            "rule_id": "TERM-ELEMENT-SCRIPT-047",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 51,
-            "rule_id": "TERM-ELEMENT-SCRIPT-050",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 53,
-            "rule_id": "TERM-ELEMENT-SCRIPT-052",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 55,
-            "rule_id": "TERM-ELEMENT-SCRIPT-054",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          }
-        ]
-      }
-    },
-    {
       "rule_set_id": "change_general_1783407559_4bc7e0",
       "process": "change_general",
       "filename": "变更登记一般情形审查规则_导入版.xlsx",
@@ -132,6 +12,7 @@
       "unsupported_count": 13,
       "error_count": 0,
       "warning_count": 13,
+      "scope_count": 0,
       "report": {
         "total_rules": 394,
         "script_count": 309,
@@ -234,6 +115,7 @@
       "unsupported_count": 11,
       "error_count": 0,
       "warning_count": 11,
+      "scope_count": 0,
       "report": {
         "total_rules": 311,
         "script_count": 223,
@@ -313,24 +195,362 @@
       }
     },
     {
-      "rule_set_id": "pre_registration_reapply_1783410247_95c0f3",
+      "rule_set_id": "termination_1783646353_802aa1",
+      "process": "termination",
+      "filename": "终止登记审查规则_导入版.xlsx",
+      "created_at": 1783646353,
+      "active": true,
+      "total_rules": 80,
+      "script_count": 54,
+      "ai_count": 26,
+      "unsupported_count": 7,
+      "error_count": 0,
+      "warning_count": 7,
+      "scope_count": 0,
+      "report": {
+        "total_rules": 80,
+        "script_count": 54,
+        "ai_count": 26,
+        "unsupported_count": 7,
+        "error_count": 0,
+        "warning_count": 7,
+        "errors": [],
+        "warnings": [
+          {
+            "sheet": "脚本审核规则",
+            "row": 8,
+            "rule_id": "TERM-ELEMENT-SCRIPT-007",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 13,
+            "rule_id": "TERM-ELEMENT-SCRIPT-012",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 16,
+            "rule_id": "TERM-ELEMENT-SCRIPT-015",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 48,
+            "rule_id": "TERM-ELEMENT-SCRIPT-047",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 51,
+            "rule_id": "TERM-ELEMENT-SCRIPT-050",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 53,
+            "rule_id": "TERM-ELEMENT-SCRIPT-052",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 55,
+            "rule_id": "TERM-ELEMENT-SCRIPT-054",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          }
+        ]
+      }
+    },
+    {
+      "rule_set_id": "pre_registration_1783674842_534d3d",
+      "process": "pre_registration",
+      "filename": "预登记审查规则_导入版_脚本结构化.xlsx",
+      "created_at": 1783674842,
+      "active": true,
+      "total_rules": 366,
+      "script_count": 292,
+      "ai_count": 74,
+      "unsupported_count": 7,
+      "error_count": 0,
+      "warning_count": 13,
+      "scope_count": 9,
+      "report": {
+        "total_rules": 366,
+        "script_count": 292,
+        "ai_count": 74,
+        "unsupported_count": 7,
+        "error_count": 0,
+        "warning_count": 13,
+        "scope_count": 9,
+        "errors": [],
+        "warnings": [
+          {
+            "sheet": "脚本审核规则",
+            "row": 4,
+            "rule_id": "PREG-SCRIPT-003",
+            "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 60,
+            "rule_id": "PREG-SCRIPT-061",
+            "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 71,
+            "rule_id": "PREG-SCRIPT-072",
+            "message": "enum 缺少非空 values，规则将跳过且不会转入 AI 兜底"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 106,
+            "rule_id": "PREG-SCRIPT-108",
+            "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 116,
+            "rule_id": "PREG-SCRIPT-118",
+            "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 119,
+            "rule_id": "PREG-SCRIPT-121",
+            "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 123,
+            "rule_id": "PREG-SCRIPT-125",
+            "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 133,
+            "rule_id": "PREG-SCRIPT-135",
+            "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 135,
+            "rule_id": "PREG-SCRIPT-137",
+            "message": "enum 缺少非空 values，规则将跳过且不会转入 AI 兜底"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 138,
+            "rule_id": "PREG-SCRIPT-140",
+            "message": "enum 缺少非空 values，规则将跳过且不会转入 AI 兜底"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 277,
+            "rule_id": "PREG-SCRIPT-280",
+            "message": "enum 缺少非空 values，规则将跳过且不会转入 AI 兜底"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 279,
+            "rule_id": "PREG-SCRIPT-282",
+            "message": "enum 缺少非空 values，规则将跳过且不会转入 AI 兜底"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 287,
+            "rule_id": "PREG-SCRIPT-290",
+            "message": "enum 缺少非空 values，规则将跳过且不会转入 AI 兜底"
+          }
+        ]
+      }
+    },
+    {
+      "rule_set_id": "pre_report_1783935671_4a1f9c",
+      "process": "pre_report",
+      "filename": "事前报告审查规则_导入版.xlsx",
+      "created_at": 1783935671,
+      "active": true,
+      "total_rules": 46,
+      "script_count": 31,
+      "ai_count": 15,
+      "unsupported_count": 5,
+      "error_count": 0,
+      "warning_count": 6,
+      "scope_count": 0,
+      "report": {
+        "total_rules": 46,
+        "script_count": 31,
+        "ai_count": 15,
+        "unsupported_count": 5,
+        "error_count": 0,
+        "warning_count": 6,
+        "scope_count": 0,
+        "errors": [],
+        "warnings": [
+          {
+            "sheet": "脚本审核规则",
+            "row": 4,
+            "rule_id": "PRE-REPORT-FILE-SCRIPT-003",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 5,
+            "rule_id": "PRE-REPORT-FILE-SCRIPT-004",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 16,
+            "rule_id": "PRE-REPORT-ELEMENT-SCRIPT-011",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 19,
+            "rule_id": "PRE-REPORT-ELEMENT-SCRIPT-014",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 21,
+            "rule_id": "PRE-REPORT-ELEMENT-SCRIPT-016",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "表级报送范围",
+            "row": 0,
+            "message": "未配置表级报送范围，按旧版规则执行"
+          }
+        ]
+      }
+    },
+    {
+      "rule_set_id": "initial_1783992341_266e5a",
+      "process": "initial",
+      "filename": "初始登记审查规则_导入版.xlsx",
+      "created_at": 1783992341,
+      "active": true,
+      "total_rules": 318,
+      "script_count": 226,
+      "ai_count": 92,
+      "unsupported_count": 13,
+      "error_count": 0,
+      "warning_count": 13,
+      "scope_count": 9,
+      "report": {
+        "total_rules": 318,
+        "script_count": 226,
+        "ai_count": 92,
+        "unsupported_count": 13,
+        "error_count": 0,
+        "warning_count": 13,
+        "scope_count": 9,
+        "errors": [],
+        "warnings": [
+          {
+            "sheet": "脚本审核规则",
+            "row": 2,
+            "rule_id": "INITIAL-FILE-SCRIPT-001",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 16,
+            "rule_id": "INITIAL-ELEMENT-SCRIPT-012",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 19,
+            "rule_id": "INITIAL-ELEMENT-SCRIPT-015",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 20,
+            "rule_id": "INITIAL-ELEMENT-SCRIPT-016",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 22,
+            "rule_id": "INITIAL-ELEMENT-SCRIPT-018",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 25,
+            "rule_id": "INITIAL-ELEMENT-SCRIPT-021",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 33,
+            "rule_id": "INITIAL-ELEMENT-SCRIPT-029",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 78,
+            "rule_id": "INITIAL-ELEMENT-SCRIPT-074",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 86,
+            "rule_id": "INITIAL-ELEMENT-SCRIPT-082",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 108,
+            "rule_id": "INITIAL-ELEMENT-SCRIPT-104",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 172,
+            "rule_id": "INITIAL-ELEMENT-SCRIPT-168",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 225,
+            "rule_id": "INITIAL-ELEMENT-SCRIPT-221",
+            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+          },
+          {
+            "sheet": "脚本审核规则",
+            "row": 226,
+            "rule_id": "INITIAL-ELEMENT-SCRIPT-222",
+            "message": "format_check 暂按保守策略入库，参数不足时审核阶段跳过"
+          }
+        ]
+      }
+    },
+    {
+      "rule_set_id": "pre_registration_reapply_1783996768_c750df",
       "process": "pre_registration_reapply",
       "filename": "重新申请预登记审查规则_导入版.xlsx",
-      "created_at": 1783410247,
+      "created_at": 1783996768,
       "active": true,
-      "total_rules": 376,
-      "script_count": 295,
-      "ai_count": 81,
-      "unsupported_count": 126,
+      "total_rules": 374,
+      "script_count": 292,
+      "ai_count": 82,
+      "unsupported_count": 119,
       "error_count": 0,
-      "warning_count": 126,
+      "warning_count": 119,
+      "scope_count": 9,
       "report": {
-        "total_rules": 376,
-        "script_count": 295,
-        "ai_count": 81,
-        "unsupported_count": 126,
+        "total_rules": 374,
+        "script_count": 292,
+        "ai_count": 82,
+        "unsupported_count": 119,
         "error_count": 0,
-        "warning_count": 126,
+        "warning_count": 119,
+        "scope_count": 9,
         "errors": [],
         "warnings": [
           {
@@ -479,1569 +699,573 @@
           },
           {
             "sheet": "脚本审核规则",
-            "row": 46,
-            "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-045",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 51,
+            "row": 49,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-050",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 53,
+            "row": 51,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-052",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 55,
+            "row": 53,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-054",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 57,
+            "row": 55,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-056",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 59,
+            "row": 57,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-058",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 61,
+            "row": 59,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-060",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 62,
+            "row": 60,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-061",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 63,
+            "row": 61,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-062",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 64,
+            "row": 62,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-063",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 67,
+            "row": 65,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-066",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 68,
+            "row": 66,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-067",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 71,
+            "row": 69,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-070",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 72,
+            "row": 70,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-071",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 75,
+            "row": 73,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-074",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 76,
+            "row": 74,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-075",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 79,
+            "row": 77,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-078",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 83,
-            "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-082",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 89,
+            "row": 86,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-088",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 92,
+            "row": 89,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-091",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 101,
+            "row": 98,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-100",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 103,
+            "row": 100,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-102",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 104,
+            "row": 101,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-103",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 108,
+            "row": 105,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-107",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 111,
+            "row": 108,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-110",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 112,
+            "row": 109,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-111",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 114,
+            "row": 111,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-113",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 118,
+            "row": 115,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-117",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 119,
+            "row": 116,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-118",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 121,
+            "row": 118,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-120",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 122,
+            "row": 119,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-121",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 125,
+            "row": 122,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-124",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 126,
+            "row": 123,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-125",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 128,
+            "row": 125,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-127",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 132,
+            "row": 129,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-131",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 133,
+            "row": 130,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-132",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 135,
+            "row": 132,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-134",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 136,
+            "row": 133,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-135",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 137,
+            "row": 134,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-136",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 139,
+            "row": 136,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-138",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 140,
+            "row": 137,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-139",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 143,
+            "row": 140,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-142",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 144,
+            "row": 141,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-143",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 146,
+            "row": 143,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-145",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 150,
+            "row": 147,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-149",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 153,
+            "row": 150,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-152",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 158,
+            "row": 155,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-157",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 161,
+            "row": 158,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-160",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 165,
+            "row": 162,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-164",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 166,
+            "row": 163,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-165",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 168,
+            "row": 165,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-167",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 170,
+            "row": 167,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-169",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 173,
+            "row": 170,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-172",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 174,
+            "row": 171,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-173",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 177,
+            "row": 174,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-176",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 178,
+            "row": 175,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-177",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 180,
+            "row": 177,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-179",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 182,
+            "row": 179,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-181",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 184,
+            "row": 181,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-183",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 187,
+            "row": 184,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-186",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 192,
+            "row": 189,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-191",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 193,
+            "row": 190,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-192",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 196,
+            "row": 193,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-195",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 200,
+            "row": 197,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-199",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 203,
+            "row": 200,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-202",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 206,
+            "row": 203,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-205",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 208,
+            "row": 205,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-207",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 209,
+            "row": 206,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-208",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 212,
+            "row": 209,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-211",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 215,
+            "row": 212,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-214",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 218,
+            "row": 215,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-217",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 221,
+            "row": 218,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-220",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 224,
+            "row": 221,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-223",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 226,
+            "row": 223,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-225",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 228,
+            "row": 225,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-227",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 229,
+            "row": 226,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-228",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 231,
+            "row": 228,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-230",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 232,
+            "row": 229,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-231",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 237,
+            "row": 234,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-236",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 243,
+            "row": 240,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-242",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 249,
+            "row": 246,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-248",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 255,
+            "row": 252,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-254",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 258,
+            "row": 255,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-257",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 260,
+            "row": 257,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-259",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 263,
-            "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-262",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 265,
-            "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-264",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 266,
-            "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-265",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 267,
-            "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-266",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
             "row": 269,
-            "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-268",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 272,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-271",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 273,
+            "row": 270,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-272",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 275,
+            "row": 272,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-274",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 277,
+            "row": 274,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-276",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 279,
+            "row": 276,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-278",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 280,
+            "row": 277,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-279",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 282,
+            "row": 279,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-281",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 283,
+            "row": 280,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-282",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 287,
+            "row": 284,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-286",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 289,
+            "row": 286,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-288",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 290,
+            "row": 287,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-289",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 293,
+            "row": 290,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-292",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
           },
           {
             "sheet": "脚本审核规则",
-            "row": 295,
+            "row": 292,
             "rule_id": "PREG-REAPPLY-ELEMENT-SCRIPT-294",
             "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          }
-        ]
-      }
-    },
-    {
-      "rule_set_id": "pre_registration_supplement_1783416070_e62139",
-      "process": "pre_registration_supplement",
-      "filename": "补充预登记审查规则_导入版.xlsx",
-      "created_at": 1783416070,
-      "active": true,
-      "total_rules": 375,
-      "script_count": 295,
-      "ai_count": 80,
-      "unsupported_count": 126,
-      "error_count": 0,
-      "warning_count": 126,
-      "report": {
-        "total_rules": 375,
-        "script_count": 295,
-        "ai_count": 80,
-        "unsupported_count": 126,
-        "error_count": 0,
-        "warning_count": 126,
-        "errors": [],
-        "warnings": [
-          {
-            "sheet": "脚本审核规则",
-            "row": 4,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-003",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 5,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-004",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 10,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-009",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 12,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-011",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 14,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-013",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 15,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-014",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 16,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-015",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 17,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-016",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 18,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-017",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 20,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-019",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 21,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-020",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 22,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-021",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 23,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-022",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 25,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-024",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 26,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-025",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 27,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-026",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 28,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-027",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 31,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-030",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 32,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-031",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 33,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-032",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 36,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-035",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 37,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-036",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 40,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-039",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 42,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-041",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 46,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-045",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 51,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-050",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 53,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-052",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 55,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-054",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 57,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-056",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 59,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-058",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 61,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-060",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 62,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-061",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 63,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-062",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 64,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-063",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 67,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-066",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 68,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-067",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 71,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-070",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 72,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-071",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 75,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-074",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 76,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-075",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 79,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-078",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 83,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-082",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 89,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-088",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 92,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-091",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 101,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-100",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 103,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-102",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 104,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-103",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 108,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-107",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 111,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-110",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 112,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-111",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 114,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-113",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 118,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-117",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 119,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-118",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 121,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-120",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 122,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-121",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 125,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-124",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 126,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-125",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 128,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-127",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 132,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-131",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 133,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-132",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 135,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-134",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 136,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-135",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 137,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-136",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 139,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-138",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 140,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-139",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 143,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-142",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 144,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-143",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 146,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-145",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 150,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-149",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 153,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-152",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 158,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-157",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 161,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-160",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 165,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-164",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 166,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-165",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 168,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-167",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 170,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-169",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 173,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-172",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 174,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-173",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 177,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-176",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 178,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-177",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 180,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-179",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 182,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-181",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 184,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-183",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 187,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-186",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 192,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-191",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 193,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-192",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 196,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-195",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 200,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-199",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 203,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-202",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 206,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-205",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 208,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-207",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 209,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-208",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 212,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-211",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 215,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-214",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 218,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-217",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 221,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-220",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 224,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-223",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 226,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-225",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 228,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-227",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 229,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-228",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 231,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-230",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 232,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-231",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 237,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-236",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 243,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-242",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 249,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-248",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 255,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-254",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 258,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-257",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 260,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-259",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 263,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-262",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 265,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-264",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 266,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-265",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 267,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-266",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 269,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-268",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 272,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-271",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 273,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-272",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 275,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-274",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 277,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-276",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 279,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-278",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 280,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-279",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 282,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-281",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 283,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-282",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 287,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-286",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 289,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-288",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 290,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-289",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 293,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-292",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 295,
-            "rule_id": "PREG-SUPPLEMENT-ELEMENT-SCRIPT-294",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          }
-        ]
-      }
-    },
-    {
-      "rule_set_id": "pre_registration_1783494554_c1978c",
-      "process": "pre_registration",
-      "filename": "预登记审查规则_导入版_脚本结构化.xlsx",
-      "created_at": 1783494554,
-      "active": true,
-      "total_rules": 366,
-      "script_count": 292,
-      "ai_count": 74,
-      "unsupported_count": 8,
-      "error_count": 0,
-      "warning_count": 8,
-      "report": {
-        "total_rules": 366,
-        "script_count": 292,
-        "ai_count": 74,
-        "unsupported_count": 8,
-        "error_count": 0,
-        "warning_count": 8,
-        "errors": [],
-        "warnings": [
-          {
-            "sheet": "脚本审核规则",
-            "row": 4,
-            "rule_id": "PREG-SCRIPT-003",
-            "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 60,
-            "rule_id": "PREG-SCRIPT-061",
-            "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 106,
-            "rule_id": "PREG-SCRIPT-108",
-            "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 116,
-            "rule_id": "PREG-SCRIPT-118",
-            "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 119,
-            "rule_id": "PREG-SCRIPT-121",
-            "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 123,
-            "rule_id": "PREG-SCRIPT-125",
-            "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 133,
-            "rule_id": "PREG-SCRIPT-135",
-            "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 262,
-            "rule_id": "PREG-SCRIPT-265",
-            "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
-          }
-        ]
-      }
-    },
-    {
-      "rule_set_id": "initial_1783565005_67ed5d",
-      "process": "initial",
-      "filename": "初始登记审查规则_导入版.xlsx",
-      "created_at": 1783565005,
-      "active": true,
-      "total_rules": 319,
-      "script_count": 226,
-      "ai_count": 93,
-      "unsupported_count": 13,
-      "error_count": 0,
-      "warning_count": 13,
-      "report": {
-        "total_rules": 319,
-        "script_count": 226,
-        "ai_count": 93,
-        "unsupported_count": 13,
-        "error_count": 0,
-        "warning_count": 13,
-        "errors": [],
-        "warnings": [
-          {
-            "sheet": "脚本审核规则",
-            "row": 2,
-            "rule_id": "INITIAL-FILE-SCRIPT-001",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 16,
-            "rule_id": "INITIAL-ELEMENT-SCRIPT-012",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 19,
-            "rule_id": "INITIAL-ELEMENT-SCRIPT-015",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 20,
-            "rule_id": "INITIAL-ELEMENT-SCRIPT-016",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 22,
-            "rule_id": "INITIAL-ELEMENT-SCRIPT-018",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 25,
-            "rule_id": "INITIAL-ELEMENT-SCRIPT-021",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 33,
-            "rule_id": "INITIAL-ELEMENT-SCRIPT-029",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 78,
-            "rule_id": "INITIAL-ELEMENT-SCRIPT-074",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 86,
-            "rule_id": "INITIAL-ELEMENT-SCRIPT-082",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 108,
-            "rule_id": "INITIAL-ELEMENT-SCRIPT-104",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 172,
-            "rule_id": "INITIAL-ELEMENT-SCRIPT-168",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 225,
-            "rule_id": "INITIAL-ELEMENT-SCRIPT-221",
-            "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
-          },
-          {
-            "sheet": "脚本审核规则",
-            "row": 226,
-            "rule_id": "INITIAL-ELEMENT-SCRIPT-222",
-            "message": "format_check 暂按保守策略入库，参数不足时审核阶段跳过"
           }
         ]
       }

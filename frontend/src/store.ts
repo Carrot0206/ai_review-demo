@@ -267,7 +267,7 @@ export const useStore = create<AppState>((set, get) => ({
     }))
   },
 
-  builtinRulesEnabledByProcess: initByProcess<boolean>(true),
+  builtinRulesEnabledByProcess: initByProcess<boolean>(false),
   setBuiltinRulesEnabled: (enabled, process) => {
     const key = process ?? get().process
     set((s) => ({

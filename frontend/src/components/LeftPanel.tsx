@@ -541,7 +541,9 @@ export default function LeftPanel() {
     try {
       const res = await importRuleSet(process, file)
       await activateRuleSet(res.rule_set_id)
-      message.success(`已导入并启用 ${res.filename}：脚本 ${res.script_count} 条，AI ${res.ai_count} 条`)
+      message.success(
+        `已导入并启用 ${res.filename}：脚本 ${res.script_count} 条，AI ${res.ai_count} 条，范围 ${res.scope_count || 0} 条`,
+      )
       await refreshRules()
     } catch (e: any) {
       message.error('规则表导入失败：' + (e?.response?.data?.detail || e?.message))
@@ -871,6 +873,7 @@ export default function LeftPanel() {
                                 {r.filename}
                                 <div className="muted" style={{ marginTop: 2 }}>
                                   脚本 {r.script_count} · AI {r.ai_count}
+                                  {r.scope_count ? ` · 范围 ${r.scope_count}` : ''}
                                   {r.unsupported_count ? ` · 待结构化 ${r.unsupported_count}` : ''}
                                   {r.warning_count ? ` · 警告 ${r.warning_count}` : ''}
                                 </div>

@@ -110,18 +110,6 @@ def is_explicit_cross_document_rule(r: Rule) -> bool:
     申报模板 JSON 内部跨表/跨字段逻辑，不等于申请书与模板核对。只有规则的
     适用材料和规则文本同时明确指向申请书/信托文件，才按跨文件处理。
     """
-    tags = " ".join(r.applicable_materials or [])
-    has_template = "模板" in tags or "JSON" in tags
-    has_external_doc = (
-        "申请书" in tags
-        or "信托文件" in tags
-        or "信托合同" in tags
-        or "清算报告" in tags
-        or "其他附件" in tags
-    )
-    if not (has_template and has_external_doc):
-        return False
-
     text = " ".join(
         str(x or "")
         for x in [
@@ -141,6 +129,21 @@ def is_explicit_cross_document_rule(r: Rule) -> bool:
         or "佐证" in text
     )
     mentions_compare = "一致" in text or "==" in text or "相同" in text or "对应" in text
+    if r.rule_type == "cross_material_consistency" and mentions_external_doc and mentions_compare:
+        return True
+
+    tags = " ".join(r.applicable_materials or [])
+    has_template = "模板" in tags or "JSON" in tags
+    has_external_doc = (
+        "申请书" in tags
+        or "信托文件" in tags
+        or "信托合同" in tags
+        or "清算报告" in tags
+        or "其他附件" in tags
+    )
+    if not (has_template and has_external_doc):
+        return False
+
     return mentions_external_doc and mentions_compare
 
 
@@ -155,6 +158,8 @@ def materials_needed_by_group(rules: Iterable[Rule]) -> Optional[set[str]]:
     注意：不再无条件追加"申请书"。模板字段类检查不应让 LLM 在申请书里查找。
     """
     rules_list = list(rules)
+    if any(_needs_termination_liquidation_context(r) for r in rules_list):
+        return {"申报模板", "申请书", "其他附件"}
     # 一致性 / 跨材料类规则 → 强制全发（让申请书与模板都在）
     if any(is_explicit_cross_document_rule(r) for r in rules_list):
         return None
@@ -172,6 +177,32 @@ def materials_needed_by_group(rules: Iterable[Rule]) -> Optional[set[str]]:
                 return None
             needed.add(mt)
     return needed
+
+
+def _needs_termination_liquidation_context(rule: Rule) -> bool:
+    """终止登记部分字段规则必须同时读取申报模板和清算报告。
+
+    旧导入版或手工上传规则的 applicable_materials 可能只写了"申报模板"，
+    但 report_field_consistency / cross_material_consistency 的审核口径需要
+    清算报告上下文。这里在材料裁剪前补齐材料范围，避免模型只看到模板。
+    """
+    if rule.registration_type != "终止登记":
+        return False
+    text = " ".join(
+        str(x or "")
+        for x in [
+            rule.rule_name,
+            rule.rule_text,
+            rule.rule_type,
+            rule.check_type,
+            rule.machine_params,
+            " ".join(rule.ai_check_focus or []),
+            " ".join(rule.applicable_materials or []),
+        ]
+    )
+    if rule.rule_type in {"report_field_consistency", "cross_material_consistency", "supporting_evidence", "responsibility_release", "timeliness"}:
+        return True
+    return "清算报告" in text and any(keyword in text for keyword in ("一致", "口径", "对应", "记载", "出具日", "T日"))
 
 
 def filter_materials(

@@ -1,10 +1,11 @@
 {
-  "total_rules": 319,
+  "total_rules": 318,
   "script_count": 226,
-  "ai_count": 93,
+  "ai_count": 92,
   "unsupported_count": 13,
   "error_count": 0,
   "warning_count": 13,
+  "scope_count": 9,
   "errors": [],
   "warnings": [
     {

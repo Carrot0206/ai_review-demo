@@ -4,7 +4,8 @@
   "ai_count": 15,
   "unsupported_count": 5,
   "error_count": 0,
-  "warning_count": 5,
+  "warning_count": 6,
+  "scope_count": 0,
   "errors": [],
   "warnings": [
     {
@@ -36,6 +37,11 @@
       "row": 21,
       "rule_id": "PRE-REPORT-ELEMENT-SCRIPT-016",
       "message": "custom_condition 暂按保守策略入库，参数不足时审核阶段跳过"
+    },
+    {
+      "sheet": "表级报送范围",
+      "row": 0,
+      "message": "未配置表级报送范围，按旧版规则执行"
     }
   ]
 }

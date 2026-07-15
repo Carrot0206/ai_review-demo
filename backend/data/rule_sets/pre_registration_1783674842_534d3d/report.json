@@ -2,9 +2,10 @@
   "total_rules": 366,
   "script_count": 292,
   "ai_count": 74,
-  "unsupported_count": 8,
+  "unsupported_count": 7,
   "error_count": 0,
-  "warning_count": 8,
+  "warning_count": 13,
+  "scope_count": 9,
   "errors": [],
   "warnings": [
     {
@@ -18,6 +19,12 @@
       "row": 60,
       "rule_id": "PREG-SCRIPT-061",
       "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
+    },
+    {
+      "sheet": "脚本审核规则",
+      "row": 71,
+      "rule_id": "PREG-SCRIPT-072",
+      "message": "enum 缺少非空 values，规则将跳过且不会转入 AI 兜底"
     },
     {
       "sheet": "脚本审核规则",
@@ -51,9 +58,33 @@
     },
     {
       "sheet": "脚本审核规则",
-      "row": 262,
-      "rule_id": "PREG-SCRIPT-265",
-      "message": "conditional_compare 暂按保守策略入库，参数不足时审核阶段跳过"
+      "row": 135,
+      "rule_id": "PREG-SCRIPT-137",
+      "message": "enum 缺少非空 values，规则将跳过且不会转入 AI 兜底"
+    },
+    {
+      "sheet": "脚本审核规则",
+      "row": 138,
+      "rule_id": "PREG-SCRIPT-140",
+      "message": "enum 缺少非空 values，规则将跳过且不会转入 AI 兜底"
+    },
+    {
+      "sheet": "脚本审核规则",
+      "row": 277,
+      "rule_id": "PREG-SCRIPT-280",
+      "message": "enum 缺少非空 values，规则将跳过且不会转入 AI 兜底"
+    },
+    {
+      "sheet": "脚本审核规则",
+      "row": 279,
+      "rule_id": "PREG-SCRIPT-282",
+      "message": "enum 缺少非空 values，规则将跳过且不会转入 AI 兜底"
+    },
+    {
+      "sheet": "脚本审核规则",
+      "row": 287,
+      "rule_id": "PREG-SCRIPT-290",
+      "message": "enum 缺少非空 values，规则将跳过且不会转入 AI 兜底"
     }
   ]
 }

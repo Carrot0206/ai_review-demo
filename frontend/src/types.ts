@@ -56,6 +56,7 @@ export interface RuleSetMeta {
   unsupported_count: number
   error_count: number
   warning_count: number
+  scope_count?: number
   report?: {
     errors?: { sheet?: string; row?: number; rule_id?: string; message: string }[]
     warnings?: { sheet?: string; row?: number; rule_id?: string; message: string }[]
@@ -170,6 +171,17 @@ export interface ReviewResult {
   deduped_issues?: Issue[]
   human_review_items: HumanReviewItem[]
   batch_logs: BatchLog[]
+  scope_decisions?: ScopeDecision[]
+}
+
+export interface ScopeDecision {
+  scope_id: string
+  table_name: string
+  status: 'required' | 'not_required' | 'prohibited' | 'unknown' | 'conflict'
+  reason: string
+  source: 'script' | 'ai' | 'script+ai'
+  table_present: boolean
+  evidence: IssueLocation[]
 }
 
 export interface JobInfo {
@@ -198,4 +210,78 @@ export interface SampleListResponse {
   termination: SampleFile[]
   change_general: SampleFile[]
   correction_general: SampleFile[]
+}
+
+export type RuleLibraryProcess =
+  | 'pre_registration'
+  | 'pre_report'
+  | 'initial'
+  | 'termination'
+
+export type RuleLibraryMethod = 'script' | 'ai'
+export type RuleLibraryObject = '文件' | '材料' | '表' | '字段' | '跨材料'
+export type RuleLibraryDimension =
+  | '文件格式标准化'
+  | '法定要素完整性'
+  | '文本语义合规'
+  | '跨文件数据一致性'
+  | '非标资产穿透'
+  | '报送时效合规'
+
+export interface RuleLibraryRuleInput {
+  rule_id: string
+  rule_name: string
+  process: RuleLibraryProcess
+  review_method: RuleLibraryMethod
+  applicable_materials: string[]
+  rule_object: RuleLibraryObject
+  table_name: string
+  field_path: string
+  review_dimension: RuleLibraryDimension
+  trigger_condition: string
+  rule_text: string
+  basis_text: string
+  risk_level: RiskLevel
+  version: string
+  enabled: boolean
+  remarks: string
+  operator: string
+  script_params: Record<string, unknown>
+  special_prompt: string
+}
+
+export interface RuleLibraryRule extends RuleLibraryRuleInput {
+  source_file: string
+  source_sheet: string
+  source_row: number
+  created_at: number
+  updated_at: number
+  visual_rule: string
+}
+
+export interface RuleLibraryResponse {
+  process: RuleLibraryProcess
+  total: number
+  script_count: number
+  ai_count: number
+  enabled_count: number
+  rules: RuleLibraryRule[]
+}
+
+export interface RuleLibraryImportIssue {
+  sheet: string
+  row: number
+  rule_id: string
+  message: string
+}
+
+export interface RuleLibraryImportPreview {
+  filename: string
+  process: RuleLibraryProcess
+  total_rules: number
+  script_count: number
+  ai_count: number
+  valid: boolean
+  errors: RuleLibraryImportIssue[]
+  preview: RuleLibraryRule[]
 }

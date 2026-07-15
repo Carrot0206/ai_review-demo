@@ -6,8 +6,9 @@ import LeftPanel from './components/LeftPanel'
 import RightPanel from './components/RightPanel'
 import { useStore } from './store'
 import { getRules, listRuleSets, listUploads } from './api'
+import RuleLibraryPage from './pages/RuleLibraryPage'
 
-function App() {
+function ReviewApp() {
   const process = useStore((s) => s.process)
   const setRules = useStore((s) => s.setRules)
   const setRuleSets = useStore((s) => s.setRuleSets)
@@ -43,6 +44,11 @@ function App() {
       </div>
     </>
   )
+}
+
+function App() {
+  const normalizedPath = window.location.pathname.replace(/\/+$/, '') || '/'
+  return normalizedPath === '/rule-library' ? <RuleLibraryPage /> : <ReviewApp />
 }
 
 export default App
