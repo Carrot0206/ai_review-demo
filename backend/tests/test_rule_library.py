@@ -84,6 +84,35 @@ class RuleLibraryApiTest(unittest.TestCase):
         removed = self.client.delete("/api/rule-library/rules/INITIAL-SCRIPT-001")
         self.assertEqual(removed.status_code, 200)
 
+    def test_delete_all_rules_for_one_process_only(self):
+        initial_payload = self.script_payload("INITIAL-CLEAR-001")
+        pre_report_payload = {
+            **self.script_payload("PRE-REPORT-KEEP-001"),
+            "process": "pre_report",
+            "applicable_materials": ["事前报告申报模板"],
+        }
+        self.assertEqual(self.client.post("/api/rule-library/rules", json=initial_payload).status_code, 200)
+        self.assertEqual(self.client.post("/api/rule-library/rules", json=pre_report_payload).status_code, 200)
+
+        cleared = self.client.delete(
+            "/api/rule-library/rules/by-process", params={"process": "initial"}
+        )
+        self.assertEqual(cleared.status_code, 200, cleared.text)
+        self.assertEqual(cleared.json()["deleted_count"], 1)
+        self.assertEqual(
+            self.client.get("/api/rule-library/rules", params={"process": "initial"}).json()["total"],
+            0,
+        )
+        self.assertEqual(
+            self.client.get("/api/rule-library/rules", params={"process": "pre_report"}).json()["total"],
+            1,
+        )
+
+        cleared_again = self.client.delete(
+            "/api/rule-library/rules/by-process", params={"process": "initial"}
+        )
+        self.assertEqual(cleared_again.json()["deleted_count"], 0)
+
     def _ai_workbook(self, rule_id: str = "PRE-AI-001") -> bytes:
         content = rule_library.build_import_template("pre_report")
         workbook = load_workbook(io.BytesIO(content))
@@ -160,7 +189,51 @@ class RuleLibraryApiTest(unittest.TestCase):
         self.assertEqual(workbook["列说明"]["A2"].value, "规则ID")
         self.assertIsNotNone(workbook["脚本审核规则"]["A1"].comment)
         self.assertGreater(len(workbook["脚本审核规则"].data_validations.dataValidation), 0)
+        operator_validation = next(
+            item
+            for item in workbook["脚本审核规则"].data_validations.dataValidation
+            if "Q2" in str(item.sqref)
+        )
+        self.assertIn("operator字典", operator_validation.formula1)
+        self.assertLess(len(operator_validation.formula1), 255)
+        operator_values = {
+            row[0].value for row in workbook["operator字典"].iter_rows(min_row=2) if row[0].value
+        }
+        self.assertTrue(
+            {"unique", "reference_exists", "formula_compare", "group_consistency", "compound_condition"}
+            <= operator_values
+        )
         workbook.close()
+
+    def test_extended_script_operators_have_readable_visual_rules(self):
+        cases = {
+            "unique": ({"fields": ["合同编号"], "scope_label": "当前表"}, "不得重复"),
+            "reference_exists": ({"reference_source": "信托产品登记库"}, "必须存在于"),
+            "formula_compare": (
+                {"expression": "months_between(到期日,成立日)", "expected_field": "产品期限", "tolerance": 1},
+                "允许偏差 1",
+            ),
+            "group_consistency": (
+                {"group_by": "受益权代码", "consistent_fields": ["受益权类型", "业绩基准"]},
+                "必须保持一致",
+            ),
+            "compound_condition": (
+                {
+                    "combinator": "all",
+                    "conditions": [
+                        {"description": "起始日不早于成立日"},
+                        {"description": "起始日不晚于到期日"},
+                    ],
+                },
+                "且",
+            ),
+        }
+        base = self.script_payload("EXTENDED-OPERATOR-001")
+        for operator, (params, expected) in cases.items():
+            payload = rule_library.LibraryRuleInput.model_validate(
+                {**base, "rule_id": f"EXT-{operator.replace('_', '-')}", "operator": operator, "script_params": params}
+            )
+            self.assertIn(expected, rule_library.build_visual_rule(payload))
 
 
 if __name__ == "__main__":

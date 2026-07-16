@@ -1,0 +1,21 @@
+[Unit]
+Description=Trust AI Review Demo Backend
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=trustreview
+Group=trustreview
+WorkingDirectory=/opt/trust-ai-review-demo
+EnvironmentFile=-/etc/trust-ai-review-demo/backend.env
+ExecStart=/opt/trust-ai-review-demo/backend/.venv/bin/python -m uvicorn backend.app:app --host 127.0.0.1 --port 18101
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/opt/trust-ai-review-demo/backend/uploads /opt/trust-ai-review-demo/backend/data /opt/trust-ai-review-demo/backend/out
+
+[Install]
+WantedBy=multi-user.target

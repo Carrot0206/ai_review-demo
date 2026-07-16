@@ -237,6 +237,13 @@ export async function deleteRuleLibraryRules(ruleIds: string[]) {
   return data as { deleted_count: number; requested_count: number }
 }
 
+export async function deleteRuleLibraryRulesByProcess(process: RuleLibraryProcess) {
+  const { data } = await http.delete('/rule-library/rules/by-process', {
+    params: { process },
+  })
+  return data as { process: RuleLibraryProcess; deleted_count: number }
+}
+
 export async function previewRuleLibraryImport(
   process: RuleLibraryProcess,
   file: File,

@@ -17,6 +17,7 @@ from ..services.rule_library import (
     create_rules_bulk,
     delete_rule,
     delete_rules,
+    delete_rules_by_process,
     get_rule,
     list_rules,
     parse_rule_workbook,
@@ -102,6 +103,12 @@ def remove_rules(payload: BatchDelete):
         raise HTTPException(status_code=400, detail="rule_ids 不能为空")
     deleted = delete_rules(payload.rule_ids)
     return {"deleted_count": deleted, "requested_count": len(payload.rule_ids)}
+
+
+@router.delete("/rules/by-process")
+def remove_rules_by_process(process: LibraryProcess = Query(...)):
+    deleted = delete_rules_by_process(process)
+    return {"process": process, "deleted_count": deleted}
 
 
 @router.delete("/rules/{rule_id}")

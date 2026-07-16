@@ -33,6 +33,7 @@ import {
   copyRuleLibraryRule,
   deleteRuleLibraryRule,
   deleteRuleLibraryRules,
+  deleteRuleLibraryRulesByProcess,
   downloadRuleLibraryTemplate,
   getRuleLibraryRules,
   setRuleLibraryRuleEnabled,
@@ -185,6 +186,30 @@ export default function RuleLibraryPage() {
           await refresh()
         } catch (error: any) {
           message.error(error?.response?.data?.detail || error?.message || '批量删除失败')
+        }
+      },
+    })
+  }
+
+  function confirmClearProcess() {
+    const processLabel = PROCESS_LABELS[process]
+    const ruleCount = data?.total || 0
+    if (!ruleCount) return
+    Modal.confirm({
+      title: `清空${processLabel}全部规则？`,
+      content: `将永久删除${processLabel}流程下的 ${ruleCount} 条规则，其他登记流程不受影响。删除后不可恢复。`,
+      okText: '确认清空',
+      cancelText: '取消',
+      okButtonProps: { danger: true },
+      async onOk() {
+        try {
+          const result = await deleteRuleLibraryRulesByProcess(process)
+          message.success(`已清空${processLabel}流程，共删除 ${result.deleted_count} 条规则`)
+          setSelectedIds([])
+          setDetailRule(null)
+          await refresh()
+        } catch (error: any) {
+          message.error(error?.response?.data?.detail || error?.message || '清空当前流程失败')
         }
       },
     })
@@ -368,15 +393,25 @@ export default function RuleLibraryPage() {
                 <h2>{PROCESS_LABELS[process]}规则</h2>
                 <p>按规则类型筛选，点击规则查看完整内容与配置。</p>
               </div>
-              <Segmented
-                value={method}
-                options={[
-                  { label: `全部 ${data?.total || 0}`, value: 'all' },
-                  { label: `脚本 ${data?.script_count || 0}`, value: 'script' },
-                  { label: `AI ${data?.ai_count || 0}`, value: 'ai' },
-                ]}
-                onChange={(value) => setMethod(value as MethodFilter)}
-              />
+              <div className="rule-list-heading-actions">
+                <Segmented
+                  value={method}
+                  options={[
+                    { label: `全部 ${data?.total || 0}`, value: 'all' },
+                    { label: `脚本 ${data?.script_count || 0}`, value: 'script' },
+                    { label: `AI ${data?.ai_count || 0}`, value: 'ai' },
+                  ]}
+                  onChange={(value) => setMethod(value as MethodFilter)}
+                />
+                <Button
+                  danger
+                  icon={<DeleteOutlined />}
+                  disabled={!data?.total}
+                  onClick={confirmClearProcess}
+                >
+                  清空当前流程
+                </Button>
+              </div>
             </div>
 
             <div className="rule-filter-bar">

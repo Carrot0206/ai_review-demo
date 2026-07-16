@@ -45,6 +45,9 @@ function formValue(rule: RuleLibraryRule | null, process: RuleLibraryProcess) {
   if (params.mapping) {
     params.mapping_json = JSON.stringify(params.mapping, null, 2)
   }
+  if (params.conditions) {
+    params.conditions_json = JSON.stringify(params.conditions, null, 2)
+  }
   return { ...value, script_params: params }
 }
 
@@ -89,6 +92,29 @@ function normalizeParams(operator: string, raw: Record<string, unknown> = {}) {
     case 'material_required':
     case 'conditional_material_required':
       copy('material_label', 'file_ext')
+      break
+    case 'unique': {
+      copy('fields', 'scope')
+      const labels: Record<string, string> = {
+        current_table: '当前表',
+        current_process: '当前流程',
+        history: '历史登记记录',
+      }
+      if (raw.scope) params.scope_label = labels[String(raw.scope)] || String(raw.scope)
+      break
+    }
+    case 'reference_exists':
+      copy('reference_source', 'reference_field')
+      break
+    case 'formula_compare':
+      copy('expression', 'expected_field', 'expected_value', 'relation', 'tolerance')
+      break
+    case 'group_consistency':
+      copy('group_by', 'consistent_fields')
+      break
+    case 'compound_condition':
+      copy('combinator')
+      if (raw.conditions_json) params.conditions = JSON.parse(String(raw.conditions_json))
       break
     default:
       break
@@ -274,6 +300,98 @@ export default function RuleEditorDrawer({ open, process, rule, onClose, onSaved
               <Select mode="tags" tokenSeparators={[',', '，']} placeholder="例如：.pdf、.docx" />
             </Form.Item>
           </div>
+        )
+      case 'unique':
+        return (
+          <div className="rule-form-grid two-cols">
+            <Form.Item label="唯一键字段" name={['script_params', 'fields']} rules={[{ required: true, message: '请填写唯一键字段' }]}>
+              <Select mode="tags" tokenSeparators={[',', '，', '、']} placeholder="可填写一个或多个联合唯一字段" />
+            </Form.Item>
+            <Form.Item label="校验范围" name={['script_params', 'scope']} initialValue="current_table" rules={[{ required: true }]}>
+              <Select options={[
+                { value: 'current_table', label: '当前表' },
+                { value: 'current_process', label: '当前流程' },
+                { value: 'history', label: '历史登记记录' },
+              ]} />
+            </Form.Item>
+          </div>
+        )
+      case 'reference_exists':
+        return (
+          <div className="rule-form-grid two-cols">
+            <Form.Item label="参照数据源" name={['script_params', 'reference_source']} rules={[{ required: true, message: '请填写参照数据源' }]}>
+              <Input placeholder="例如：信托产品登记库" />
+            </Form.Item>
+            <Form.Item label="参照字段" name={['script_params', 'reference_field']} rules={[{ required: true, message: '请填写参照字段' }]}>
+              <Input placeholder="例如：产品编码" />
+            </Form.Item>
+          </div>
+        )
+      case 'formula_compare':
+        return (
+          <>
+            <Form.Item label="计算公式" name={['script_params', 'expression']} rules={[{ required: true, message: '请填写计算公式' }]}>
+              <Input placeholder="例如：months_between(预计到期日期, 产品成立日期)" />
+            </Form.Item>
+            <div className="rule-form-grid three-cols">
+              <Form.Item label="比较目标字段" name={['script_params', 'expected_field']}>
+                <Input placeholder="例如：信托产品期限" />
+              </Form.Item>
+              <Form.Item label="比较关系" name={['script_params', 'relation']} initialValue="within_tolerance" rules={[{ required: true }]}>
+                <Select options={[
+                  { value: 'equals', label: '等于' },
+                  { value: 'lte', label: '小于等于' },
+                  { value: 'gte', label: '大于等于' },
+                  { value: 'within_tolerance', label: '偏差不超过' },
+                ]} />
+              </Form.Item>
+              <Form.Item label="允许偏差" name={['script_params', 'tolerance']} initialValue={0}>
+                <InputNumber min={0} style={{ width: '100%' }} />
+              </Form.Item>
+            </div>
+          </>
+        )
+      case 'group_consistency':
+        return (
+          <div className="rule-form-grid two-cols">
+            <Form.Item label="分组字段" name={['script_params', 'group_by']} rules={[{ required: true, message: '请填写分组字段' }]}>
+              <Input placeholder="例如：受益权代码" />
+            </Form.Item>
+            <Form.Item label="组内一致字段" name={['script_params', 'consistent_fields']} rules={[{ required: true, message: '请填写需要保持一致的字段' }]}>
+              <Select mode="tags" tokenSeparators={[',', '，', '、']} placeholder="输入字段后回车" />
+            </Form.Item>
+          </div>
+        )
+      case 'compound_condition':
+        return (
+          <>
+            <Form.Item label="条件组合方式" name={['script_params', 'combinator']} initialValue="all" rules={[{ required: true }]}>
+              <Select options={[{ value: 'all', label: '全部满足（且）' }, { value: 'any', label: '任一满足（或）' }]} />
+            </Form.Item>
+            <Form.Item
+              label="条件列表"
+              name={['script_params', 'conditions_json']}
+              rules={[
+                { required: true, message: '请填写条件列表' },
+                {
+                  validator: async (_, value) => {
+                    if (!value) return
+                    try {
+                      const parsed = JSON.parse(value)
+                      if (!Array.isArray(parsed) || parsed.length === 0) throw new Error()
+                    } catch {
+                      throw new Error('请输入非空的JSON数组')
+                    }
+                  },
+                },
+              ]}
+            >
+              <Input.TextArea
+                rows={6}
+                placeholder={'例如：\n[{"left":"受益权起始日","op":"gte","right":"产品成立日期","description":"起始日不早于成立日"}]'}
+              />
+            </Form.Item>
+          </>
         )
       default:
         return <Alert type="info" showIcon title="该校验无需额外参数" />

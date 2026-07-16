@@ -68,6 +68,11 @@ SUPPORTED_OPERATORS = [
     "conditional_compare",
     "material_required",
     "conditional_material_required",
+    "unique",
+    "reference_exists",
+    "formula_compare",
+    "group_consistency",
+    "compound_condition",
 ]
 
 OPERATOR_DESCRIPTIONS: dict[str, str] = {
@@ -85,6 +90,11 @@ OPERATOR_DESCRIPTIONS: dict[str, str] = {
     "conditional_compare": "条件触发校验",
     "material_required": "材料必交校验",
     "conditional_material_required": "条件性材料必交",
+    "unique": "主键与重复校验",
+    "reference_exists": "参照数据有效性校验",
+    "formula_compare": "公式计算比较",
+    "group_consistency": "同组字段一致性",
+    "compound_condition": "多条件组合校验",
 }
 
 RULE_LIBRARY_FILE = Path(
@@ -332,6 +342,16 @@ def delete_rules(rule_ids: list[str]) -> int:
     return deleted
 
 
+def delete_rules_by_process(process: LibraryProcess) -> int:
+    with _STORE_LOCK:
+        rules = _load_all()
+        remaining = [rule for rule in rules if rule.process != process]
+        deleted = len(rules) - len(remaining)
+        if deleted:
+            _save_all(remaining)
+        return deleted
+
+
 def build_visual_rule(rule: LibraryRuleInput | LibraryRule) -> str:
     if rule.review_method != "script":
         return ""
@@ -366,6 +386,40 @@ def build_visual_rule(rule: LibraryRuleInput | LibraryRule) -> str:
             f"当 {trigger.get('field', '')} {trigger.get('op', '等于')} {trigger.get('value', '')} 时，"
             f"{target.get('field', field)} 执行 {target.get('op', '校验')}"
         )
+    elif operator == "unique":
+        fields = params.get("fields") or [field]
+        scope = params.get("scope_label") or params.get("scope") or "当前表"
+        detail = f"{ '、'.join(map(str, fields)) } 在{scope}内不得重复"
+    elif operator == "reference_exists":
+        source = params.get("reference_source") or "指定参照数据源"
+        reference_field = params.get("reference_field")
+        suffix = f"的 {reference_field} 字段" if reference_field else ""
+        detail = f"必须存在于{source}{suffix}中"
+    elif operator == "formula_compare":
+        expression = params.get("expression") or "指定公式"
+        expected = params.get("expected_field") or params.get("expected_value") or "目标值"
+        tolerance = params.get("tolerance")
+        tolerance_text = f"，允许偏差 {tolerance}" if tolerance not in {None, ""} else ""
+        detail = f"按公式 {expression} 计算并与 {expected} 比较{tolerance_text}"
+    elif operator == "group_consistency":
+        group_by = params.get("group_by") or "分组字段"
+        fields = params.get("consistent_fields") or [field]
+        detail = f"按 {group_by} 分组时，{'、'.join(map(str, fields))} 必须保持一致"
+    elif operator == "compound_condition":
+        conditions = params.get("conditions") or []
+        combinator = "且" if params.get("combinator", "all") == "all" else "或"
+        labels = []
+        for condition in conditions[:3]:
+            if isinstance(condition, str):
+                labels.append(condition)
+            elif isinstance(condition, dict):
+                labels.append(
+                    str(
+                        condition.get("description")
+                        or f"{condition.get('left', '')} {condition.get('op', '')} {condition.get('right', '')}"
+                    ).strip()
+                )
+        detail = combinator.join(label for label in labels if label) or "执行多条件组合校验"
     prefix = f"当 {rule.trigger_condition} 时，" if rule.trigger_condition else ""
     return f"{prefix}{field} {detail}".strip()
 
@@ -632,7 +686,10 @@ def build_import_template(process: LibraryProcess) -> bytes:
             validations["operator"] = SUPPORTED_OPERATORS
         for header, values in validations.items():
             column = headers.index(header) + 1
-            formula = '"' + ",".join(values) + '"'
+            if header == "operator":
+                formula = f'INDIRECT("operator字典!$A$2:$A${len(SUPPORTED_OPERATORS) + 1}")'
+            else:
+                formula = '"' + ",".join(values) + '"'
             validation = DataValidation(type="list", formula1=formula, allow_blank=False)
             sheet.add_data_validation(validation)
             validation.add(f"{sheet.cell(2, column).coordinate}:{sheet.cell(201, column).coordinate}")
@@ -669,6 +726,11 @@ def build_import_template(process: LibraryProcess) -> bytes:
         "conditional_compare": '{"trigger":{"field":"A","op":"equals","value":"是"},"target":{"field":"B","op":"required"}}',
         "material_required": '{"material_label":"信托合同","file_ext":[".pdf"]}',
         "conditional_material_required": '{"material_label":"关联交易说明"}',
+        "unique": '{"fields":["内部信托合同编号"],"scope":"current_table","scope_label":"当前表"}',
+        "reference_exists": '{"reference_source":"信托产品登记库","reference_field":"产品编码"}',
+        "formula_compare": '{"expression":"months_between(预计到期日期,产品成立日期)","expected_field":"信托产品期限","relation":"within_tolerance","tolerance":1}',
+        "group_consistency": '{"group_by":"受益权代码","consistent_fields":["受益权类型","业绩比较基准（上限）"]}',
+        "compound_condition": '{"combinator":"all","conditions":[{"left":"受益权起始日","op":"gte","right":"产品成立日期"},{"left":"受益权起始日","op":"lte","right":"受益权计划到期日"}]}',
     }
     for cell in dictionary[1]:
         cell.fill = header_fill

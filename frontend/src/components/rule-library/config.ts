@@ -47,6 +47,11 @@ export const OPERATOR_OPTIONS = [
   { value: 'conditional_compare', label: '条件触发校验' },
   { value: 'material_required', label: '材料必交校验' },
   { value: 'conditional_material_required', label: '条件性材料必交' },
+  { value: 'unique', label: '主键与重复校验' },
+  { value: 'reference_exists', label: '参照数据有效性校验' },
+  { value: 'formula_compare', label: '公式计算比较' },
+  { value: 'group_consistency', label: '同组字段一致性' },
+  { value: 'compound_condition', label: '多条件组合校验' },
 ]
 
 export function emptyRule(process: RuleLibraryProcess): RuleLibraryRuleInput {
@@ -122,6 +127,31 @@ export function buildVisualRule(values?: Partial<RuleLibraryRuleInput>): string 
     case 'conditional_material_required':
       detail = `必须提交材料 ${params.material_label || values.rule_name || '指定材料'}`
       break
+    case 'unique': {
+      const fields = (params.fields as string[]) || [field]
+      detail = `${fields.join('、')} 在 ${params.scope_label || params.scope || '当前表'} 内不得重复`
+      break
+    }
+    case 'reference_exists':
+      detail = `必须存在于 ${params.reference_source || '指定参照数据源'}${params.reference_field ? ` 的 ${params.reference_field}` : ''} 中`
+      break
+    case 'formula_compare':
+      detail = `按公式 ${params.expression || '指定公式'} 计算并与 ${params.expected_field || params.expected_value || '目标值'} 比较${params.tolerance !== undefined && params.tolerance !== '' ? `，允许偏差 ${params.tolerance}` : ''}`
+      break
+    case 'group_consistency': {
+      const consistentFields = (params.consistent_fields as string[]) || [field]
+      detail = `按 ${params.group_by || '分组字段'} 分组时，${consistentFields.join('、')} 必须保持一致`
+      break
+    }
+    case 'compound_condition': {
+      const conditions = (params.conditions as Array<string | Record<string, string>>) || []
+      const labels = conditions.slice(0, 3).map((condition) => {
+        if (typeof condition === 'string') return condition
+        return condition.description || `${condition.left || ''} ${condition.op || ''} ${condition.right || ''}`.trim()
+      }).filter(Boolean)
+      detail = labels.join(params.combinator === 'any' ? ' 或 ' : ' 且 ') || '执行多条件组合校验'
+      break
+    }
   }
   const prefix = values.trigger_condition ? `当 ${values.trigger_condition} 时，` : ''
   return `${prefix}${field} ${detail}`
