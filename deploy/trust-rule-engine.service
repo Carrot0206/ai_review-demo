@@ -1,0 +1,24 @@
+[Unit]
+Description=Trust Registration Rule Engine
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/trust-rule-engine
+EnvironmentFile=-/etc/trust-rule-engine/backend.env
+Environment=RULE_LIBRARY_FILE=/opt/trust-rule-engine-data/rules.json
+Environment=RULE_ENGINE_DB_FILE=/opt/trust-rule-engine-data/rule_engine.db
+Environment=MATERIAL_UPLOAD_DIR=/opt/trust-rule-engine-data/materials
+ExecStart=/opt/trust-rule-engine/backend/.venv/bin/python -m uvicorn backend.app:app --host 127.0.0.1 --port 18102 --workers 1
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/opt/trust-rule-engine-data
+
+[Install]
+WantedBy=multi-user.target

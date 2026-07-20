@@ -1,29 +1,34 @@
-"""FastAPI 应用入口。
-
-启动：
-  cd trust-ai-review-demo
-  source backend/.venv/bin/activate
-  uvicorn backend.app:app --reload --port 8000
-"""
+"""独立规则库与规则引擎 FastAPI 应用。"""
 from __future__ import annotations
+
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .api.review_router import router as review_router
+from .api.material_router import router as material_router
 from .api.rule_library_router import router as rule_library_router
-from .api.rule_sets_router import router as rule_sets_router
-from .api.rules_router import router as rules_router
-from .api.samples_router import router as samples_router
-from .api.upload_router import router as upload_router
+from .api.rule_engine_router import router as rule_engine_router
+from .services.ai_client import close_ai_client, load_ai_config
+from .storage import database
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    database.init_db()
+    database.mark_running_interrupted()
+    database.cleanup_ai_traces()
+    yield
+    await close_ai_client()
+
 
 app = FastAPI(
-    title="信托登记 AI 辅助审核 Demo",
-    description="中信登信托产品登记 AI 辅助审核演示后端",
+    title="信托登记规则库与规则引擎",
+    description="独立提供规则库管理，并承载后续脚本执行器、AI执行器和异步审核API。",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
-# 前端开发期跨域
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -33,14 +38,17 @@ app.add_middleware(
 )
 
 
-@app.get("/api/health")
+@app.get("/api/rule-engine/health")
 def health():
-    return {"status": "ok"}
+    config = load_ai_config(require_key=False)
+    return {
+        "status": "ok",
+        "service": "trust-rule-engine",
+        "ai_configured": bool(config.api_key),
+        "ai_model": config.model,
+    }
 
 
-app.include_router(rules_router)
 app.include_router(rule_library_router)
-app.include_router(rule_sets_router)
-app.include_router(upload_router)
-app.include_router(review_router)
-app.include_router(samples_router)
+app.include_router(material_router)
+app.include_router(rule_engine_router)

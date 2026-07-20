@@ -7,56 +7,60 @@ PARENT_DIR="$(cd "${APP_DIR}/.." && pwd)"
 APP_NAME="$(basename "${APP_DIR}")"
 ARCHIVE="${PARENT_DIR}/${APP_NAME}-deploy.tar.gz"
 TARGET="${1:-root@192.168.21.103}"
+MODE="${2:-}"
 REMOTE_ARCHIVE="/tmp/${APP_NAME}-deploy.tar.gz"
+SYNC_RULES=0
+
+if [[ -n "${MODE}" && "${MODE}" != "--sync-rules" ]]; then
+  echo "用法：$0 [user@host] [--sync-rules]"
+  exit 1
+fi
+if [[ "${MODE}" == "--sync-rules" ]]; then
+  SYNC_RULES=1
+fi
 
 "${SCRIPT_DIR}/package_release.sh"
 
-echo "上传更新包到 ${TARGET}:${REMOTE_ARCHIVE}"
+echo "上传部署包到 ${TARGET}:${REMOTE_ARCHIVE}"
 scp "${ARCHIVE}" "${TARGET}:${REMOTE_ARCHIVE}"
 
-echo "在服务器更新应用..."
-ssh "${TARGET}" "set -euo pipefail
-APP_DIR=/opt/${APP_NAME}
-SERVICE_NAME=trust-ai-review-demo
-BACKUP=/opt/${APP_NAME}.backup-\$(date +%Y%m%d-%H%M%S).tar.gz
-STATE_DIR=\$(mktemp -d /tmp/${APP_NAME}-state.XXXXXX)
+echo "在服务器安装/更新信托登记审查管理中台..."
+ssh "${TARGET}" "SYNC_RULES=${SYNC_RULES} bash -s" <<'REMOTE_SCRIPT'
+set -euo pipefail
 
-cleanup() {
-  rm -rf \"\${STATE_DIR}\"
-}
-trap cleanup EXIT
+APP_NAME="trust-rule-engine"
+APP_DIR="/opt/${APP_NAME}"
+REMOTE_ARCHIVE="/tmp/${APP_NAME}-deploy.tar.gz"
 
-if [ ! -d \"\${APP_DIR}\" ]; then
-  echo \"未找到 \${APP_DIR}。请先执行首次部署脚本 deploy/upload_and_install.sh。\"
+if [[ "${EUID}" -ne 0 ]]; then
+  echo "远程部署需要root权限，请使用 root@服务器地址。"
   exit 1
 fi
 
-tar -czf \"\${BACKUP}\" -C /opt ${APP_NAME}
+mkdir -p /opt
+if [[ -d "${APP_DIR}" ]]; then
+  BACKUP="/opt/${APP_NAME}.backup-$(date +%Y%m%d-%H%M%S).tar.gz"
+  tar \
+    --exclude="${APP_NAME}/backend/.venv" \
+    --exclude="${APP_NAME}/frontend/node_modules" \
+    -czf "${BACKUP}" \
+    -C /opt \
+    "${APP_NAME}"
+  echo "已备份现有程序：${BACKUP}"
+fi
 
-# These files are changed through the web/API and must not be replaced by a code update.
-for path in backend/data/rule_sets backend/data/rule_library/rules.json backend/data/user_rules.json; do
-  if [ -e \"\${APP_DIR}/\${path}\" ]; then
-    mkdir -p \"\${STATE_DIR}/\$(dirname \"\${path}\")\"
-    cp -a \"\${APP_DIR}/\${path}\" \"\${STATE_DIR}/\${path}\"
-  fi
-done
+tar -xzf "${REMOTE_ARCHIVE}" -C /opt
+cd "${APP_DIR}"
+SYNC_RULES="${SYNC_RULES}" bash deploy/install_server.sh
+rm -f "${REMOTE_ARCHIVE}"
 
-tar -xzf ${REMOTE_ARCHIVE} -C /opt
-
-for path in backend/data/rule_sets backend/data/rule_library/rules.json backend/data/user_rules.json; do
-  if [ -e \"\${STATE_DIR}/\${path}\" ]; then
-    rm -rf \"\${APP_DIR}/\${path}\"
-    mkdir -p \"\$(dirname \"\${APP_DIR}/\${path}\")\"
-    cp -a \"\${STATE_DIR}/\${path}\" \"\${APP_DIR}/\${path}\"
-  fi
-done
-
-\"\${APP_DIR}/backend/.venv/bin/pip\" install -r \"\${APP_DIR}/backend/requirements.txt\"
-systemctl restart \"\${SERVICE_NAME}\"
-curl --fail --silent http://127.0.0.1:18101/api/health
-curl --fail --silent http://127.0.0.1:28101/api/health
+curl --fail --silent --show-error http://127.0.0.1:28101/api/rule-engine/health
 echo
-echo \"更新完成。备份文件：\${BACKUP}\"
-"
+REMOTE_SCRIPT
 
-echo "完成。请在浏览器中强制刷新：http://192.168.21.103:28101"
+echo "部署完成，请强制刷新浏览器："
+echo "  http://192.168.21.103:28101/rule-library/"
+echo "  http://192.168.21.103:28101/rule-library/review"
+if [[ "${SYNC_RULES}" == "0" ]]; then
+  echo "服务器现有规则库已保留；如需用本地规则覆盖，请再次执行并追加 --sync-rules。"
+fi

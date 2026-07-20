@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+export COPYFILE_DISABLE=1
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
@@ -10,7 +11,7 @@ ARCHIVE="${PARENT_DIR}/${APP_NAME}-deploy.tar.gz"
 cd "${APP_DIR}"
 
 if [[ -f "backend/.env" ]]; then
-  echo "注意：backend/.env 不会被打包。真实密钥请只放在服务器 /etc/trust-ai-review-demo/backend.env。"
+  echo "注意：backend/.env 不会被打包，服务器密钥保存在 /etc/trust-rule-engine/backend.env。"
 fi
 
 if [[ ! -d "frontend/node_modules" ]]; then
@@ -18,19 +19,21 @@ if [[ ! -d "frontend/node_modules" ]]; then
   (cd frontend && npm ci)
 fi
 
-echo "构建前端..."
-(cd frontend && npm run build)
+echo "检查并构建前端..."
+(cd frontend && npm run lint && npm run build)
 
 echo "生成部署包：${ARCHIVE}"
 tar \
+  --no-xattrs \
   --exclude=".git" \
   --exclude=".DS_Store" \
   --exclude="__pycache__" \
   --exclude="*.pyc" \
   --exclude="backend/.env" \
   --exclude="backend/.venv" \
-  --exclude="backend/uploads" \
-  --exclude="backend/out" \
+  --exclude="backend/data/materials" \
+  --exclude="backend/data/*.db" \
+  --exclude="backend/data/*.db-*" \
   --exclude="frontend/node_modules" \
   -czf "${ARCHIVE}" \
   -C "${PARENT_DIR}" \

@@ -1,64 +1,68 @@
-# 部署说明
+# 一键部署说明
 
-## 安全约定
-
-- 不要把 `backend/.env` 打包、提交或发给别人。
-- 真实大模型 Key 只写到服务器 `/etc/trust-ai-review-demo/backend.env`。
-- 后端只监听 `127.0.0.1:18101`，外部统一通过 Nginx 的 `28101` 端口访问。
-
-## 一键上传并安装
+## 日常部署或首次安装
 
 在本地项目根目录执行：
 
 ```bash
-chmod +x deploy/*.sh
-./deploy/upload_and_install.sh root@192.168.21.103
-```
-
-脚本会提示输入服务器密码，但不会保存密码。
-
-## 日常更新（推荐）
-
-网页、规则库页面或后端代码更新后，在本地项目根目录执行：
-
-```bash
+cd "/Users/xieyinghan/Downloads/ai审核信托产品登记demo/trust-rule-engine"
 ./deploy/upload_and_update.sh root@192.168.21.103
 ```
 
-此脚本会重新构建前端、上传更新包并重启后端服务。它会在服务器的
-`/opt/` 下保留一个带时间戳的完整备份，并保留以下运行数据：
+同一个命令同时支持首次安装和后续更新，会自动完成：
 
-- `/etc/trust-ai-review-demo/backend.env` 中的 DeepSeek Key；
-- 已上传的材料和审核输出；
-- 已通过网页或 API 导入的规则集；
-- 规则库网页中已保存的规则。
+- 前端lint与生产构建；
+- 生成不包含密钥、虚拟环境和运行数据的部署包；
+- 上传并备份服务器现有程序；
+- 安装/更新Python依赖及systemd服务；
+- 安装整合后的Nginx配置并执行健康检查。
 
-更新期间后端会有数秒不可用；Nginx、端口、防火墙和现有 systemd 服务配置
-不会被重新安装或修改。更新完成后浏览器请使用强制刷新（macOS：`Command + Shift + R`）。
-
-如果更新同时包含了要覆盖服务器现有“规则库内容”或“已导入规则集”的数据，
-请先导出或备份服务器数据；默认更新策略以保护服务器上正在使用的数据为准。
-
-## 首次部署后配置 Key
-
-登录服务器：
+默认保留服务器的规则库、审核任务数据库、上传材料和API Key。若明确需要用本地规则库覆盖服务器规则库，执行：
 
 ```bash
-ssh root@192.168.21.103
-nano /etc/trust-ai-review-demo/backend.env
-systemctl restart trust-ai-review-demo
+./deploy/upload_and_update.sh root@192.168.21.103 --sync-rules
+```
+
+覆盖前脚本会自动备份服务器的 `rules.json`。
+
+## 数据与服务
+
+目标部署目录：
+
+- 原审核Demo：`/opt/trust-ai-review-demo`
+- 规则库与规则引擎：`/opt/trust-rule-engine`
+- 可写规则数据：`/opt/trust-rule-engine-data/rules.json`
+- 审核任务数据库：`/opt/trust-rule-engine-data/rule_engine.db`
+- 上传材料与解析结果：`/opt/trust-rule-engine-data/materials`
+
+真实模型配置保存在服务器 `/etc/trust-rule-engine/backend.env`，不会进入部署包。首次部署后编辑：
+
+```bash
+nano /etc/trust-rule-engine/backend.env
+systemctl restart trust-rule-engine
+```
+
+至少填写：
+
+```env
+DEEPSEEK_API_KEY=你的API_KEY
 ```
 
 ## 验证
 
 ```bash
-curl http://127.0.0.1:18101/api/health
-systemctl status trust-ai-review-demo --no-pager
-systemctl status nginx --no-pager
+ssh root@192.168.21.103
+systemctl status trust-rule-engine --no-pager
+curl http://127.0.0.1:18102/api/rule-engine/health
+curl 'http://127.0.0.1:28101/api/rule-library/rules?process=pre_registration'
 ```
 
-浏览器访问：
+访问地址：
 
-```text
-http://192.168.21.103:28101
-```
+- 规则库：`http://192.168.21.103:28101/rule-library/`
+- 登记审核：`http://192.168.21.103:28101/rule-library/review`
+
+规则引擎必须保持单个 Uvicorn worker；当前全局并发信号量和内存任务调度器以单进程为边界。
+新审核页面的材料上传、解析和审核均由规则引擎提供，不需要启动原审核Demo后端。
+
+当前服务器因Python运行环境位于 `/root/miniconda3`，规则引擎systemd服务暂时使用root用户运行。服务仍启用 `NoNewPrivileges`、`PrivateTmp` 和 `ProtectSystem=full`；后续迁移到 `/opt` 独立Python环境后，应恢复为 `trustreview` 用户。

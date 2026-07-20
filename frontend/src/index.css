@@ -1,20 +1,14 @@
-/* ===== 全局重置 + 主题变量 ===== */
 :root {
-  /* 中信登业务系统主色 */
   --c-primary: #4A54A8;
   --c-primary-2: #3A4398;
   --c-primary-3: #6570C7;
   --c-primary-bg: #F0F2FF;
-
-  /* 风险等级 */
   --c-risk-high: #DC2626;
   --c-risk-high-bg: #FEE2E2;
   --c-risk-mid: #F59E0B;
   --c-risk-mid-bg: #FEF3C7;
   --c-risk-low: #10B981;
   --c-risk-low-bg: #D1FAE5;
-
-  /* 中性 */
   --c-bg: #F0F2F5;
   --c-panel: #FFFFFF;
   --c-text: #0F172A;
@@ -22,12 +16,10 @@
   --c-text-3: #94A3B8;
   --c-border: #E2E8F0;
   --c-border-2: #CBD5E1;
-
   --radius: 4px;
   --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
   --shadow-md: 0 2px 8px rgba(15, 23, 42, 0.08);
   --shadow-lg: 0 8px 24px rgba(15, 23, 42, 0.12);
-
   font: 14px/1.55 -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', Roboto, sans-serif;
   color: var(--c-text);
   background: var(--c-bg);
@@ -38,8 +30,6 @@
 * { box-sizing: border-box; }
 html, body, #root { margin: 0; padding: 0; height: 100%; }
 body { background: var(--c-bg); }
-
-/* 滚动条美化 */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }

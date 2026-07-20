@@ -1,54 +1,83 @@
-import { useEffect } from 'react'
-import './App.css'
-import Header from './components/Header'
-import ProcessBar from './components/ProcessBar'
-import LeftPanel from './components/LeftPanel'
-import RightPanel from './components/RightPanel'
-import { useStore } from './store'
-import { getRules, listRuleSets, listUploads } from './api'
+import { useEffect, useState } from 'react'
+import {
+  FileSearchOutlined,
+  FileTextOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+} from '@ant-design/icons'
 import RuleLibraryPage from './pages/RuleLibraryPage'
+import ReviewWorkspacePage from './pages/ReviewWorkspacePage'
+import './app.css'
 
-function ReviewApp() {
-  const process = useStore((s) => s.process)
-  const setRules = useStore((s) => s.setRules)
-  const setRuleSets = useStore((s) => s.setRuleSets)
-  const setUploads = useStore((s) => s.setUploads)
 
-  // 切流程刷新当前流程的规则集和上传列表;
-  // 审核结果/进度/任务状态按流程隔离保留,不在切流程时清空
+type ManagementPage = 'rule-library' | 'review'
+
+function pageFromPath(): ManagementPage {
+  return window.location.pathname.includes('/review') ? 'review' : 'rule-library'
+}
+
+export default function App() {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [page, setPage] = useState<ManagementPage>(pageFromPath)
+
   useEffect(() => {
-    getRules(process)
-      .then((r) => {
-        setRules(r)
-        setRuleSets(r.rule_sets || [])
-      })
-      .catch(() => {})
-    listRuleSets(process).then(setRuleSets).catch(() => {})
-    listUploads(process).then(setUploads).catch(() => {})
-  }, [process, setRules, setRuleSets, setUploads])
+    const handlePopState = () => setPage(pageFromPath())
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
+  function navigate(event: React.MouseEvent<HTMLAnchorElement>, nextPage: ManagementPage, path: string) {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+    event.preventDefault()
+    window.history.pushState({}, '', path)
+    setPage(nextPage)
+  }
 
   return (
-    <>
-      <Header />
-      <ProcessBar />
-      <div className="main-grid">
-        <div className="left-col">
-          <LeftPanel />
+    <div className={`management-shell${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
+      <aside className="management-sidebar" aria-label="管理中台主导航">
+        <div className="management-sidebar-brand">
+          <div className="management-sidebar-logo" aria-hidden="true">信</div>
+          <div className="management-sidebar-title">信托登记审查管理中台</div>
         </div>
-        <div className="right-col">
-          <RightPanel />
-        </div>
+
+        <button
+          type="button"
+          className="management-sidebar-toggle"
+          aria-label={sidebarCollapsed ? '展开侧栏' : '收起侧栏'}
+          aria-expanded={!sidebarCollapsed}
+          onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
+        >
+          {sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+        </button>
+
+        <nav className="management-sidebar-nav">
+          <a
+            className={`management-sidebar-link${page === 'rule-library' ? ' active' : ''}`}
+            href="/rule-library/"
+            aria-current={page === 'rule-library' ? 'page' : undefined}
+            title={sidebarCollapsed ? '信托规则库' : undefined}
+            onClick={(event) => navigate(event, 'rule-library', '/rule-library/')}
+          >
+            <FileTextOutlined />
+            <span>信托规则库</span>
+          </a>
+          <a
+            className={`management-sidebar-link${page === 'review' ? ' active' : ''}`}
+            href="/rule-library/review"
+            aria-current={page === 'review' ? 'page' : undefined}
+            title={sidebarCollapsed ? '信托产品登记审核' : undefined}
+            onClick={(event) => navigate(event, 'review', '/rule-library/review')}
+          >
+            <FileSearchOutlined />
+            <span>信托产品登记审核</span>
+          </a>
+        </nav>
+      </aside>
+
+      <div className="management-content">
+        {page === 'rule-library' ? <RuleLibraryPage /> : <ReviewWorkspacePage />}
       </div>
-      <div className="app-footer">
-        信托登记 AI 辅助审核 Demo · Powered by DeepSeek · 仅用于演示
-      </div>
-    </>
+    </div>
   )
 }
-
-function App() {
-  const normalizedPath = window.location.pathname.replace(/\/+$/, '') || '/'
-  return normalizedPath === '/rule-library' ? <RuleLibraryPage /> : <ReviewApp />
-}
-
-export default App
