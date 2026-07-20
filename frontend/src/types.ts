@@ -101,11 +101,18 @@ export interface ReviewUpload {
   uploaded_at: number
   parse_status?: string
   parse_error?: string | null
+  parser_profile?: string
+  template_version?: string
+  request_type?: string
+  mapping_version?: string
+  parse_warnings?: string[]
 }
 
 export interface MaterialSegment {
   location: string
   text: string
+  raw_location?: string
+  raw_text?: string
 }
 
 export interface ExtractedMaterial {
@@ -114,6 +121,11 @@ export interface ExtractedMaterial {
   file_kind: 'json' | 'pdf' | 'docx' | 'txt' | 'excel' | 'unknown'
   size_bytes?: number | null
   segments: MaterialSegment[]
+  parser_profile?: string
+  template_version?: string
+  request_type?: string
+  mapping_version?: string
+  parse_warnings?: string[]
 }
 
 export interface RuleEvidence {

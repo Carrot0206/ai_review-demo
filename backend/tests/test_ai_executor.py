@@ -23,8 +23,10 @@ class FakeClient:
         self.active = 0
         self.peak = 0
         self.invalid = invalid
+        self.last_messages = []
 
     async def chat(self, messages):
+        self.last_messages = messages
         self.calls += 1
         self.active += 1
         self.peak = max(self.peak, self.active)
@@ -65,6 +67,39 @@ class AIExecutorTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(results), 9)
         self.assertEqual(failed, set())
         self.assertEqual(client.peak, 3)
+
+    async def test_ai_prompt_contains_normalized_and_raw_material_values(self):
+        rule = make_rule("required", field="产品基本信息.登记类型", rule_id="AI-RAW-001")
+        rule = rule.model_copy(update={"review_method": "ai", "operator": ""})
+        client = FakeClient()
+        await run_ai_rules(
+            task_id="TASK-RAW",
+            process="pre_registration",
+            rules=[rule],
+            materials=[
+                ExtractedMaterial(
+                    material_name="新预登记.json",
+                    material_type="申报模板",
+                    file_kind="json",
+                    segments=[
+                        MaterialSegment(
+                            location="产品基本信息.登记类型",
+                            text="预登记",
+                            raw_location="projectList[0].pro_pre_regi.djlx",
+                            raw_text="0",
+                        )
+                    ],
+                )
+            ],
+            execution_method="ai",
+            batch_prefix="AI-",
+            client=client,
+        )
+        self.assertIn("raw_location和raw_text仅用于追溯", client.last_messages[0]["content"])
+        payload = json.loads(client.last_messages[-1]["content"])
+        segment = payload["materials"][0]["segments"][0]
+        self.assertEqual(segment["text"], "预登记")
+        self.assertEqual(segment["raw_text"], "0")
 
     async def test_invalid_rule_id_set_retries_then_fails_batch(self):
         rules = []

@@ -1,12 +1,17 @@
 """将上传材料解析为规则引擎统一的 ExtractedMaterial。"""
 from __future__ import annotations
 
-import json
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Optional
 
 from ..models.schemas import ExtractedMaterial, MaterialSegment
+from .registration_template_adapter import (
+    is_registration_export,
+    load_json_document,
+    parse_registration_export,
+)
+from .rule_library import LibraryProcess
 
 
 SUPPORTED_EXTENSIONS = {".json", ".xlsx", ".xlsm", ".pdf", ".docx", ".txt"}
@@ -65,9 +70,14 @@ def _flatten_json(value: Any, prefix: str = "") -> list[tuple[str, str]]:
     return output
 
 
-def parse_json_template(path: Path, material_type: Optional[str] = None) -> ExtractedMaterial:
-    with path.open("r", encoding="utf-8") as file:
-        payload = json.load(file)
+def parse_json_template(
+    path: Path,
+    material_type: Optional[str] = None,
+    process: Optional[LibraryProcess] = None,
+) -> ExtractedMaterial:
+    payload = load_json_document(path)
+    if is_registration_export(payload):
+        return parse_registration_export(path, payload, process)
     segments = [
         MaterialSegment(location=location, text=text)
         for location, text in _flatten_json(payload)
@@ -78,6 +88,7 @@ def parse_json_template(path: Path, material_type: Optional[str] = None) -> Extr
         material_type=material_type or guess_material_type(path.name),
         file_kind="json",
         segments=segments,
+        parser_profile="legacy_json",
     )
 
 
@@ -96,8 +107,7 @@ def _clean_cell(value: Any) -> str:
 
 
 def _clean_section_name(name: str) -> str:
-    cleaned = name.split(".", 1)[1].strip() if "." in name else name.strip()
-    return "关联交易信息" if cleaned == "关联交易事项" else cleaned
+    return name.split(".", 1)[1].strip() if "." in name else name.strip()
 
 
 def _is_section_name(name: str) -> bool:
@@ -255,12 +265,16 @@ def parse_txt(path: Path, material_type: Optional[str] = None) -> ExtractedMater
     )
 
 
-def parse_material(path: Path, material_type: Optional[str] = None) -> ExtractedMaterial:
+def parse_material(
+    path: Path,
+    material_type: Optional[str] = None,
+    process: Optional[LibraryProcess] = None,
+) -> ExtractedMaterial:
     if not path.exists():
         raise FileNotFoundError(f"材料文件不存在：{path}")
     suffix = path.suffix.lower()
     if suffix == ".json":
-        return parse_json_template(path, material_type)
+        return parse_json_template(path, material_type, process)
     if suffix in {".xlsx", ".xlsm"}:
         return parse_excel_template(path, material_type)
     if suffix == ".pdf":

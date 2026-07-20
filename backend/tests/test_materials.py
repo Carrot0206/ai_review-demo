@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import json
+import copy
 import tempfile
 import unittest
 from pathlib import Path
@@ -14,6 +15,11 @@ from openpyxl import Workbook
 from backend.app import app
 from backend.services import material_store
 from backend.services.material_parser import parse_material
+from backend.services.registration_template_adapter import load_json_document
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+ACTUAL_SAMPLE_DIR = PROJECT_ROOT / "申请模版json样例"
 
 
 class MaterialParserTest(unittest.TestCase):
@@ -113,6 +119,72 @@ class MaterialParserTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "暂不支持"):
             parse_material(path)
 
+    def test_actual_registration_exports_are_normalized(self):
+        expected = {
+            "新预登记.json": ("pre_registration", "pre.v2401.1", 161),
+            "新事前报告.json": ("pre_report", "report.v2401.1", 29),
+            "新初始登记.json": ("initial", "init.v2401.1", 244),
+            "新终止登记.json": ("termination", "dc.v2401.1", 25),
+        }
+        for filename, (process, version, segment_count) in expected.items():
+            with self.subTest(filename=filename):
+                material = parse_material(ACTUAL_SAMPLE_DIR / filename, process=process)
+                self.assertEqual(material.material_type, "申报模板")
+                self.assertEqual(material.parser_profile, "registration_export_json")
+                self.assertEqual(material.template_version, version)
+                self.assertEqual(len(material.segments), segment_count)
+                self.assertEqual(material.parse_warnings, [])
+                self.assertTrue(all(item.raw_location for item in material.segments))
+
+        pre_registration = parse_material(ACTUAL_SAMPLE_DIR / "新预登记.json")
+        pre_values = {item.location: item for item in pre_registration.segments}
+        self.assertEqual(pre_values["产品基本信息.登记类型"].text, "预登记")
+        self.assertEqual(pre_values["产品基本信息.登记类型"].raw_text, "0")
+        self.assertEqual(pre_values["异地推介信息[0].推介地1"].text, "北京市")
+        self.assertEqual(pre_values["异地推介信息[0].推介地2"].text, "北京市")
+
+        termination = parse_material(ACTUAL_SAMPLE_DIR / "新终止登记.json")
+        termination_values = {item.location: item for item in termination.segments}
+        self.assertEqual(termination_values["期限信息.清算报告日期"].text, "2024-06-16")
+        self.assertEqual(termination_values["期限信息.清算报告日期"].raw_text, "2024-6-16")
+        self.assertEqual(termination_values["期限信息.项目整体盈亏情况"].text, "整体盈亏平衡")
+
+    def test_actual_export_version_and_validation_boundaries(self):
+        payload = load_json_document(ACTUAL_SAMPLE_DIR / "新预登记.json")
+
+        unknown_version = copy.deepcopy(payload)
+        unknown_version["version"] = "pre.v9999.1"
+        unknown_path = self.root / "未知版本.json"
+        unknown_path.write_text(json.dumps(unknown_version, ensure_ascii=False), encoding="utf-8")
+        material = parse_material(unknown_path, process="pre_registration")
+        self.assertEqual(len(material.parse_warnings), 1)
+        self.assertIn("未经验证", material.parse_warnings[0])
+
+        with self.assertRaisesRegex(ValueError, "与当前选择流程"):
+            parse_material(ACTUAL_SAMPLE_DIR / "新预登记.json", process="initial")
+
+        multiple = copy.deepcopy(payload)
+        multiple["projectList"].append(copy.deepcopy(multiple["projectList"][0]))
+        multiple["projectCount"] = "2"
+        multiple_path = self.root / "多产品.json"
+        multiple_path.write_text(json.dumps(multiple, ensure_ascii=False), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "拆分"):
+            parse_material(multiple_path, process="pre_registration")
+
+        unknown_field = copy.deepcopy(payload)
+        unknown_field["projectList"][0]["pro_pre_regi"]["future_field"] = "1"
+        unknown_field_path = self.root / "未知字段.json"
+        unknown_field_path.write_text(json.dumps(unknown_field, ensure_ascii=False), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "未知字段代码"):
+            parse_material(unknown_field_path, process="pre_registration")
+
+        unknown_enum = copy.deepcopy(payload)
+        unknown_enum["projectList"][0]["pro_pre_regi"]["djlx"] = "999"
+        unknown_enum_path = self.root / "未知枚举.json"
+        unknown_enum_path.write_text(json.dumps(unknown_enum, ensure_ascii=False), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "未知枚举代码"):
+            parse_material(unknown_enum_path, process="pre_registration")
+
 
 class MaterialApiTest(unittest.TestCase):
     def setUp(self):
@@ -190,6 +262,34 @@ class MaterialApiTest(unittest.TestCase):
             self.assertEqual(too_large.status_code, 413)
         finally:
             material_router.MAX_MATERIAL_UPLOAD_BYTES = original_limit
+
+    def test_actual_export_upload_overrides_filename_material_type(self):
+        content = (ACTUAL_SAMPLE_DIR / "新预登记.json").read_bytes()
+        uploaded = self.client.post(
+            "/api/rule-engine/materials",
+            data={"process": "pre_registration"},
+            files={"file": ("新预登记.json", content, "application/json")},
+        )
+        self.assertEqual(uploaded.status_code, 200, uploaded.text)
+        metadata = uploaded.json()
+        self.assertEqual(metadata["parse_status"], "已解析")
+        self.assertEqual(metadata["material_type"], "申报模板")
+        self.assertEqual(metadata["parser_profile"], "registration_export_json")
+        self.assertEqual(metadata["template_version"], "pre.v2401.1")
+        extracted = self.client.get(
+            f"/api/rule-engine/materials/{metadata['file_id']}/extracted"
+        ).json()
+        registration_type = next(
+            item for item in extracted["segments"] if item["location"] == "产品基本信息.登记类型"
+        )
+        self.assertEqual(registration_type["text"], "预登记")
+        self.assertEqual(registration_type["raw_text"], "0")
+        duplicate = self.client.post(
+            "/api/rule-engine/materials",
+            data={"process": "pre_registration"},
+            files={"file": ("新预登记.json", content, "application/json")},
+        )
+        self.assertEqual(duplicate.status_code, 409)
 
 
 if __name__ == "__main__":

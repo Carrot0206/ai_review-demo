@@ -46,6 +46,7 @@ def build_messages(
 {fallback}
 必须为批内每条规则返回且仅返回一条结果，不能遗漏、重复或增加rule_id。
 允许状态只有passed、failed、not_applicable、undetermined。
+材料片段的location和text是规则引擎标准化后的中文审核路径和值；raw_location和raw_text仅用于追溯原始申报代码，不得优先于标准化值。
 只有存在明确材料证据时才能返回failed；failed必须给出问题摘要、整改建议和真实证据位置。
 材料缺失或证据不足且无法完成判断时返回undetermined；规则触发条件未满足时返回not_applicable。
 不要输出Markdown。输出合法JSON：
@@ -74,4 +75,3 @@ def build_messages(
         separators=(",", ":"),
     )
     return [{"role": "system", "content": system}, {"role": "user", "content": user}]
-

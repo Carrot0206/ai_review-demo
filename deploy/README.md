@@ -64,5 +64,6 @@ curl 'http://127.0.0.1:28101/api/rule-library/rules?process=pre_registration'
 
 规则引擎必须保持单个 Uvicorn worker；当前全局并发信号量和内存任务调度器以单进程为边界。
 新审核页面的材料上传、解析和审核均由规则引擎提供，不需要启动原审核Demo后端。
+实际登记JSON的四流程字段映射已生成在代码目录 `backend/data/template_mappings`，服务器运行时不读取或部署原始XLSM。
 
 当前服务器因Python运行环境位于 `/root/miniconda3`，规则引擎systemd服务暂时使用root用户运行。服务仍启用 `NoNewPrivileges`、`PrivateTmp` 和 `ProtectSystem=full`；后续迁移到 `/opt` 独立Python环境后，应恢复为 `trustreview` 用户。

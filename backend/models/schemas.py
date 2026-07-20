@@ -23,6 +23,8 @@ ExecutionMethod = Literal["script", "ai", "ai_fallback"]
 class MaterialSegment(BaseModel):
     location: str
     text: str = ""
+    raw_location: str = ""
+    raw_text: str = ""
 
 
 class ExtractedMaterial(BaseModel):
@@ -31,6 +33,11 @@ class ExtractedMaterial(BaseModel):
     file_kind: Literal["json", "pdf", "docx", "txt", "excel", "unknown"] = "unknown"
     size_bytes: Optional[int] = None
     segments: list[MaterialSegment] = Field(default_factory=list)
+    parser_profile: str = ""
+    template_version: str = ""
+    request_type: str = ""
+    mapping_version: str = ""
+    parse_warnings: list[str] = Field(default_factory=list)
 
 
 class ReviewStart(BaseModel):

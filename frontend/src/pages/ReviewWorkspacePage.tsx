@@ -9,6 +9,7 @@ import {
   Segmented,
   Skeleton,
   Tag,
+  Tooltip,
   Upload,
   message,
 } from 'antd'
@@ -61,7 +62,7 @@ const TEMPLATE_SECTIONS: Record<RuleLibraryProcess, string[]> = {
     '风险控制信息',
     '房地产项目信息',
     '异地推介信息',
-    '关联交易信息',
+    '关联交易事项',
   ],
   pre_report: ['产品基本信息', '关联交易事项'],
   initial: [
@@ -100,6 +101,8 @@ interface TemplateField {
   label: string
   value: string
   location: string
+  rawLocation?: string
+  rawValue?: string
 }
 
 interface TemplateRecord {
@@ -196,12 +199,24 @@ function buildTemplateSections(material: ExtractedMaterial | null, process: Rule
         recordMap.set(recordIndex, record)
         section.records.push(record)
       }
-      record.fields.push({ label: arrayMatch[2], value: segment.text, location: segment.location })
+      record.fields.push({
+        label: arrayMatch[2],
+        value: segment.text,
+        location: segment.location,
+        rawLocation: segment.raw_location,
+        rawValue: segment.raw_text,
+      })
       continue
     }
     const fieldMatch = remainder.match(/^\.(.+)$/)
     if (fieldMatch && !fieldMatch[1].includes('.')) {
-      section.fields.push({ label: fieldMatch[1], value: segment.text, location: segment.location })
+      section.fields.push({
+        label: fieldMatch[1],
+        value: segment.text,
+        location: segment.location,
+        rawLocation: segment.raw_location,
+        rawValue: segment.raw_text,
+      })
     }
   }
 
@@ -228,6 +243,7 @@ function canonicalLocation(value: string) {
 function locationsMatch(left: string, right: string) {
   const normalizedLeft = canonicalLocation(left.trim())
   const normalizedRight = canonicalLocation(right.trim())
+  if (!normalizedLeft || !normalizedRight) return false
   return normalizedLeft === normalizedRight || normalizedLeft.endsWith(normalizedRight) || normalizedRight.endsWith(normalizedLeft)
 }
 
@@ -521,6 +537,9 @@ export default function ReviewWorkspacePage() {
     const issues = issuesForField(field, session.result?.issues || [], templateMaterial)
     const risk = topRisk(issues)
     const linkedIssue = issues.find((issue) => riskFilters.has(issue.risk_level))
+    const rawTrace = field.rawLocation
+      ? `原始路径：${field.rawLocation}\n原始值：${field.rawValue ?? ''}`
+      : ''
     return (
       <div
         className="review-template-field"
@@ -536,7 +555,7 @@ export default function ReviewWorkspacePage() {
           className={`review-template-value ${riskClass(risk)}${linkedIssue ? ' has-issue' : ''}`}
           disabled={!linkedIssue}
           onClick={() => linkedIssue && selectIssue(linkedIssue)}
-          title={linkedIssue ? '点击查看关联问题' : undefined}
+          title={[linkedIssue ? '点击查看关联问题' : '', rawTrace].filter(Boolean).join('\n') || undefined}
         >
           <span>{field.value || '（空）'}</span>
           {risk && <span className="review-template-warning">!</span>}
@@ -647,6 +666,11 @@ export default function ReviewWorkspacePage() {
                             <div>
                               {upload.material_type && <Tag color="geekblue">{upload.material_type}</Tag>}
                               {upload.parse_status && <Tag color={upload.parse_status === '已解析' ? 'success' : 'warning'}>{upload.parse_status}</Tag>}
+                              {(upload.parse_warnings?.length || 0) > 0 && (
+                                <Tooltip title={upload.parse_warnings?.join('；')}>
+                                  <Tag color="warning">兼容解析</Tag>
+                                </Tooltip>
+                              )}
                               <span>{formatSize(upload.size_bytes)}</span>
                             </div>
                           </div>
@@ -706,6 +730,12 @@ export default function ReviewWorkspacePage() {
                 <h2>申报模板内容</h2>
                 <div>
                   {templateMaterial && <Tag color="geekblue">{templateMaterial.material_name}</Tag>}
+                  {templateMaterial?.template_version && <Tag>{templateMaterial.template_version}</Tag>}
+                  {(templateMaterial?.parse_warnings?.length || 0) > 0 && (
+                    <Tooltip title={templateMaterial?.parse_warnings?.join('；')}>
+                      <Tag color="warning">版本未经验证</Tag>
+                    </Tooltip>
+                  )}
                   {session.result && <Tag color="error">字段问题 {session.result.issues.length}</Tag>}
                 </div>
               </div>

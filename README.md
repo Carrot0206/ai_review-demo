@@ -50,6 +50,17 @@ cd "/Users/xieyinghan/Downloads/ai审核信托产品登记demo/trust-rule-engine
 
 新审核页面的上传、解析和审核接口均由规则引擎后端 `127.0.0.1:8001` 提供，本地不需要启动原审核后端 `8000`。支持 JSON、XLSX/XLSM、文本型PDF、DOCX和TXT；扫描型PDF第一版不支持OCR。
 
+实际登记系统导出的JSON支持预登记、事前报告、初始登记和终止登记。解析器会识别BOM及32位报文头，根据 `requestType` 校验登记流程，把接口字段代码和枚举代码转换为规则库使用的中文路径和值，并保留 `raw_location`、`raw_text` 供追溯。普通测试JSON仍沿用递归扁平化解析。
+
+四流程运行时映射位于 `backend/data/template_mappings`，生产环境不需要部署XLSM。登记模板更新后，在项目总目录执行：
+
+```bash
+python3 tools/generate_registration_template_mappings.py
+python3 tools/generate_registration_template_mappings.py --check
+```
+
+未知模板版本在字段结构和枚举代码仍可完整识别时兼容解析并返回警告；未知表、字段、枚举代码、流程不一致或多产品JSON会解析失败。
+
 复制 `backend/.env.example` 为 `backend/.env` 并填写 DeepSeek 配置。该配置由规则引擎独立维护，不再读取原审核Demo的环境变量。AI完整输入输出默认保留7天，可通过 `AI_TRACE_RETENTION_DAYS` 调整。为保证 `AI_MAX_CONCURRENCY=2500` 是服务级全局限制，第一版必须使用单个 Uvicorn worker。
 
 ## 审核API
@@ -101,6 +112,7 @@ curl -X POST http://127.0.0.1:8001/api/rule-engine/reviews \
 ```bash
 python3 -m unittest discover backend/tests
 python3 -m compileall -q backend
+python3 ../tools/generate_registration_template_mappings.py --check
 cd frontend
 npm run lint
 npm run build

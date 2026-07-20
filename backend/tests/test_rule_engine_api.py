@@ -14,6 +14,9 @@ from backend.storage import database
 from backend.tests.test_ai_executor import FakeClient
 
 
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+
+
 class RuleEngineApiTest(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
@@ -209,6 +212,41 @@ class RuleEngineApiTest(unittest.TestCase):
             json={"process": "pre_registration", "file_ids": [failed_upload.json()["file_id"]]},
         )
         self.assertEqual(failed_review.status_code, 409)
+
+    def test_actual_registration_export_runs_through_review_api(self):
+        rule = self.script_rule_payload()
+        rule.update(
+            {
+                "rule_id": "ENGINE-ACTUAL-001",
+                "rule_name": "实际申报模板产品名称必填",
+                "table_name": "1.产品基本信息",
+                "field_path": "1.产品基本信息.信托产品全称",
+            }
+        )
+        self.assertEqual(self.client.post("/api/rule-library/rules", json=rule).status_code, 200)
+        uploaded = self.client.post(
+            "/api/rule-engine/materials",
+            data={"process": "pre_registration"},
+            files={
+                "file": (
+                    "新预登记.json",
+                    (PROJECT_ROOT / "申请模版json样例" / "新预登记.json").read_bytes(),
+                    "application/json",
+                )
+            },
+        )
+        self.assertEqual(uploaded.status_code, 200, uploaded.text)
+        self.assertEqual(uploaded.json()["material_type"], "申报模板")
+        created = self.client.post(
+            "/api/rule-engine/reviews",
+            json={
+                "process": "pre_registration",
+                "file_ids": [uploaded.json()["file_id"]],
+            },
+        )
+        self.assertEqual(created.status_code, 202, created.text)
+        final = self.wait_for_status(created.json()["task_id"], {"done"})
+        self.assertEqual(final["status_counts"]["passed"], 1)
 
 
 if __name__ == "__main__":

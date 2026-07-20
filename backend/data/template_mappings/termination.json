@@ -1,0 +1,283 @@
+{
+  "mapping_version": "2026-07-20.1",
+  "process": "termination",
+  "request_type": "4",
+  "supported_versions": [
+    "dc.v2401.1"
+  ],
+  "main_container": "pro_termina_regi",
+  "source_workbook": "新终止登记.xlsm",
+  "source_sha256": "f61283ec78b5503b9ffc407db041e2fb79a7b6f9aa8623606d5940c5d02eec04",
+  "containers": {
+    "pro_termina_regi": {
+      "sectioned_object": true,
+      "fields": {
+        "djlx": {
+          "name": "登记类型",
+          "section": "产品基本信息",
+          "component_type": "5",
+          "binding": "dict_登记类型",
+          "multiple": false,
+          "values": {
+            "4": "终止登记"
+          }
+        },
+        "xtdjxtcpbm": {
+          "name": "信托登记系统产品编码",
+          "section": "产品基本信息",
+          "component_type": "27",
+          "binding": "",
+          "multiple": false
+        },
+        "xtcpqc": {
+          "name": "信托产品全称",
+          "section": "产品基本信息",
+          "component_type": "27",
+          "binding": "",
+          "multiple": false
+        },
+        "xtjgmc": {
+          "name": "信托机构名称",
+          "section": "产品基本信息",
+          "component_type": "5",
+          "binding": "信托机构名称new",
+          "multiple": false,
+          "values": {
+            "D10001000000": "安徽国元信托有限责任公司",
+            "D10002000002": "建元信托股份有限公司",
+            "D10003000004": "百瑞信托有限责任公司",
+            "D10004000006": "北方国际信托股份有限公司",
+            "D10005000008": "北京国际信托有限公司",
+            "D10006000001": "渤海国际信托股份有限公司",
+            "D10007000001": "长安国际信托股份有限公司",
+            "D10008000003": "长城新盛信托有限责任公司",
+            "D10009000005": "重庆国际信托股份有限公司",
+            "D10010000007": "大业信托有限责任公司",
+            "D10011000009": "东莞信托有限公司",
+            "D10012000000": "国通信托有限责任公司",
+            "D10013000002": "光大兴陇信托有限责任公司",
+            "D10014000004": "广东粤财信托有限公司",
+            "D10015000006": "国联信托股份有限公司",
+            "D10016000008": "国民信托有限公司",
+            "D10017000001": "国投泰康信托有限公司",
+            "D10018000001": "杭州工商信托股份有限公司",
+            "D10019000003": "湖南省财信信托有限责任公司",
+            "D10020000005": "华澳国际信托有限公司",
+            "D10021000007": "华宝信托有限责任公司",
+            "D10022000009": "华宸信托有限责任公司",
+            "D10023000000": "华能贵诚信托有限公司",
+            "D10024000002": "华融国际信托有限责任公司",
+            "D10025000004": "华润深国投信托有限公司",
+            "D10026000006": "华鑫国际信托有限公司",
+            "D10027000008": "华信信托股份有限公司",
+            "D10028000001": "吉林省信托有限责任公司",
+            "D10029000001": "建信信托有限责任公司",
+            "D10030000003": "江苏省国际信托有限责任公司",
+            "D10031000005": "交银国际信托有限公司",
+            "D10032000007": "昆仑信托有限责任公司",
+            "D10033000009": "陆家嘴国际信托有限公司",
+            "D10034000000": "平安信托有限责任公司",
+            "D10035000002": "山东省国际信托股份有限公司",
+            "D10036000004": "山西信托股份有限公司",
+            "D10037000006": "陕西省国际信托股份有限公司",
+            "D10038000008": "上海爱建信托有限责任公司",
+            "D10039000001": "上海国际信托有限公司",
+            "D10040000001": "四川信托有限公司",
+            "D10041000003": "苏州信托有限公司",
+            "D10042000005": "天津信托有限责任公司",
+            "D10043000007": "万向信托股份公司",
+            "D10044000009": "五矿国际信托有限公司",
+            "D10045000000": "西部信托有限公司",
+            "D10046000002": "西藏信托有限公司",
+            "D10047000004": "厦门国际信托有限公司",
+            "D10049000008": "新时代信托股份有限公司",
+            "D10050000001": "兴业国际信托有限公司",
+            "D10051000001": "英大国际信托有限责任公司",
+            "D10052000003": "云南国际信托有限公司",
+            "D10053000005": "浙商金汇信托股份有限公司",
+            "D10054000007": "中诚信托有限责任公司",
+            "D10055000009": "中国对外经济贸易信托有限公司",
+            "D10056000000": "中国金谷国际信托有限责任公司",
+            "D10057000002": "中国民生信托有限公司",
+            "D10058000004": "中海信托股份有限公司",
+            "D10059000006": "中航信托股份有限公司",
+            "D10060000008": "中建投信托股份有限公司",
+            "D10061000001": "雪松国际信托股份有限公司",
+            "D10062000001": "中粮信托有限责任公司",
+            "D10063000003": "中融国际信托有限公司",
+            "D10064000005": "中泰信托有限责任公司",
+            "D10065000007": "中铁信托有限责任公司",
+            "D10066000009": "中信信托有限责任公司",
+            "D10067000000": "中原信托有限公司",
+            "D10068000002": "紫金信托有限责任公司",
+            "D19999000007": "中国信托业保障基金有限责任公司"
+          }
+        },
+        "qsbgrq": {
+          "name": "清算报告日期",
+          "section": "期限信息",
+          "component_type": "4",
+          "binding": "",
+          "multiple": false
+        },
+        "sjdqrq": {
+          "name": "实际到期日期",
+          "section": "期限信息",
+          "component_type": "4",
+          "binding": "",
+          "multiple": false
+        },
+        "sfaydrqqs": {
+          "name": "是否按约定日期清算",
+          "section": "期限信息",
+          "component_type": "5",
+          "binding": "dict_是否",
+          "multiple": false,
+          "values": {
+            "1": "是",
+            "0": "否"
+          }
+        },
+        "xmztylqk": {
+          "name": "项目整体盈亏情况",
+          "section": "期限信息",
+          "component_type": "5",
+          "binding": "dict_项目整体盈亏情况",
+          "multiple": false,
+          "values": {
+            "0": "整体盈利",
+            "1": "整体亏损",
+            "2": "整体盈亏平衡"
+          }
+        },
+        "sfywcxtccfp": {
+          "name": "是否已完成信托财产分配",
+          "section": "期限信息",
+          "component_type": "5",
+          "binding": "dict_是否",
+          "multiple": false,
+          "values": {
+            "1": "是",
+            "0": "否"
+          }
+        },
+        "sfywcxh": {
+          "name": "是否已完成销户",
+          "section": "期限信息",
+          "component_type": "5",
+          "binding": "dict_是否",
+          "multiple": false,
+          "values": {
+            "1": "是",
+            "0": "否"
+          }
+        },
+        "ljssxt": {
+          "name": "累计实收信托",
+          "section": "财务信息",
+          "component_type": "T100",
+          "binding": "",
+          "multiple": false
+        },
+        "rjssxt": {
+          "name": "日均实收信托",
+          "section": "财务信息",
+          "component_type": "T100",
+          "binding": "",
+          "multiple": false
+        },
+        "sjsy": {
+          "name": "实际收益",
+          "section": "财务信息",
+          "component_type": "T100",
+          "binding": "",
+          "multiple": false
+        },
+        "xtfy": {
+          "name": "信托费用",
+          "section": "财务信息",
+          "component_type": "T100",
+          "binding": "",
+          "multiple": false
+        },
+        "strljjbbc": {
+          "name": "受托人累计基本报酬",
+          "section": "财务信息",
+          "component_type": "T100",
+          "binding": "",
+          "multiple": false
+        },
+        "strljyjbc": {
+          "name": "受托人累计业绩报酬",
+          "section": "财务信息",
+          "component_type": "T100",
+          "binding": "",
+          "multiple": false
+        },
+        "xtsyljfpe": {
+          "name": "信托收益累计分配额",
+          "section": "财务信息",
+          "component_type": "T100",
+          "binding": "",
+          "multiple": false
+        },
+        "xtbjljgfe": {
+          "name": "信托本金累计给付额",
+          "section": "财务信息",
+          "component_type": "T100",
+          "binding": "",
+          "multiple": false
+        },
+        "xtfyl": {
+          "name": "信托费用率",
+          "section": "财务信息",
+          "component_type": "T100",
+          "binding": "",
+          "multiple": false
+        },
+        "sjxtbcl": {
+          "name": "实际信托报酬率",
+          "section": "财务信息",
+          "component_type": "T100",
+          "binding": "",
+          "multiple": false
+        },
+        "sjsyl": {
+          "name": "实际收益率",
+          "section": "财务信息",
+          "component_type": "T100",
+          "binding": "",
+          "multiple": false
+        },
+        "sunshijine": {
+          "name": "损失金额",
+          "section": "财务信息",
+          "component_type": "T100",
+          "binding": "",
+          "multiple": false
+        },
+        "shesujine": {
+          "name": "涉诉金额",
+          "section": "财务信息",
+          "component_type": "T100",
+          "binding": "",
+          "multiple": false
+        },
+        "pfje": {
+          "name": "赔付金额",
+          "section": "财务信息",
+          "component_type": "T100",
+          "binding": "",
+          "multiple": false
+        },
+        "ywxxsm": {
+          "name": "业务信息说明",
+          "section": "其他信息",
+          "component_type": "27",
+          "binding": "",
+          "multiple": false
+        }
+      }
+    }
+  }
+}

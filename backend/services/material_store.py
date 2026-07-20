@@ -72,12 +72,17 @@ def list_materials(process: Optional[str] = None) -> list[dict[str, Any]]:
     return sorted(output, key=lambda item: (item.get("uploaded_at", 0), item.get("file_id", "")), reverse=True)
 
 
-def find_duplicate(original_name: str, material_type: str, process: str) -> Optional[dict[str, Any]]:
+def find_duplicate(
+    original_name: str,
+    material_type: Optional[str],
+    process: str,
+) -> Optional[dict[str, Any]]:
     return next(
         (
             item
             for item in list_materials(process)
-            if item.get("original_name") == original_name and item.get("material_type") == material_type
+            if item.get("original_name") == original_name
+            and (material_type is None or item.get("material_type") == material_type)
         ),
         None,
     )
@@ -87,7 +92,7 @@ def begin_material_upload(original_name: str, process: str, material_type: Optio
     safe_name = Path(original_name).name
     effective_type = material_type or guess_material_type(safe_name)
     with _LOCK:
-        if find_duplicate(safe_name, effective_type, process):
+        if find_duplicate(safe_name, effective_type if material_type else None, process):
             raise DuplicateMaterialError(f"该文件（{safe_name}）已存在于当前流程，不允许重复添加")
         file_id = uuid.uuid4().hex[:12]
         directory = _material_dir(file_id)
@@ -106,6 +111,11 @@ def begin_material_upload(original_name: str, process: str, material_type: Optio
             "parse_error": None,
             "segments_count": 0,
             "file_kind": "unknown",
+            "parser_profile": "",
+            "template_version": "",
+            "request_type": "",
+            "mapping_version": "",
+            "parse_warnings": [],
         }
         _atomic_write_json(directory / "meta.json", metadata)
         return metadata, staging_path
@@ -129,7 +139,11 @@ def finish_material_upload(file_id: str, staging_path: Path, size_bytes: int) ->
         _atomic_write_json(_material_dir(file_id) / "meta.json", metadata)
 
     try:
-        extracted = parse_material(final_path, metadata["material_type"])
+        extracted = parse_material(
+            final_path,
+            metadata["material_type"],
+            metadata["process"],
+        )
         extracted.material_name = metadata["original_name"]
         extracted.size_bytes = size_bytes
         _atomic_write_json(_material_dir(file_id) / "extracted.json", extracted.model_dump(mode="json"))
@@ -138,6 +152,12 @@ def finish_material_upload(file_id: str, staging_path: Path, size_bytes: int) ->
                 "parse_status": "已解析",
                 "segments_count": len(extracted.segments),
                 "file_kind": extracted.file_kind,
+                "material_type": extracted.material_type,
+                "parser_profile": extracted.parser_profile,
+                "template_version": extracted.template_version,
+                "request_type": extracted.request_type,
+                "mapping_version": extracted.mapping_version,
+                "parse_warnings": extracted.parse_warnings,
             }
         )
     except Exception as error:

@@ -2,10 +2,15 @@ from __future__ import annotations
 
 import unittest
 from datetime import date, timedelta
+from pathlib import Path
 
 from backend.executors.script_executor import execute_rule, execute_rules
 from backend.models.schemas import ExtractedMaterial, MaterialSegment
 from backend.services.rule_library import LibraryRule
+from backend.services.material_parser import parse_material
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 
 def make_rule(operator: str, params=None, field="表.A", rule_id=None) -> LibraryRule:
@@ -216,6 +221,26 @@ class ScriptExecutorTest(unittest.TestCase):
         result = execute_rule(rule, source)
         self.assertEqual(result.status, "failed")
         self.assertEqual([item.location for item in result.evidence], ["明细[1].类型"])
+
+    def test_actual_export_chinese_paths_match_script_rules(self):
+        material = parse_material(
+            PROJECT_ROOT / "申请模版json样例" / "新预登记.json",
+            process="pre_registration",
+        )
+        required = make_rule("required", field="1.产品基本信息.信托产品全称")
+        registration_type = make_rule(
+            "enum",
+            {"values": ["预登记", "初始登记"]},
+            "1.产品基本信息.登记类型",
+        )
+        repeated_enum = make_rule(
+            "enum",
+            {"values": ["资金投向", "受托财产"]},
+            "4.底层资产及交易对手.资产取得方式",
+        )
+        for rule in (required, registration_type, repeated_enum):
+            with self.subTest(rule=rule.field_path):
+                self.assertEqual(execute_rule(rule, [material]).status, "passed")
 
     def test_compound_condition_subtypes(self):
         checks = [
